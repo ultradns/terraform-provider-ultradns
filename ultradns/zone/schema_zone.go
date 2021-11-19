@@ -25,18 +25,21 @@ func zoneSchema() map[string]*schema.Schema {
 			Type:     schema.TypeSet,
 			Optional: true,
 			MaxItems: 1,
+			Set:      zeroIndexHash,
 			Elem:     &schema.Resource{Schema: primaryZoneCreateInfoSchema()},
 		},
 		"secondary_create_info": {
 			Type:     schema.TypeSet,
 			Optional: true,
 			MaxItems: 1,
+			Set:      zeroIndexHash,
 			Elem:     &schema.Resource{Schema: secondaryZoneCreateInfo()},
 		},
 		"alias_create_info": {
 			Type:     schema.TypeSet,
 			Optional: true,
 			MaxItems: 1,
+			Set:      zeroIndexHash,
 			Elem:     &schema.Resource{Schema: aliasZoneCreateInfo()},
 		},
 	}
@@ -253,4 +256,8 @@ func zoneDsSchema() map[string]*schema.Schema {
 			},
 		},
 	}
+}
+
+func zeroIndexHash(v interface{}) int {
+	return 0
 }
