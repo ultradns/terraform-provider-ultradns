@@ -1,9 +1,8 @@
-package zone
+package ultradns
 
 import (
-	ultradns "terraform-provider-ultradns/udnssdk"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/ultradns-go-sdk/ultradns"
 )
 
 func mapZoneSchema(zr *ultradns.ZoneResponse, rd *schema.ResourceData) error {
@@ -130,52 +129,6 @@ func mapAliasZoneSchema(zr *ultradns.ZoneResponse, rd *schema.ResourceData) erro
 	set.Add(aliasCreateInfo)
 
 	if err := rd.Set("alias_create_info", set); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func mapZoneDataSourceSchema(zlr *ultradns.ZoneListResponse, rd *schema.ResourceData) error {
-
-	if err := rd.Set("sort", zlr.QueryInfo.Sort); err != nil {
-		return err
-	}
-
-	if err := rd.Set("reverse", zlr.QueryInfo.Reverse); err != nil {
-		return err
-	}
-
-	if err := rd.Set("limit", zlr.QueryInfo.Limit); err != nil {
-		return err
-	}
-
-	if err := rd.Set("total_count", zlr.ResultInfo.TotalCount); err != nil {
-		return err
-	}
-
-	if err := rd.Set("returned_count", zlr.ResultInfo.ReturnedCount); err != nil {
-		return err
-	}
-
-	if err := rd.Set("offset", zlr.ResultInfo.Offset); err != nil {
-		return err
-	}
-
-	zones := make([]interface{}, zlr.ResultInfo.ReturnedCount, zlr.ResultInfo.ReturnedCount)
-
-	for i, zone := range *zlr.Zones {
-		prop := make(map[string]interface{})
-
-		prop["name"] = zone.Properties.Name
-		prop["account_name"] = zone.Properties.AccountName
-		prop["type"] = zone.Properties.Type
-
-		zones[i] = prop
-
-	}
-
-	if err := rd.Set("zones", zones); err != nil {
 		return err
 	}
 

@@ -7,9 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	"terraform-provider-ultradns/ultradns/zone"
-
-	ultradns "terraform-provider-ultradns/udnssdk"
+	"github.com/ultradns/ultradns-go-sdk/ultradns"
 )
 
 func Provider() *schema.Provider {
@@ -52,10 +50,10 @@ func Provider() *schema.Provider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"ultradns_zone": zone.ResourceZone(),
+			"ultradns_zone": ResourceZone(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"ultradns_zone": zone.DataSourceZone(),
+			"ultradns_zone": DataSourceZone(),
 		},
 	}
 }

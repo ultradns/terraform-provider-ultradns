@@ -1,4 +1,4 @@
-package zone
+package ultradns
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-	ultradns "terraform-provider-ultradns/udnssdk"
+	"github.com/ultradns/ultradns-go-sdk/ultradns"
 )
 
 func ResourceZone() *schema.Resource {
@@ -23,6 +23,83 @@ func ResourceZone() *schema.Resource {
 
 		Schema: zoneSchema(),
 	}
+}
+
+func resourceZoneCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	client := meta.(*ultradns.Client)
+	zone := newZone(rd)
+
+	_, err := client.CreateZone(zone)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	rd.SetId(zone.Properties.Name)
+
+	return resourceZoneRead(ctx, rd, meta)
+}
+
+func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	client := meta.(*ultradns.Client)
+	zoneId := rd.Id()
+
+	_, zoneType, zoneResponse, err := client.ReadZone(zoneId)
+
+	if err != nil {
+		rd.SetId("")
+		return nil
+	}
+
+	switch zoneType {
+	case "PRIMARY":
+		if er := mapPrimaryZoneSchema(zoneResponse, rd); er != nil {
+			return diag.FromErr(er)
+		}
+	case "SECONDARY":
+		if er := mapSecondaryZoneSchema(zoneResponse, rd); er != nil {
+			return diag.FromErr(er)
+		}
+	case "ALIAS":
+		if er := mapAliasZoneSchema(zoneResponse, rd); er != nil {
+			return diag.FromErr(er)
+		}
+	}
+
+	return diags
+}
+
+func resourceZoneUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	client := meta.(*ultradns.Client)
+	zoneId := rd.Id()
+
+	zone := newZone(rd)
+
+	_, err := client.UpdateZone(zoneId, zone)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return resourceZoneRead(ctx, rd, meta)
+}
+
+func resourceZoneDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	client := meta.(*ultradns.Client)
+	zoneId := rd.Id()
+
+	_, err := client.DeleteZone(zoneId)
+	if err != nil {
+		rd.SetId("")
+		return diag.FromErr(err)
+	}
+
+	rd.SetId("")
+	return diags
 }
 
 func newZone(rd *schema.ResourceData) ultradns.Zone {
@@ -242,80 +319,4 @@ func getAliasCreateInfo(rd *schema.ResourceData) *ultradns.AliasZone {
 		aliasCreateInfo.OriginalZoneName = data["original_zone_name"].(string)
 	}
 	return aliasCreateInfo
-}
-
-func resourceZoneCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ultradns.Client)
-	zone := newZone(rd)
-
-	_, err := client.CreateZone(zone)
-
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	rd.SetId(zone.Properties.Name)
-
-	return resourceZoneRead(ctx, rd, meta)
-}
-
-func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	client := meta.(*ultradns.Client)
-	zoneId := rd.Id()
-
-	_, zoneType, zoneResponse, err := client.ReadZone(zoneId)
-
-	if err != nil {
-		rd.SetId("")
-		return nil
-	}
-
-	switch zoneType {
-	case "PRIMARY":
-		if er := mapPrimaryZoneSchema(zoneResponse, rd); er != nil {
-			return diag.FromErr(er)
-		}
-	case "SECONDARY":
-		if er := mapSecondaryZoneSchema(zoneResponse, rd); er != nil {
-			return diag.FromErr(er)
-		}
-	case "ALIAS":
-		if er := mapAliasZoneSchema(zoneResponse, rd); er != nil {
-			return diag.FromErr(er)
-		}
-	}
-
-	return diags
-}
-
-func resourceZoneUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ultradns.Client)
-	zoneId := rd.Id()
-
-	zone := newZone(rd)
-
-	_, err := client.UpdateZone(zoneId, zone)
-
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	return resourceZoneRead(ctx, rd, meta)
-}
-
-func resourceZoneDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	client := meta.(*ultradns.Client)
-	zoneId := rd.Id()
-
-	_, err := client.DeleteZone(zoneId)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	rd.SetId("")
-	return diags
 }

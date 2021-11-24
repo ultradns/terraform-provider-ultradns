@@ -1,10 +1,11 @@
-package zone
+package ultradns
 
 import (
 	"context"
 	"strconv"
-	ultradns "terraform-provider-ultradns/udnssdk"
 	"time"
+
+	"github.com/ultradns/ultradns-go-sdk/ultradns"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -15,7 +16,7 @@ func DataSourceZone() *schema.Resource {
 
 		ReadContext: dataSourceZoneRead,
 
-		Schema: zoneDsSchema(),
+		Schema: dataSourceZoneSchema(),
 	}
 }
 
@@ -24,7 +25,7 @@ func dataSourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta inter
 
 	client := meta.(*ultradns.Client)
 
-	param := getUrlParameters(rd)
+	param := getZoneListUrlParameters(rd)
 
 	_, zoneListResponse, err := client.ListZone(param)
 
@@ -41,26 +42,4 @@ func dataSourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	rd.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 
 	return diags
-}
-
-func getUrlParameters(rd *schema.ResourceData) string {
-	param := "?"
-
-	if val, ok := rd.GetOk("query"); ok {
-		param = param + "&q=" + val.(string)
-	}
-
-	if val, ok := rd.GetOk("sort"); ok {
-		param = param + "&sort=" + val.(string)
-	}
-
-	if val, ok := rd.GetOk("reverse"); ok {
-		param = param + "&reverse=" + strconv.FormatBool(val.(bool))
-	}
-
-	if val, ok := rd.GetOk("limit"); ok {
-		param = param + "&limit=" + strconv.Itoa(val.(int))
-	}
-
-	return param
 }
