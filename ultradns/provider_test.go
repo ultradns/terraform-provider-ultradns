@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	testUsername  = os.Getenv("ULTRADNS_USERNAME")
-	testPassword  = os.Getenv("ULTRADNS_PASSWORD")
-	testHost      = os.Getenv("ULTRADNS_HOST_URL")
-	testVersion   = os.Getenv("ULTRADNS_API_VERSION")
-	testUserAgent = os.Getenv("ULTRADNS_USER_AGENT")
+	testUsername  = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME")
+	testPassword  = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD")
+	testHost      = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
+	testVersion   = os.Getenv("ULTRADNS_UNIT_TEST_API_VERSION")
+	testUserAgent = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
 	testZoneName  = os.Getenv("ULTRADNS_UNIT_TEST_ZONE_NAME")
 )
 
@@ -38,7 +38,29 @@ func TestProvider(t *testing.T) {
 }
 
 func TestAccPreCheck(t *testing.T) {
+	if testUsername == "" {
+		t.Fatal("username required")
+	}
 
+	if testPassword == "" {
+		t.Fatal("password required")
+	}
+
+	if testHost == "" {
+		t.Fatal("host required")
+	}
+
+	if testVersion == "" {
+		t.Fatal("version required")
+	}
+
+	if testUserAgent == "" {
+		t.Fatal("user agent required")
+	}
+
+	if testZoneName == "" {
+		t.Fatal("zone name required")
+	}
 }
 
 func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.ResourceData) (interface{}, diag.Diagnostics) {

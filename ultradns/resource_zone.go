@@ -46,13 +46,16 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 	client := meta.(*ultradns.Client)
 	zoneId := rd.Id()
 
-	_, zoneType, zoneResponse, err := client.ReadZone(zoneId)
+	_, zoneResponse, err := client.ReadZone(zoneId)
 
 	if err != nil {
 		rd.SetId("")
 		return nil
 	}
-
+	var zoneType string
+	if zoneResponse.Properties != nil {
+		zoneType = zoneResponse.Properties.Type
+	}
 	switch zoneType {
 	case "PRIMARY":
 		if er := mapPrimaryZoneSchema(zoneResponse, rd); er != nil {
