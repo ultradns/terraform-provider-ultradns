@@ -6,7 +6,9 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/ultradns-go-sdk/ultradns"
 )
 
@@ -30,8 +32,12 @@ func init() {
 	}
 }
 
-func TestProvider(t *testing.T) {
+func TestMain(m *testing.M) {
+	testAccProvider.Configure(context.TODO(), terraform.NewResourceConfigRaw(make(map[string]interface{})))
+	resource.TestMain(m)
+}
 
+func TestProvider(t *testing.T) {
 	if err := Provider().InternalValidate(); err != nil {
 		t.Fatal(err)
 	}
@@ -39,27 +45,27 @@ func TestProvider(t *testing.T) {
 
 func TestAccPreCheck(t *testing.T) {
 	if testUsername == "" {
-		t.Fatal("username required")
+		t.Fatal("username required for creating test client")
 	}
 
 	if testPassword == "" {
-		t.Fatal("password required")
+		t.Fatal("password required for creating test client")
 	}
 
 	if testHost == "" {
-		t.Fatal("host required")
+		t.Fatal("host required for creating test client")
 	}
 
 	if testVersion == "" {
-		t.Fatal("version required")
+		t.Fatal("version required for creating test client")
 	}
 
 	if testUserAgent == "" {
-		t.Fatal("user agent required")
+		t.Fatal("user agent required for creating test client")
 	}
 
 	if testZoneName == "" {
-		t.Fatal("zone name required")
+		t.Fatal("zone name required for creating test client")
 	}
 }
 

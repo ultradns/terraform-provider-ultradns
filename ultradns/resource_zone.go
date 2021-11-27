@@ -21,7 +21,7 @@ func ResourceZone() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
-		Schema: zoneSchema(),
+		Schema: resourceZoneSchema(),
 	}
 }
 
@@ -46,28 +46,41 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 	client := meta.(*ultradns.Client)
 	zoneId := rd.Id()
 
-	_, zoneResponse, err := client.ReadZone(zoneId)
+	_, zr, err := client.ReadZone(zoneId)
 
 	if err != nil {
 		rd.SetId("")
 		return nil
 	}
 	var zoneType string
-	if zoneResponse.Properties != nil {
-		zoneType = zoneResponse.Properties.Type
+	if zr.Properties != nil {
+		zoneType = zr.Properties.Type
 	}
+
+	if err := rd.Set("name", zr.Properties.Name); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := rd.Set("account_name", zr.Properties.AccountName); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := rd.Set("type", zr.Properties.Type); err != nil {
+		return diag.FromErr(err)
+	}
+
 	switch zoneType {
 	case "PRIMARY":
-		if er := mapPrimaryZoneSchema(zoneResponse, rd); er != nil {
-			return diag.FromErr(er)
+		if err := rd.Set("primary_create_info", flattenPrimaryZone(zr, rd)); err != nil {
+			return diag.FromErr(err)
 		}
 	case "SECONDARY":
-		if er := mapSecondaryZoneSchema(zoneResponse, rd); er != nil {
-			return diag.FromErr(er)
+		if err := rd.Set("secondary_create_info", flattenSecondaryZone(zr, rd)); err != nil {
+			return diag.FromErr(err)
 		}
 	case "ALIAS":
-		if er := mapAliasZoneSchema(zoneResponse, rd); er != nil {
-			return diag.FromErr(er)
+		if err := rd.Set("alias_create_info", flattenAliasZone(zr, rd)); err != nil {
+			return diag.FromErr(err)
 		}
 	}
 
@@ -109,7 +122,7 @@ func newZone(rd *schema.ResourceData) ultradns.Zone {
 
 	var zoneType string
 	zone := ultradns.Zone{}
-	properties := ultradns.ZoneProperties{}
+	properties := &ultradns.ZoneProperties{}
 
 	if val, ok := rd.GetOk("name"); ok {
 		properties.Name = val.(string)
@@ -137,12 +150,13 @@ func newZone(rd *schema.ResourceData) ultradns.Zone {
 		zone.AliasCreateInfo = getAliasCreateInfo(rd)
 	}
 
-	zone.Properties = &properties
+	zone.Properties = properties
 	return zone
 }
 
 func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 	primaryCreateInfo := &ultradns.PrimaryZone{}
+
 	if val, ok := rd.GetOk("primary_create_info"); ok && val.(*schema.Set).Len() > 0 {
 		createInfoData := val.(*schema.Set).List()[0].(map[string]interface{})
 
@@ -208,8 +222,8 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 
 		if val, ok := createInfoData["restrict_ip"]; ok && val.(*schema.Set).Len() > 0 {
 			restrictIpDataList := val.(*schema.Set).List()
-			restrictIpList := make([]ultradns.RestrictIp, len(restrictIpDataList))
-			primaryCreateInfo.RestrictIPList = &restrictIpList
+			restrictIpList := make([]*ultradns.RestrictIp, len(restrictIpDataList))
+			primaryCreateInfo.RestrictIPList = restrictIpList
 			for i, d := range restrictIpDataList {
 				restrictIpData := d.(map[string]interface{})
 				restrictIp := ultradns.RestrictIp{}
@@ -233,14 +247,14 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 				if val, ok := restrictIpData["comment"]; ok {
 					restrictIp.Comment = val.(string)
 				}
-				restrictIpList[i] = restrictIp
+				restrictIpList[i] = &restrictIp
 			}
 		}
 
 		if val, ok := createInfoData["notify_addresses"]; ok && val.(*schema.Set).Len() > 0 {
 			notifyAddressDataList := val.(*schema.Set).List()
-			notifyAddressList := make([]ultradns.NotifyAddress, len(notifyAddressDataList))
-			primaryCreateInfo.NotifyAddresses = &notifyAddressList
+			notifyAddressList := make([]*ultradns.NotifyAddress, len(notifyAddressDataList))
+			primaryCreateInfo.NotifyAddresses = notifyAddressList
 
 			for i, d := range notifyAddressDataList {
 				notifyAddressData := d.(map[string]interface{})
@@ -254,7 +268,7 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 					notifyAddress.Description = val.(string)
 				}
 
-				notifyAddressList[i] = notifyAddress
+				notifyAddressList[i] = &notifyAddress
 			}
 		}
 
@@ -264,6 +278,7 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 
 func getSecondaryCreateInfo(rd *schema.ResourceData) *ultradns.SecondaryZone {
 	secondaryCreateInfo := &ultradns.SecondaryZone{}
+
 	if val, ok := rd.GetOk("secondary_create_info"); ok && val.(*schema.Set).Len() > 0 {
 		createInfoData := val.(*schema.Set).List()[0].(map[string]interface{})
 
@@ -317,6 +332,7 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *ultradns.SecondaryZone {
 
 func getAliasCreateInfo(rd *schema.ResourceData) *ultradns.AliasZone {
 	aliasCreateInfo := &ultradns.AliasZone{}
+
 	if val, ok := rd.GetOk("alias_create_info"); ok && val.(*schema.Set).Len() > 0 {
 		data := val.(*schema.Set).List()[0].(map[string]interface{})
 		aliasCreateInfo.OriginalZoneName = data["original_zone_name"].(string)

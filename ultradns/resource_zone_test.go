@@ -4,28 +4,26 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/ultradns-go-sdk/ultradns"
 )
 
 func TestAccZone(t *testing.T) {
-	var primaryZone ultradns.ZoneResponse
-	resourceName := "ultradns_zone.primary"
+	zoneName := fmt.Sprintf("test-acc-%s.com.", acctest.RandString(5))
 	tc := resource.TestCase{
-		PreCheck:  func() { TestAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { TestAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccZonePrimary_create_new(testZoneName),
+				Config: testAccZonePrimary_create_new(zoneName, testUsername),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", testZoneName),
-					resource.TestCheckResourceAttr(resourceName, "account_name", "teamrest"),
-					resource.TestCheckResourceAttr(resourceName, "type", "PRIMARY"),
-					testAccCheckZonePrimary(resourceName, &primaryZone),
-					testAccCheckZonePrimary_tsig(resourceName, &primaryZone),
-					testAccCheckZonePrimary_notify_address(resourceName, &primaryZone),
-					estAccCheckZonePrimary_restrict_ip(resourceName, &primaryZone),
+					resource.TestCheckResourceAttr("ultradns_zone.primary", "name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_zone.primary", "account_name", testUsername),
+					resource.TestCheckResourceAttr("ultradns_zone.primary", "type", "PRIMARY"),
+					testAccCheckZoneExists("ultradns_zone.primary"),
 				),
 			},
 		},
@@ -33,7 +31,7 @@ func TestAccZone(t *testing.T) {
 	resource.Test(t, tc)
 }
 
-func testAccCheckZonePrimary(n string, primaryZone *ultradns.ZoneResponse) resource.TestCheckFunc {
+func testAccCheckZoneExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -59,39 +57,41 @@ func testAccCheckZonePrimary(n string, primaryZone *ultradns.ZoneResponse) resou
 			return fmt.Errorf("zone type mismactched expected : %v - returned : %v", zoneTypeExpected, zoneResponse.Properties.Type)
 		}
 
-		primaryZone = zoneResponse
-
-		return nil
-	}
-}
-
-func testAccCheckZonePrimary_tsig(n string, primaryZone *ultradns.ZoneResponse) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+		if zoneAccountExpected, ok := rs.Primary.Attributes["account_name"]; !ok || zoneAccountExpected != zoneResponse.Properties.AccountName {
+			return fmt.Errorf("zone account mismactched expected : %v - returned : %v", zoneAccountExpected, zoneResponse.Properties.AccountName)
 		}
+
 		return nil
 	}
 }
 
-func testAccCheckZonePrimary_notify_address(n string, primaryZone *ultradns.ZoneResponse) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		return nil
+func testAccCheckZoneDestroy(s *terraform.State) error {
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "ultradns_zone" {
+			continue
+		}
+
+		client := testAccProvider.Meta().(*ultradns.Client)
+		res, zoneResponse, err := client.ReadZone(rs.Primary.ID)
+		if err == nil {
+			if zoneResponse.Properties != nil && zoneResponse.Properties.Name == rs.Primary.ID {
+				return fmt.Errorf("zone %v not destroyed!", rs.Primary.ID)
+			}
+			return nil
+		}
+		if res.StatusCode != 404 {
+			return err
+		}
 	}
+
+	return nil
 }
 
-func estAccCheckZonePrimary_restrict_ip(n string, primaryZone *ultradns.ZoneResponse) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		return nil
-	}
-}
-
-func testAccZonePrimary_create_new(zoneName string) string {
+func testAccZonePrimary_create_new(zoneName, accountName string) string {
 	return fmt.Sprintf(`
 	resource "ultradns_zone" "primary" {
 		name        = "%s"
-		account_name = "teamrest"
+		account_name = "%s"
 		type        = "PRIMARY"
 		primary_create_info {
 			create_type = "NEW"
@@ -114,5 +114,19 @@ func testAccZonePrimary_create_new(zoneName string) string {
 			}
 		}
 	}
-	`, zoneName)
+	`, zoneName, accountName)
+}
+
+func testAccZoneAlias_create_new(zoneName, accountName string) string {
+	return fmt.Sprintf(`
+	resource "ultradns_zone" "alias" {
+		name        = "%s"
+		account_name = "%s"
+		type        = "ALIAS"
+	  
+		alias_create_info {
+			  original_zone_name = "0-0-0-0-0antony.com."
+		}
+	  }
+	`, zoneName, accountName)
 }

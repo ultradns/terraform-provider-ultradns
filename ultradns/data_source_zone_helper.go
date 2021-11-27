@@ -26,51 +26,23 @@ func getZoneListUrlParameters(rd *schema.ResourceData) string {
 		param = param + "&limit=" + strconv.Itoa(val.(int))
 	}
 
+	if val, ok := rd.GetOk("offset"); ok {
+		param = param + "&offset=" + strconv.Itoa(val.(int))
+	}
+
 	return param
 }
 
-func mapZoneDataSourceSchema(zlr *ultradns.ZoneListResponse, rd *schema.ResourceData) error {
+func flattenZones(zlr []*ultradns.ZoneResponse) []map[string]interface{} {
+	var zones []map[string]interface{}
 
-	if err := rd.Set("sort", zlr.QueryInfo.Sort); err != nil {
-		return err
+	for _, zone := range zlr {
+		data := map[string]interface{}{
+			"name":         zone.Properties.Name,
+			"account_name": zone.Properties.AccountName,
+			"type":         zone.Properties.Type,
+		}
+		zones = append(zones, data)
 	}
-
-	if err := rd.Set("reverse", zlr.QueryInfo.Reverse); err != nil {
-		return err
-	}
-
-	if err := rd.Set("limit", zlr.QueryInfo.Limit); err != nil {
-		return err
-	}
-
-	if err := rd.Set("total_count", zlr.ResultInfo.TotalCount); err != nil {
-		return err
-	}
-
-	if err := rd.Set("returned_count", zlr.ResultInfo.ReturnedCount); err != nil {
-		return err
-	}
-
-	if err := rd.Set("offset", zlr.ResultInfo.Offset); err != nil {
-		return err
-	}
-
-	zones := make([]interface{}, zlr.ResultInfo.ReturnedCount)
-
-	for i, zone := range *zlr.Zones {
-		prop := make(map[string]interface{})
-
-		prop["name"] = zone.Properties.Name
-		prop["account_name"] = zone.Properties.AccountName
-		prop["type"] = zone.Properties.Type
-
-		zones[i] = prop
-
-	}
-
-	if err := rd.Set("zones", zones); err != nil {
-		return err
-	}
-
-	return nil
+	return zones
 }
