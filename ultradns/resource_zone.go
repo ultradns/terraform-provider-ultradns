@@ -83,7 +83,6 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 			return diag.FromErr(err)
 		}
 	}
-
 	return diags
 }
 
@@ -320,9 +319,9 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *ultradns.SecondaryZone {
 				case 0:
 					nameServerIpList.NameServerIp1 = nameServerIp
 				case 1:
-					nameServerIpList.NameServerIp1 = nameServerIp
+					nameServerIpList.NameServerIp2 = nameServerIp
 				case 2:
-					nameServerIpList.NameServerIp1 = nameServerIp
+					nameServerIpList.NameServerIp3 = nameServerIp
 				}
 			}
 		}

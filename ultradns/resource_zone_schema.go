@@ -1,21 +1,26 @@
 package ultradns
 
-import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
 
 func resourceZoneSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
-			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: true,
+			Type:         schema.TypeString,
+			Required:     true,
+			ForceNew:     true,
+			ValidateFunc: validateZoneName,
 		},
 		"account_name": {
 			Type:     schema.TypeString,
 			Required: true,
+			ForceNew: true,
 		},
 		"type": {
 			Type:     schema.TypeString,
 			Required: true,
+			ForceNew: true,
 		},
 		"change_comment": {
 			Type:     schema.TypeString,
@@ -25,21 +30,18 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			Type:     schema.TypeSet,
 			Optional: true,
 			MaxItems: 1,
-			Set:      zeroIndexHash,
 			Elem:     primaryZoneCreateInfoResource(),
 		},
 		"secondary_create_info": {
 			Type:     schema.TypeSet,
 			Optional: true,
 			MaxItems: 1,
-			Set:      zeroIndexHash,
 			Elem:     secondaryZoneCreateInfoResource(),
 		},
 		"alias_create_info": {
 			Type:     schema.TypeSet,
 			Optional: true,
 			MaxItems: 1,
-			Set:      zeroIndexHash,
 			Elem:     aliasZoneCreateInfoResource(),
 		},
 	}
@@ -58,8 +60,9 @@ func primaryZoneCreateInfoResource() *schema.Resource {
 				Default:  true,
 			},
 			"original_zone_name": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validateZoneName,
 			},
 			"inherit": {
 				Type:     schema.TypeString,
@@ -69,14 +72,12 @@ func primaryZoneCreateInfoResource() *schema.Resource {
 				Type:     schema.TypeSet,
 				Optional: true,
 				MaxItems: 1,
-				Set:      zeroIndexHash,
 				Elem:     nameServerResource(),
 			},
 			"tsig": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				MaxItems: 1,
-				Set:      zeroIndexHash,
 				Elem:     tsigResource(),
 			},
 			"restrict_ip": {
@@ -102,9 +103,9 @@ func secondaryZoneCreateInfoResource() *schema.Resource {
 			},
 			"primary_name_server": {
 				Type:     schema.TypeSet,
-				Required: true,
 				MinItems: 1,
 				MaxItems: 3,
+				Optional: true,
 				Elem:     nameServerResource(),
 			},
 		},
@@ -115,8 +116,9 @@ func aliasZoneCreateInfoResource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"original_zone_name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validateZoneName,
 			},
 		},
 	}

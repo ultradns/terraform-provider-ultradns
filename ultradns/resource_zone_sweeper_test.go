@@ -2,6 +2,7 @@ package ultradns
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -29,7 +30,7 @@ func testAccZoneSweeper(r string) error {
 			if strings.HasPrefix(zone.Properties.Name, "test-acc") {
 				_, er := client.DeleteZone(zone.Properties.Name)
 				if er != nil {
-					fmt.Errorf("error destroying %s during sweep: %s", zone.Properties.Name, er)
+					log.Printf("error destroying %s during sweep: %s", zone.Properties.Name, er)
 				}
 			}
 		}

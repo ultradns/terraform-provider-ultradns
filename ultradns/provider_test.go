@@ -18,7 +18,6 @@ var (
 	testHost      = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
 	testVersion   = os.Getenv("ULTRADNS_UNIT_TEST_API_VERSION")
 	testUserAgent = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
-	testZoneName  = os.Getenv("ULTRADNS_UNIT_TEST_ZONE_NAME")
 )
 
 var testAccProviders map[string]*schema.Provider
@@ -64,9 +63,6 @@ func TestAccPreCheck(t *testing.T) {
 		t.Fatal("user agent required for creating test client")
 	}
 
-	if testZoneName == "" {
-		t.Fatal("zone name required for creating test client")
-	}
 }
 
 func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.ResourceData) (interface{}, diag.Diagnostics) {

@@ -1,6 +1,8 @@
 package ultradns
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/ultradns-go-sdk/ultradns"
 )
@@ -8,7 +10,7 @@ import (
 func flattenPrimaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *schema.Set {
 
 	set := &schema.Set{
-		F: zeroIndexHash,
+		F: schema.HashResource(primaryZoneCreateInfoResource()),
 	}
 
 	if val, ok := rd.GetOk("primary_create_info"); ok && val.(*schema.Set).Len() > 0 {
@@ -16,7 +18,7 @@ func flattenPrimaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *sch
 
 		if len(zr.NotifyAddresses) > 0 {
 			s := &schema.Set{
-				F: schema.HashSchema(&schema.Schema{Type: schema.TypeMap}),
+				F: schema.HashResource(notifyAddressResource()),
 			}
 
 			for _, notifyAddressData := range zr.NotifyAddresses {
@@ -34,7 +36,7 @@ func flattenPrimaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *sch
 
 		if len(zr.RestrictIPList) > 0 {
 			s := &schema.Set{
-				F: schema.HashSchema(&schema.Schema{Type: schema.TypeMap}),
+				F: schema.HashResource(restrictIpResource()),
 			}
 
 			for _, restrictIpData := range zr.RestrictIPList {
@@ -62,13 +64,12 @@ func flattenPrimaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *sch
 			tsig["description"] = zr.Tsig.Description
 
 			s := &schema.Set{
-				F: zeroIndexHash,
+				F: schema.HashResource(tsigResource()),
 			}
 
 			s.Add(tsig)
 
 			primaryCreateInfo["tsig"] = s
-
 		}
 
 		set.Add(primaryCreateInfo)
@@ -79,15 +80,41 @@ func flattenPrimaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *sch
 
 func flattenSecondaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *schema.Set {
 	set := &schema.Set{
-		F: zeroIndexHash,
+		F: schema.HashResource(secondaryZoneCreateInfoResource()),
 	}
 
+	if val, ok := rd.GetOk("secondary_create_info"); ok && val.(*schema.Set).Len() > 0 {
+		secondaryCreateInfo := val.(*schema.Set).List()[0].(map[string]interface{})
+
+		if zr.NotificationEmailAddress != "" {
+			secondaryCreateInfo["notification_email_address"] = zr.NotificationEmailAddress
+		}
+
+		if zr.PrimaryNameServers != nil {
+			s := &schema.Set{
+				F: schema.HashResource(nameServerResource()),
+			}
+			if zr.PrimaryNameServers.NameServerIpList != nil {
+				if zr.PrimaryNameServers.NameServerIpList.NameServerIp1 != nil {
+					s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp1))
+				}
+				if zr.PrimaryNameServers.NameServerIpList.NameServerIp2 != nil {
+					s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp2))
+				}
+				if zr.PrimaryNameServers.NameServerIpList.NameServerIp3 != nil {
+					s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp3))
+				}
+			}
+			secondaryCreateInfo["primary_name_server"] = s
+		}
+		set.Add(secondaryCreateInfo)
+	}
 	return set
 }
 
 func flattenAliasZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *schema.Set {
 	set := &schema.Set{
-		F: zeroIndexHash,
+		F: schema.HashResource(aliasZoneCreateInfoResource()),
 	}
 
 	aliasCreateInfo := make(map[string]interface{})
@@ -96,4 +123,21 @@ func flattenAliasZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *schem
 	set.Add(aliasCreateInfo)
 
 	return set
+}
+
+func getNameServer(ns *ultradns.NameServerIp) map[string]interface{} {
+	nameserver := make(map[string]interface{})
+	nameserver["ip"] = ns.Ip
+	nameserver["tsig_key"] = ns.TsigKey
+	nameserver["tsig_key_value"] = ns.TsigKeyValue
+	nameserver["tsig_algorithm"] = ns.TsigAlgorithm
+	return nameserver
+}
+
+func validateZoneName(i interface{}, s string) (warns []string, errs []error) {
+	zoneName := i.(string)
+	if lastChar := zoneName[len(zoneName)-1]; lastChar != '.' {
+		errs = append(errs, fmt.Errorf("zone name must be a FQDN"))
+	}
+	return
 }

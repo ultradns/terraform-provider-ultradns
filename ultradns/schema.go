@@ -7,22 +7,27 @@ func resultInfoSchema() map[string]*schema.Schema {
 		"query": {
 			Type:     schema.TypeString,
 			Optional: true,
+			ForceNew: true,
 		},
 		"sort": {
 			Type:     schema.TypeString,
 			Optional: true,
+			ForceNew: true,
 		},
 		"reverse": {
 			Type:     schema.TypeBool,
 			Optional: true,
+			ForceNew: true,
 		},
 		"limit": {
 			Type:     schema.TypeInt,
 			Optional: true,
+			ForceNew: true,
 		},
 		"offset": {
 			Type:     schema.TypeInt,
 			Optional: true,
+			ForceNew: true,
 		},
 		"total_count": {
 			Type:     schema.TypeInt,

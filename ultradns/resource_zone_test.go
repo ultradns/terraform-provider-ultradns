@@ -10,7 +10,7 @@ import (
 	"github.com/ultradns/ultradns-go-sdk/ultradns"
 )
 
-func TestAccZone(t *testing.T) {
+func TestAccZoneResource(t *testing.T) {
 	zoneName := fmt.Sprintf("test-acc-%s.com.", acctest.RandString(5))
 	tc := resource.TestCase{
 		PreCheck:     func() { TestAccPreCheck(t) },
@@ -20,10 +20,28 @@ func TestAccZone(t *testing.T) {
 			{
 				Config: testAccZonePrimary_create_new(zoneName, testUsername),
 				Check: resource.ComposeTestCheckFunc(
+					testAccCheckZoneExists("ultradns_zone.primary"),
 					resource.TestCheckResourceAttr("ultradns_zone.primary", "name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_zone.primary", "account_name", testUsername),
 					resource.TestCheckResourceAttr("ultradns_zone.primary", "type", "PRIMARY"),
-					testAccCheckZoneExists("ultradns_zone.primary"),
+				),
+			},
+			{
+				Config: testAccZoneSecondary_create_new("d100-permission.com.", testUsername),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckZoneExists("ultradns_zone.secondary"),
+					resource.TestCheckResourceAttr("ultradns_zone.secondary", "name", "d100-permission.com."),
+					resource.TestCheckResourceAttr("ultradns_zone.secondary", "account_name", testUsername),
+					resource.TestCheckResourceAttr("ultradns_zone.secondary", "type", "SECONDARY"),
+				),
+			},
+			{
+				Config: testAccZoneAlias_create_new(zoneName, testUsername),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckZoneExists("ultradns_zone.alias"),
+					resource.TestCheckResourceAttr("ultradns_zone.alias", "name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_zone.alias", "account_name", testUsername),
+					resource.TestCheckResourceAttr("ultradns_zone.alias", "type", "ALIAS"),
 				),
 			},
 		},
@@ -111,6 +129,21 @@ func testAccZonePrimary_create_new(zoneName, accountName string) string {
 			}
 			restrict_ip {
 				single_ip = "192.168.1.4"
+			}
+		}
+	}
+	`, zoneName, accountName)
+}
+
+func testAccZoneSecondary_create_new(zoneName, accountName string) string {
+	return fmt.Sprintf(`
+	resource "ultradns_zone" "secondary" {
+		name        = "%s"
+		account_name = "%s"
+		type        = "SECONDARY"
+		secondary_create_info {
+			primary_name_server {
+				ip = "e2e-bind-useast1a01-01.dev.ultradns.net"
 			}
 		}
 	}
