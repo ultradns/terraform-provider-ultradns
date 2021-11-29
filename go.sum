@@ -392,8 +392,8 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/ulikunitz/xz v0.5.8/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0oWt/14=
 github.com/ulikunitz/xz v0.5.10 h1:t92gobL9l3HE202wg3rlk19F6X+JOxl9BBrCCMYEYd8=
 github.com/ulikunitz/xz v0.5.10/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0oWt/14=
-github.com/ultradns/ultradns-go-sdk v0.0.4-alpha h1:sxZhC1OLjAIYQhg73UuH0MN921nxSPS1I560UFeqH+g=
-github.com/ultradns/ultradns-go-sdk v0.0.4-alpha/go.mod h1:HpAe4exYlaZ4/nLj1RpTo7CrRjCyUovENLHMHdtB8eA=
+github.com/ultradns/ultradns-go-sdk v0.0.5-alpha h1:Gib5m6Q67TzCdflWywOmwNM9+RAvczW8lFM7k7zj4jc=
+github.com/ultradns/ultradns-go-sdk v0.0.5-alpha/go.mod h1:HpAe4exYlaZ4/nLj1RpTo7CrRjCyUovENLHMHdtB8eA=
 github.com/vmihailenco/msgpack v3.3.3+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
 github.com/vmihailenco/msgpack v4.0.4+incompatible h1:dSLoQfGFAo3F6OoNhwUmLwVgaUXK79GlxNBwueZn0xI=
 github.com/vmihailenco/msgpack v4.0.4+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
