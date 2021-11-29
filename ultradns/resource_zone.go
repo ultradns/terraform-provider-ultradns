@@ -69,6 +69,12 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 		return diag.FromErr(err)
 	}
 
+	if zr.Properties.ChangeComment != "" {
+		if err := rd.Set("change_comment", zr.Properties.ChangeComment); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
 	switch zoneType {
 	case "PRIMARY":
 		if err := rd.Set("primary_create_info", flattenPrimaryZone(zr, rd)); err != nil {

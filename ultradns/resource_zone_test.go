@@ -44,6 +44,14 @@ func TestAccZoneResource(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_zone.alias", "type", "ALIAS"),
 				),
 			},
+			{
+				Config: testAccZone_import(zoneName, testUsername),
+			},
+			{
+				ResourceName:     "ultradns_zone.importdata",
+				ImportState:      true,
+				ImportStateCheck: testAccZoneImportStateCheck(zoneName, testUsername),
+			},
 		},
 	}
 	resource.Test(t, tc)
@@ -105,6 +113,25 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 	return nil
 }
 
+func testAccZoneImportStateCheck(zoneName, accountName string) func(is []*terraform.InstanceState) error {
+	return func(is []*terraform.InstanceState) error {
+		if len(is) > 0 {
+			state := is[0]
+			if zoneName != state.ID {
+				return fmt.Errorf("zone name mismactched expected : %v - returned : %v", zoneName, state.ID)
+			}
+			if accountName != state.Attributes["account_name"] {
+				return fmt.Errorf("zone account mismactched expected : %v - returned : %v", accountName, state.Attributes["account_name"])
+			}
+			if "PRIMARY" != state.Attributes["type"] {
+				return fmt.Errorf("zone type mismactched expected : %v - returned : %v", "PRIMARY", state.Attributes["type"])
+			}
+			return nil
+		}
+		return fmt.Errorf("length of instance state is %v while checking import state", len(is))
+	}
+}
+
 func testAccZonePrimary_create_new(zoneName, accountName string) string {
 	return fmt.Sprintf(`
 	resource "ultradns_zone" "primary" {
@@ -161,5 +188,21 @@ func testAccZoneAlias_create_new(zoneName, accountName string) string {
 			  original_zone_name = "0-0-0-0-0antony.com."
 		}
 	  }
+	`, zoneName, accountName)
+}
+
+func testAccZone_import(zoneName, accountName string) string {
+	return fmt.Sprintf(`
+	resource "ultradns_zone" "importdata" {
+		name = "%s"
+		account_name = "%s"
+		type = "PRIMARY"
+		primary_create_info {
+			create_type = "NEW"
+			notify_addresses {
+				notify_address = "192.168.1.1"
+			}
+		}
+	}
 	`, zoneName, accountName)
 }
