@@ -45,7 +45,7 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Description: "User agent for UltraDNS rest api.",
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_USER_Agent", "terraform-provider-ultrdns"),
+				DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_USER_AGENT", "terraform-provider-ultrdns"),
 			},
 		},
 

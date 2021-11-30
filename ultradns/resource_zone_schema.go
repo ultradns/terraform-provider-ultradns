@@ -57,7 +57,7 @@ func primaryZoneCreateInfoResource() *schema.Resource {
 			"force_import": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
+				Default:  false,
 			},
 			"original_zone_name": {
 				Type:         schema.TypeString,
