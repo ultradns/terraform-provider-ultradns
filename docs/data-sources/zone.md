@@ -27,6 +27,9 @@ data "ultradns_zone" "zone" {
 * `reverse` - (Optional) (Bool) Whether the list is ascending (false) or descending (true).
 * `limit` - (Optional) (Integer) The maximum number of rows requested.
 * `offset` - (Optional) (Integer) The position in the list for the first returned element (0 based).
+
+## Attributes Reference
+
 * `total_count` - (Computed) (Integer) Count of all zones in the system for the specified query.
 * `returned_count` - (Computed) (Integer) The number of zones returned.
 * `zones` - (Computed) (List) List of the returned zones. Each item in the list matches the structure below.
