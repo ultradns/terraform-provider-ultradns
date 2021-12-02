@@ -1,4 +1,4 @@
-package ultradns
+package zone_test
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
 	"github.com/ultradns/ultradns-go-sdk/ultradns"
 )
 
@@ -17,7 +18,7 @@ func init() {
 }
 
 func testAccZoneSweeper(r string) error {
-	client := testAccProvider.Meta().(*ultradns.Client)
+	client := acctest.TestAccProvider.Meta().(*ultradns.Client)
 	offset := 0
 	totalCount := 1
 	for totalCount > offset {

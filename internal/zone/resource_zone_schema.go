@@ -1,4 +1,4 @@
-package ultradns
+package zone
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -83,7 +83,7 @@ func primaryZoneCreateInfoResource() *schema.Resource {
 			"restrict_ip": {
 				Type:     schema.TypeSet,
 				Optional: true,
-				Elem:     restrictIpResource(),
+				Elem:     restrictIPResource(),
 			},
 			"notify_addresses": {
 				Type:     schema.TypeSet,
@@ -101,10 +101,21 @@ func secondaryZoneCreateInfoResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"primary_name_server": {
+			"primary_name_server_1": {
 				Type:     schema.TypeSet,
-				MinItems: 1,
-				MaxItems: 3,
+				MaxItems: 1,
+				Optional: true,
+				Elem:     nameServerResource(),
+			},
+			"primary_name_server_2": {
+				Type:     schema.TypeSet,
+				MaxItems: 1,
+				Optional: true,
+				Elem:     nameServerResource(),
+			},
+			"primary_name_server_3": {
+				Type:     schema.TypeSet,
+				MaxItems: 1,
 				Optional: true,
 				Elem:     nameServerResource(),
 			},
@@ -170,7 +181,7 @@ func tsigResource() *schema.Resource {
 	}
 }
 
-func restrictIpResource() *schema.Resource {
+func restrictIPResource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"start_ip": {

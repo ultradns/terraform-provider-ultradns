@@ -1,56 +1,57 @@
-package ultradns
+package zone_test
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
 	"github.com/ultradns/ultradns-go-sdk/ultradns"
 )
 
 func TestAccZoneResource(t *testing.T) {
-	zoneName := fmt.Sprintf("test-acc-%s.com.", acctest.RandString(5))
+	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
 	tc := resource.TestCase{
-		PreCheck:     func() { TestAccPreCheck(t) },
-		Providers:    testAccProviders,
+		PreCheck:     func() { acctest.PreCheck(t) },
+		Providers:    acctest.TestAccProviders,
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccZonePrimary_create_new(zoneName, testUsername),
+				Config: testAccZonePrimary_create_new(zoneName, acctest.TestUsername),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists("ultradns_zone.primary"),
 					resource.TestCheckResourceAttr("ultradns_zone.primary", "name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_zone.primary", "account_name", testUsername),
+					resource.TestCheckResourceAttr("ultradns_zone.primary", "account_name", acctest.TestUsername),
 					resource.TestCheckResourceAttr("ultradns_zone.primary", "type", "PRIMARY"),
 				),
 			},
 			{
-				Config: testAccZoneSecondary_create_new("d100-permission.com.", testUsername),
+				Config: testAccZoneSecondary_create_new("d100-permission.com.", acctest.TestUsername),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists("ultradns_zone.secondary"),
 					resource.TestCheckResourceAttr("ultradns_zone.secondary", "name", "d100-permission.com."),
-					resource.TestCheckResourceAttr("ultradns_zone.secondary", "account_name", testUsername),
+					resource.TestCheckResourceAttr("ultradns_zone.secondary", "account_name", acctest.TestUsername),
 					resource.TestCheckResourceAttr("ultradns_zone.secondary", "type", "SECONDARY"),
 				),
 			},
 			{
-				Config: testAccZoneAlias_create_new(zoneName, testUsername),
+				Config: testAccZoneAlias_create_new(zoneName, acctest.TestUsername),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists("ultradns_zone.alias"),
 					resource.TestCheckResourceAttr("ultradns_zone.alias", "name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_zone.alias", "account_name", testUsername),
+					resource.TestCheckResourceAttr("ultradns_zone.alias", "account_name", acctest.TestUsername),
 					resource.TestCheckResourceAttr("ultradns_zone.alias", "type", "ALIAS"),
 				),
 			},
 			{
-				Config: testAccZone_import(zoneName, testUsername),
+				Config: testAccZone_import(zoneName, acctest.TestUsername),
 			},
 			{
 				ResourceName:     "ultradns_zone.importdata",
 				ImportState:      true,
-				ImportStateCheck: testAccZoneImportStateCheck(zoneName, testUsername),
+				ImportStateCheck: testAccZoneImportStateCheck(zoneName, acctest.TestUsername),
 			},
 		},
 	}
@@ -64,7 +65,7 @@ func testAccCheckZoneExists(n string) resource.TestCheckFunc {
 			return fmt.Errorf("Not found: %s", n)
 		}
 
-		client := testAccProvider.Meta().(*ultradns.Client)
+		client := acctest.TestAccProvider.Meta().(*ultradns.Client)
 		_, zoneResponse, err := client.ReadZone(rs.Primary.ID)
 
 		if err != nil {
@@ -97,7 +98,7 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 			continue
 		}
 
-		client := testAccProvider.Meta().(*ultradns.Client)
+		client := acctest.TestAccProvider.Meta().(*ultradns.Client)
 		res, zoneResponse, err := client.ReadZone(rs.Primary.ID)
 		if err == nil {
 			if zoneResponse.Properties != nil && zoneResponse.Properties.Name == rs.Primary.ID {
@@ -169,7 +170,7 @@ func testAccZoneSecondary_create_new(zoneName, accountName string) string {
 		account_name = "%s"
 		type        = "SECONDARY"
 		secondary_create_info {
-			primary_name_server {
+			primary_name_server_1 {
 				ip = "e2e-bind-useast1a01-01.dev.ultradns.net"
 			}
 		}

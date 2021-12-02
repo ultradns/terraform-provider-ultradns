@@ -1,4 +1,4 @@
-package ultradns
+package zone
 
 import (
 	"fmt"
@@ -39,19 +39,19 @@ func flattenPrimaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *sch
 
 	if len(zr.RestrictIPList) > 0 {
 		s := &schema.Set{
-			F: schema.HashResource(restrictIpResource()),
+			F: schema.HashResource(restrictIPResource()),
 		}
 
-		for _, restrictIpData := range zr.RestrictIPList {
-			restrictIp := make(map[string]interface{})
+		for _, restrictIPData := range zr.RestrictIPList {
+			restrictIP := make(map[string]interface{})
 
-			restrictIp["start_ip"] = restrictIpData.StartIp
-			restrictIp["end_ip"] = restrictIpData.EndIp
-			restrictIp["cidr"] = restrictIpData.Cidr
-			restrictIp["single_ip"] = restrictIpData.SingleIp
-			restrictIp["comment"] = restrictIpData.Comment
+			restrictIP["start_ip"] = restrictIPData.StartIp
+			restrictIP["end_ip"] = restrictIPData.EndIp
+			restrictIP["cidr"] = restrictIPData.Cidr
+			restrictIP["single_ip"] = restrictIPData.SingleIp
+			restrictIP["comment"] = restrictIPData.Comment
 
-			s.Add(restrictIp)
+			s.Add(restrictIP)
 		}
 
 		primaryCreateInfo["restrict_ip"] = s
@@ -95,22 +95,28 @@ func flattenSecondaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *s
 		secondaryCreateInfo["notification_email_address"] = zr.NotificationEmailAddress
 	}
 
-	if zr.PrimaryNameServers != nil {
-		s := &schema.Set{
-			F: schema.HashResource(nameServerResource()),
+	if zr.PrimaryNameServers != nil && zr.PrimaryNameServers.NameServerIpList != nil {
+		if zr.PrimaryNameServers.NameServerIpList.NameServerIp1 != nil {
+			s := &schema.Set{
+				F: schema.HashResource(nameServerResource()),
+			}
+			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp1))
+			secondaryCreateInfo["primary_name_server_1"] = s
 		}
-		if zr.PrimaryNameServers.NameServerIpList != nil {
-			if zr.PrimaryNameServers.NameServerIpList.NameServerIp1 != nil {
-				s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp1))
+		if zr.PrimaryNameServers.NameServerIpList.NameServerIp2 != nil {
+			s := &schema.Set{
+				F: schema.HashResource(nameServerResource()),
 			}
-			if zr.PrimaryNameServers.NameServerIpList.NameServerIp2 != nil {
-				s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp2))
-			}
-			if zr.PrimaryNameServers.NameServerIpList.NameServerIp3 != nil {
-				s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp3))
-			}
+			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp1))
+			secondaryCreateInfo["primary_name_server_2"] = s
 		}
-		secondaryCreateInfo["primary_name_server"] = s
+		if zr.PrimaryNameServers.NameServerIpList.NameServerIp3 != nil {
+			s := &schema.Set{
+				F: schema.HashResource(nameServerResource()),
+			}
+			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp1))
+			secondaryCreateInfo["primary_name_server_3"] = s
+		}
 	}
 	set.Add(secondaryCreateInfo)
 

@@ -1,8 +1,8 @@
-package ultradns
+package helper
 
 import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-func resultInfoSchema() map[string]*schema.Schema {
+func ResultInfoSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"query": {
 			Type:     schema.TypeString,
@@ -26,6 +26,11 @@ func resultInfoSchema() map[string]*schema.Schema {
 		},
 		"offset": {
 			Type:     schema.TypeInt,
+			Optional: true,
+			ForceNew: true,
+		},
+		"cursor": {
+			Type:     schema.TypeString,
 			Optional: true,
 			ForceNew: true,
 		},
