@@ -44,6 +44,36 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			MaxItems: 1,
 			Elem:     aliasZoneCreateInfoResource(),
 		},
+		"dnssec_status": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"status": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"owner": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"resource_record_count": {
+			Type:     schema.TypeInt,
+			Computed: true,
+		},
+		"last_modified_time": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"registrar_info": {
+			Type:     schema.TypeSet,
+			Computed: true,
+			Elem:     registrarInfoResource(),
+		},
+		"transfer_status_details": {
+			Type:     schema.TypeSet,
+			Computed: true,
+			Elem:     transferStatusResource(),
+		},
 	}
 }
 

@@ -51,35 +51,66 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 		rd.SetId("")
 		return nil
 	}
-	var zoneType string
+
 	if zr.Properties != nil {
-		zoneType = zr.Properties.Type
-	}
 
-	if err := rd.Set("name", zr.Properties.Name); err != nil {
-		return diag.FromErr(err)
-	}
-
-	if err := rd.Set("account_name", zr.Properties.AccountName); err != nil {
-		return diag.FromErr(err)
-	}
-
-	if err := rd.Set("type", zr.Properties.Type); err != nil {
-		return diag.FromErr(err)
-	}
-
-	switch zoneType {
-	case "PRIMARY":
-		if err := rd.Set("primary_create_info", flattenPrimaryZone(zr, rd)); err != nil {
+		if err := rd.Set("name", zr.Properties.Name); err != nil {
 			return diag.FromErr(err)
 		}
-	case "SECONDARY":
-		if err := rd.Set("secondary_create_info", flattenSecondaryZone(zr, rd)); err != nil {
+
+		if err := rd.Set("account_name", zr.Properties.AccountName); err != nil {
 			return diag.FromErr(err)
 		}
-	case "ALIAS":
-		if err := rd.Set("alias_create_info", flattenAliasZone(zr, rd)); err != nil {
+
+		if err := rd.Set("type", zr.Properties.Type); err != nil {
 			return diag.FromErr(err)
+		}
+
+		if err := rd.Set("dnssec_status", zr.Properties.DnsSecStatus); err != nil {
+			return diag.FromErr(err)
+		}
+
+		if err := rd.Set("resource_record_count", zr.Properties.ResourceRecordCount); err != nil {
+			return diag.FromErr(err)
+		}
+
+		if err := rd.Set("last_modified_time", zr.Properties.LastModifiedDateTime); err != nil {
+			return diag.FromErr(err)
+		}
+
+		if err := rd.Set("status", zr.Properties.Status); err != nil {
+			return diag.FromErr(err)
+		}
+
+		if err := rd.Set("owner", zr.Properties.Owner); err != nil {
+			return diag.FromErr(err)
+		}
+
+		if zr.RegistrarInfo != nil {
+			if err := rd.Set("registrar_info", flattenRegistrarInfo(zr.RegistrarInfo)); err != nil {
+				return diag.FromErr(err)
+			}
+		}
+
+		if zr.TransferStatusDetails != nil {
+			if err := rd.Set("transfer_status_details", flattenTransferStatusDetails(zr.TransferStatusDetails)); err != nil {
+				return diag.FromErr(err)
+			}
+		}
+
+		switch zr.Properties.Type {
+		case "PRIMARY":
+			if err := rd.Set("primary_create_info", flattenPrimaryZone(zr, rd)); err != nil {
+				return diag.FromErr(err)
+			}
+		case "SECONDARY":
+			if err := rd.Set("secondary_create_info", flattenSecondaryZone(zr, rd)); err != nil {
+				return diag.FromErr(err)
+			}
+		case "ALIAS":
+			if err := rd.Set("alias_create_info", flattenAliasZone(zr, rd)); err != nil {
+				return diag.FromErr(err)
+			}
 		}
 	}
 	return diags
