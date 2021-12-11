@@ -2,12 +2,10 @@ package zone
 
 import (
 	"context"
-	"strconv"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/ultradns/ultradns-go-sdk/ultradns"
+	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 )
 
 func DataSourceZone() *schema.Resource {
@@ -22,17 +20,17 @@ func DataSourceZone() *schema.Resource {
 func dataSourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := meta.(*ultradns.Client)
+	services := meta.(*service.Service)
 
-	param := getZoneListURLParameters(rd)
+	query := getQueryInfo(rd)
 
-	_, zlr, err := client.ListZone(param)
+	_, zlr, err := services.ZoneService.ListZone(query)
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(strconv.FormatInt(time.Now().Unix(), 10))
+	rd.SetId(query.URI())
 
 	if zlr.QueryInfo != nil {
 		if err := rd.Set("query", zlr.QueryInfo.Query); err != nil {
@@ -40,6 +38,10 @@ func dataSourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta inter
 		}
 
 		if err := rd.Set("sort", zlr.QueryInfo.Sort); err != nil {
+			return diag.FromErr(err)
+		}
+
+		if err := rd.Set("cursor", zlr.QueryInfo.Cursor); err != nil {
 			return diag.FromErr(err)
 		}
 
@@ -52,16 +54,32 @@ func dataSourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta inter
 		}
 	}
 
-	if zlr.ResultInfo != nil {
-		if err := rd.Set("total_count", zlr.ResultInfo.TotalCount); err != nil {
+	// if zlr.ResultInfo != nil {
+	// 	if err := rd.Set("total_count", zlr.ResultInfo.TotalCount); err != nil {
+	// 		return diag.FromErr(err)
+	// 	}
+
+	// 	if err := rd.Set("returned_count", zlr.ResultInfo.ReturnedCount); err != nil {
+	// 		return diag.FromErr(err)
+	// 	}
+
+	// 	if err := rd.Set("offset", zlr.ResultInfo.Offset); err != nil {
+	// 		return diag.FromErr(err)
+	// 	}
+	// }
+
+	if zlr.CursorInfo != nil {
+		if err := rd.Set("next", zlr.CursorInfo.Next); err != nil {
 			return diag.FromErr(err)
 		}
 
-		if err := rd.Set("returned_count", zlr.ResultInfo.ReturnedCount); err != nil {
+		if err := rd.Set("previous", zlr.CursorInfo.Previous); err != nil {
 			return diag.FromErr(err)
 		}
-
-		if err := rd.Set("offset", zlr.ResultInfo.Offset); err != nil {
+		if err := rd.Set("first", zlr.CursorInfo.First); err != nil {
+			return diag.FromErr(err)
+		}
+		if err := rd.Set("last", zlr.CursorInfo.Last); err != nil {
 			return diag.FromErr(err)
 		}
 	}

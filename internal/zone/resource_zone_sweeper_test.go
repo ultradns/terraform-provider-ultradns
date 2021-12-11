@@ -1,13 +1,13 @@
 package zone_test
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
-	"github.com/ultradns/ultradns-go-sdk/ultradns"
+	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 )
 
 func init() {
@@ -18,30 +18,34 @@ func init() {
 }
 
 func testAccZoneSweeper(r string) error {
-	client := acctest.TestAccProvider.Meta().(*ultradns.Client)
-	offset := 0
-	totalCount := 1
-	for totalCount > offset {
-		queryString := testAccGetZoneQueryString(offset)
-		_, zoneList, err := client.ListZone(queryString)
+	services := acctest.TestAccProvider.Meta().(*service.Service)
+	cursor := ""
+	initial := true
+	for {
+		query := testAccGetZoneQueryString(cursor)
+		_, zoneList, err := services.ZoneService.ListZone(query)
 		if err != nil {
 			return err
 		}
 		for _, zone := range zoneList.Zones {
 			if strings.HasPrefix(zone.Properties.Name, "test-acc") {
-				_, er := client.DeleteZone(zone.Properties.Name)
+				_, er := services.ZoneService.DeleteZone(zone.Properties.Name)
 				if er != nil {
 					log.Printf("error destroying %s during sweep: %s", zone.Properties.Name, er)
 				}
 			}
 		}
-		totalCount = zoneList.ResultInfo.TotalCount
-		offset += 1000
+		if zoneList.CursorInfo.Next == "" && !initial {
+			return nil
+		}
+		initial = false
+		cursor = zoneList.CursorInfo.Next
 	}
-
-	return nil
 }
 
-func testAccGetZoneQueryString(offset int) string {
-	return fmt.Sprintf("?&limit=%v&offset=%v", 1000, offset)
+func testAccGetZoneQueryString(cursor string) *helper.QueryInfo {
+	return &helper.QueryInfo{
+		Limit:  1000,
+		Cursor: cursor,
+	}
 }

@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/ultradns/ultradns-go-sdk/ultradns"
+	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
-func flattenPrimaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *schema.Set {
+func flattenPrimaryZone(zr *zone.Response, rd *schema.ResourceData) *schema.Set {
 
 	set := &schema.Set{
 		F: schema.HashResource(primaryZoneCreateInfoResource()),
@@ -45,10 +45,10 @@ func flattenPrimaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *sch
 		for _, restrictIPData := range zr.RestrictIPList {
 			restrictIP := make(map[string]interface{})
 
-			restrictIP["start_ip"] = restrictIPData.StartIp
-			restrictIP["end_ip"] = restrictIPData.EndIp
+			restrictIP["start_ip"] = restrictIPData.StartIP
+			restrictIP["end_ip"] = restrictIPData.EndIP
 			restrictIP["cidr"] = restrictIPData.Cidr
-			restrictIP["single_ip"] = restrictIPData.SingleIp
+			restrictIP["single_ip"] = restrictIPData.SingleIP
 			restrictIP["comment"] = restrictIPData.Comment
 
 			s.Add(restrictIP)
@@ -80,7 +80,7 @@ func flattenPrimaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *sch
 	return set
 }
 
-func flattenSecondaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *schema.Set {
+func flattenSecondaryZone(zr *zone.Response, rd *schema.ResourceData) *schema.Set {
 	set := &schema.Set{
 		F: schema.HashResource(secondaryZoneCreateInfoResource()),
 	}
@@ -95,26 +95,26 @@ func flattenSecondaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *s
 		secondaryCreateInfo["notification_email_address"] = zr.NotificationEmailAddress
 	}
 
-	if zr.PrimaryNameServers != nil && zr.PrimaryNameServers.NameServerIpList != nil {
-		if zr.PrimaryNameServers.NameServerIpList.NameServerIp1 != nil {
+	if zr.PrimaryNameServers != nil && zr.PrimaryNameServers.NameServerIPList != nil {
+		if zr.PrimaryNameServers.NameServerIPList.NameServerIP1 != nil {
 			s := &schema.Set{
 				F: schema.HashResource(nameServerResource()),
 			}
-			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp1))
+			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIPList.NameServerIP1))
 			secondaryCreateInfo["primary_name_server_1"] = s
 		}
-		if zr.PrimaryNameServers.NameServerIpList.NameServerIp2 != nil {
+		if zr.PrimaryNameServers.NameServerIPList.NameServerIP2 != nil {
 			s := &schema.Set{
 				F: schema.HashResource(nameServerResource()),
 			}
-			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp1))
+			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIPList.NameServerIP2))
 			secondaryCreateInfo["primary_name_server_2"] = s
 		}
-		if zr.PrimaryNameServers.NameServerIpList.NameServerIp3 != nil {
+		if zr.PrimaryNameServers.NameServerIPList.NameServerIP3 != nil {
 			s := &schema.Set{
 				F: schema.HashResource(nameServerResource()),
 			}
-			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIpList.NameServerIp1))
+			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIPList.NameServerIP3))
 			secondaryCreateInfo["primary_name_server_3"] = s
 		}
 	}
@@ -123,7 +123,7 @@ func flattenSecondaryZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *s
 	return set
 }
 
-func flattenAliasZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *schema.Set {
+func flattenAliasZone(zr *zone.Response, rd *schema.ResourceData) *schema.Set {
 	set := &schema.Set{
 		F: schema.HashResource(aliasZoneCreateInfoResource()),
 	}
@@ -136,9 +136,9 @@ func flattenAliasZone(zr *ultradns.ZoneResponse, rd *schema.ResourceData) *schem
 	return set
 }
 
-func getNameServer(ns *ultradns.NameServerIp) map[string]interface{} {
+func getNameServer(ns *zone.NameServer) map[string]interface{} {
 	nameserver := make(map[string]interface{})
-	nameserver["ip"] = ns.Ip
+	nameserver["ip"] = ns.IP
 	nameserver["tsig_key"] = ns.TsigKey
 	nameserver["tsig_key_value"] = ns.TsigKeyValue
 	nameserver["tsig_algorithm"] = ns.TsigAlgorithm

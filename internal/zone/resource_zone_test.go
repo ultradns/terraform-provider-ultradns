@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"testing"
 
-	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
-	"github.com/ultradns/ultradns-go-sdk/ultradns"
+	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/ultradns-go-sdk/pkg/test"
 )
 
 func TestAccZoneResource(t *testing.T) {
-	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
+	zoneName := fmt.Sprintf("test-acc-%s.com.", test.GetRandomString())
 	tc := resource.TestCase{
 		PreCheck:     func() { acctest.PreCheck(t) },
 		Providers:    acctest.TestAccProviders,
@@ -65,8 +65,8 @@ func testAccCheckZoneExists(n string) resource.TestCheckFunc {
 			return fmt.Errorf("Not found: %s", n)
 		}
 
-		client := acctest.TestAccProvider.Meta().(*ultradns.Client)
-		_, zoneResponse, err := client.ReadZone(rs.Primary.ID)
+		services := acctest.TestAccProvider.Meta().(*service.Service)
+		_, zoneResponse, err := services.ZoneService.ReadZone(rs.Primary.ID)
 
 		if err != nil {
 			return err
@@ -98,8 +98,8 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 			continue
 		}
 
-		client := acctest.TestAccProvider.Meta().(*ultradns.Client)
-		res, zoneResponse, err := client.ReadZone(rs.Primary.ID)
+		services := acctest.TestAccProvider.Meta().(*service.Service)
+		res, zoneResponse, err := services.ZoneService.ReadZone(rs.Primary.ID)
 		if err == nil {
 			if zoneResponse.Properties != nil && zoneResponse.Properties.Name == rs.Primary.ID {
 				return fmt.Errorf("zone %v not destroyed!", rs.Primary.ID)

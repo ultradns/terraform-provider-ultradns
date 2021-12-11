@@ -23,12 +23,12 @@ func providerSchema() map[string]*schema.Schema {
 			Optional:    true,
 			DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_HOST_URL", nil),
 		},
-		"apiversion": {
-			Type:        schema.TypeString,
-			Description: "Api version for UltraDNS rest api.",
-			Optional:    true,
-			DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_API_VERSION", nil),
-		},
+		// "apiversion": {
+		// 	Type:        schema.TypeString,
+		// 	Description: "Api version for UltraDNS rest api.",
+		// 	Optional:    true,
+		// 	DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_API_VERSION", nil),
+		// },
 		"useragent": {
 			Type:        schema.TypeString,
 			Description: "User agent for UltraDNS rest api.",

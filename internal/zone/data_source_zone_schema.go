@@ -6,8 +6,15 @@ import (
 )
 
 func dataSourceZoneSchema() map[string]*schema.Schema {
-	zoneSchema := helper.ResultInfoSchema()
-
+	zoneSchema := make(map[string]*schema.Schema)
+	queryInfo := helper.QueryInfoSchema()
+	for k, v := range queryInfo {
+		zoneSchema[k] = v
+	}
+	cursorInfo := helper.CursorInfoSchema()
+	for k, v := range cursorInfo {
+		zoneSchema[k] = v
+	}
 	zoneSchema["zones"] = &schema.Schema{
 		Type:     schema.TypeList,
 		Computed: true,

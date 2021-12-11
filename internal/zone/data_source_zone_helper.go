@@ -1,43 +1,42 @@
 package zone
 
 import (
-	"strconv"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/ultradns/ultradns-go-sdk/ultradns"
+	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
+	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
-func getZoneListURLParameters(rd *schema.ResourceData) string {
-	param := "?"
+func getQueryInfo(rd *schema.ResourceData) *helper.QueryInfo {
+	query := &helper.QueryInfo{}
 
 	if val, ok := rd.GetOk("query"); ok {
-		param = param + "&q=" + val.(string)
+		query.Query = val.(string)
 	}
 
 	if val, ok := rd.GetOk("sort"); ok {
-		param = param + "&sort=" + val.(string)
+		query.Sort = val.(string)
 	}
 
 	if val, ok := rd.GetOk("reverse"); ok {
-		param = param + "&reverse=" + strconv.FormatBool(val.(bool))
+		query.Reverse = val.(bool)
 	}
 
 	if val, ok := rd.GetOk("limit"); ok {
-		param = param + "&limit=" + strconv.Itoa(val.(int))
+		query.Limit = val.(int)
 	}
 
 	if val, ok := rd.GetOk("offset"); ok {
-		param = param + "&offset=" + strconv.Itoa(val.(int))
+		query.Offset = val.(int)
 	}
 
 	if val, ok := rd.GetOk("cursor"); ok {
-		param = param + "&cursor=" + val.(string)
+		query.Cursor = val.(string)
 	}
 
-	return param
+	return query
 }
 
-func flattenZones(zlr []*ultradns.ZoneResponse) []map[string]interface{} {
+func flattenZones(zlr []*zone.Response) []map[string]interface{} {
 	var zones []map[string]interface{}
 
 	for _, zone := range zlr {
@@ -47,14 +46,14 @@ func flattenZones(zlr []*ultradns.ZoneResponse) []map[string]interface{} {
 			data["name"] = zone.Properties.Name
 			data["account_name"] = zone.Properties.AccountName
 			data["type"] = zone.Properties.Type
-			data["dnssec_status"] = zone.Properties.DnsSecStatus
+			data["dnssec_status"] = zone.Properties.DNSSecStatus
 			data["status"] = zone.Properties.Status
 			data["owner"] = zone.Properties.Owner
 			data["resource_record_count"] = zone.Properties.ResourceRecordCount
 			data["last_modified_time"] = zone.Properties.LastModifiedDateTime
 		}
 
-		//data["inherit"] =
+		data["inherit"] = zone.Inherit
 		data["notification_email_address"] = zone.NotificationEmailAddress
 		data["original_zone_name"] = zone.OriginalZoneName
 
@@ -74,17 +73,17 @@ func flattenZones(zlr []*ultradns.ZoneResponse) []map[string]interface{} {
 			data["registrar_info"] = flattenRegistrarInfo(zone.RegistrarInfo)
 		}
 
-		if zone.PrimaryNameServers != nil && zone.PrimaryNameServers.NameServerIpList != nil {
-			if zone.PrimaryNameServers.NameServerIpList.NameServerIp1 != nil {
-				data["primary_name_server_1"] = flattenNameServer(zone.PrimaryNameServers.NameServerIpList.NameServerIp1)
+		if zone.PrimaryNameServers != nil && zone.PrimaryNameServers.NameServerIPList != nil {
+			if zone.PrimaryNameServers.NameServerIPList.NameServerIP1 != nil {
+				data["primary_name_server_1"] = flattenNameServer(zone.PrimaryNameServers.NameServerIPList.NameServerIP1)
 			}
 
-			if zone.PrimaryNameServers.NameServerIpList.NameServerIp2 != nil {
-				data["primary_name_server_2"] = flattenNameServer(zone.PrimaryNameServers.NameServerIpList.NameServerIp2)
+			if zone.PrimaryNameServers.NameServerIPList.NameServerIP2 != nil {
+				data["primary_name_server_2"] = flattenNameServer(zone.PrimaryNameServers.NameServerIPList.NameServerIP2)
 			}
 
-			if zone.PrimaryNameServers.NameServerIpList.NameServerIp3 != nil {
-				data["primary_name_server_3"] = flattenNameServer(zone.PrimaryNameServers.NameServerIpList.NameServerIp3)
+			if zone.PrimaryNameServers.NameServerIPList.NameServerIP3 != nil {
+				data["primary_name_server_3"] = flattenNameServer(zone.PrimaryNameServers.NameServerIPList.NameServerIP3)
 			}
 		}
 
@@ -97,7 +96,7 @@ func flattenZones(zlr []*ultradns.ZoneResponse) []map[string]interface{} {
 	return zones
 }
 
-func flattenTsig(t *ultradns.Tsig) *schema.Set {
+func flattenTsig(t *zone.Tsig) *schema.Set {
 	set := &schema.Set{F: zeroIndexHash}
 	tsig := make(map[string]interface{})
 
@@ -110,16 +109,16 @@ func flattenTsig(t *ultradns.Tsig) *schema.Set {
 	return set
 }
 
-func flattenRestrictIP(ri []*ultradns.RestrictIp) *schema.Set {
+func flattenRestrictIP(ri []*zone.RestrictIP) *schema.Set {
 	set := &schema.Set{F: zeroIndexHash}
 
 	for _, restrictIPData := range ri {
 		restrictIP := make(map[string]interface{})
 
-		restrictIP["start_ip"] = restrictIPData.StartIp
-		restrictIP["end_ip"] = restrictIPData.EndIp
+		restrictIP["start_ip"] = restrictIPData.StartIP
+		restrictIP["end_ip"] = restrictIPData.EndIP
 		restrictIP["cidr"] = restrictIPData.Cidr
-		restrictIP["single_ip"] = restrictIPData.SingleIp
+		restrictIP["single_ip"] = restrictIPData.SingleIP
 		restrictIP["comment"] = restrictIPData.Comment
 
 		set.Add(restrictIP)
@@ -127,7 +126,7 @@ func flattenRestrictIP(ri []*ultradns.RestrictIp) *schema.Set {
 	return set
 }
 
-func flattenNotifyAddresses(na []*ultradns.NotifyAddress) *schema.Set {
+func flattenNotifyAddresses(na []*zone.NotifyAddress) *schema.Set {
 	set := &schema.Set{F: zeroIndexHash}
 
 	for _, notifyAddressData := range na {
@@ -141,7 +140,7 @@ func flattenNotifyAddresses(na []*ultradns.NotifyAddress) *schema.Set {
 	return set
 }
 
-func flattenRegistrarInfo(ri *ultradns.RegistrarInfo) *schema.Set {
+func flattenRegistrarInfo(ri *zone.RegistrarInfo) *schema.Set {
 	set := &schema.Set{F: zeroIndexHash}
 
 	registrarInfo := make(map[string]interface{})
@@ -154,7 +153,7 @@ func flattenRegistrarInfo(ri *ultradns.RegistrarInfo) *schema.Set {
 	return set
 }
 
-func flattenRegistrarInfoNameServer(nsl *ultradns.NameServersList) *schema.Set {
+func flattenRegistrarInfoNameServer(nsl *zone.NameServersList) *schema.Set {
 	set := &schema.Set{F: zeroIndexHash}
 
 	RegistrarInfoNameServersList := make(map[string]interface{})
@@ -168,12 +167,12 @@ func flattenRegistrarInfoNameServer(nsl *ultradns.NameServersList) *schema.Set {
 	return set
 }
 
-func flattenNameServer(ns *ultradns.NameServerIp) *schema.Set {
+func flattenNameServer(ns *zone.NameServer) *schema.Set {
 	set := &schema.Set{F: zeroIndexHash}
 
 	nameServer := make(map[string]interface{})
 
-	nameServer["ip"] = ns.Ip
+	nameServer["ip"] = ns.IP
 	nameServer["tsig_key"] = ns.TsigKey
 	nameServer["tsig_key_value"] = ns.TsigKeyValue
 	nameServer["tsig_algorithm"] = ns.TsigAlgorithm
@@ -182,7 +181,7 @@ func flattenNameServer(ns *ultradns.NameServerIp) *schema.Set {
 	return set
 }
 
-func flattenTransferStatusDetails(tsd *ultradns.TransferStatusDetails) *schema.Set {
+func flattenTransferStatusDetails(tsd *zone.TransferStatusDetails) *schema.Set {
 	set := &schema.Set{F: zeroIndexHash}
 	transferDetails := make(map[string]interface{})
 

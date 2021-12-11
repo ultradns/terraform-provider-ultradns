@@ -5,12 +5,12 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/ultradns/ultradns-go-sdk/ultradns"
+	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
 func ResourceZone() *schema.Resource {
 	return &schema.Resource{
-
 		CreateContext: resourceZoneCreate,
 		ReadContext:   resourceZoneRead,
 		UpdateContext: resourceZoneUpdate,
@@ -25,10 +25,10 @@ func ResourceZone() *schema.Resource {
 }
 
 func resourceZoneCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ultradns.Client)
+	services := meta.(*service.Service)
 	zone := newZone(rd)
 
-	_, err := client.CreateZone(zone)
+	_, err := services.ZoneService.CreateZone(zone)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -42,10 +42,10 @@ func resourceZoneCreate(ctx context.Context, rd *schema.ResourceData, meta inter
 func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := meta.(*ultradns.Client)
+	services := meta.(*service.Service)
 	zoneID := rd.Id()
 
-	_, zr, err := client.ReadZone(zoneID)
+	_, zr, err := services.ZoneService.ReadZone(zoneID)
 
 	if err != nil {
 		rd.SetId("")
@@ -66,7 +66,7 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 			return diag.FromErr(err)
 		}
 
-		if err := rd.Set("dnssec_status", zr.Properties.DnsSecStatus); err != nil {
+		if err := rd.Set("dnssec_status", zr.Properties.DNSSecStatus); err != nil {
 			return diag.FromErr(err)
 		}
 
@@ -117,12 +117,12 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 }
 
 func resourceZoneUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ultradns.Client)
+	services := meta.(*service.Service)
 	zoneID := rd.Id()
 
 	zone := newZone(rd)
 
-	_, err := client.UpdateZone(zoneID, zone)
+	_, err := services.ZoneService.UpdateZone(zoneID, zone)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -134,10 +134,10 @@ func resourceZoneUpdate(ctx context.Context, rd *schema.ResourceData, meta inter
 func resourceZoneDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := meta.(*ultradns.Client)
+	services := meta.(*service.Service)
 	zoneID := rd.Id()
 
-	_, err := client.DeleteZone(zoneID)
+	_, err := services.ZoneService.DeleteZone(zoneID)
 	if err != nil {
 		rd.SetId("")
 		return diag.FromErr(err)
@@ -147,12 +147,11 @@ func resourceZoneDelete(ctx context.Context, rd *schema.ResourceData, meta inter
 	return diags
 }
 
-func newZone(rd *schema.ResourceData) ultradns.Zone {
+func newZone(rd *schema.ResourceData) *zone.Zone {
 
 	var zoneType string
-	zone := ultradns.Zone{}
-	properties := &ultradns.ZoneProperties{}
-
+	zoneData := &zone.Zone{}
+	properties := &zone.Properties{}
 	if val, ok := rd.GetOk("name"); ok {
 		properties.Name = val.(string)
 	}
@@ -167,24 +166,24 @@ func newZone(rd *schema.ResourceData) ultradns.Zone {
 	}
 
 	if val, ok := rd.GetOk("change_comment"); ok {
-		zone.ChangeComment = val.(string)
+		zoneData.ChangeComment = val.(string)
 	}
 
 	switch zoneType {
 	case "PRIMARY":
-		zone.PrimaryCreateInfo = getPrimaryCreateInfo(rd)
+		zoneData.PrimaryCreateInfo = getPrimaryCreateInfo(rd)
 	case "SECONDARY":
-		zone.SecondaryCreateInfo = getSecondaryCreateInfo(rd)
+		zoneData.SecondaryCreateInfo = getSecondaryCreateInfo(rd)
 	case "ALIAS":
-		zone.AliasCreateInfo = getAliasCreateInfo(rd)
+		zoneData.AliasCreateInfo = getAliasCreateInfo(rd)
 	}
 
-	zone.Properties = properties
-	return zone
+	zoneData.Properties = properties
+	return zoneData
 }
 
-func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
-	primaryCreateInfo := &ultradns.PrimaryZone{}
+func getPrimaryCreateInfo(rd *schema.ResourceData) *zone.PrimaryZone {
+	primaryCreateInfo := &zone.PrimaryZone{}
 
 	if val, ok := rd.GetOk("primary_create_info"); ok && val.(*schema.Set).Len() > 0 {
 		createInfoData := val.(*schema.Set).List()[0].(map[string]interface{})
@@ -207,11 +206,11 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 
 		if val, ok := createInfoData["name_server"]; ok && val.(*schema.Set).Len() > 0 {
 			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
-			nameServer := &ultradns.NameServerIp{}
+			nameServer := &zone.NameServer{}
 			primaryCreateInfo.NameServer = nameServer
 
 			if val, ok := nameServerData["ip"]; ok {
-				nameServer.Ip = val.(string)
+				nameServer.IP = val.(string)
 			}
 
 			if val, ok := nameServerData["tsig_key"]; ok {
@@ -229,7 +228,7 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 
 		if val, ok := createInfoData["tsig"]; ok && val.(*schema.Set).Len() > 0 {
 			tsigData := val.(*schema.Set).List()[0].(map[string]interface{})
-			tsig := &ultradns.Tsig{}
+			tsig := &zone.Tsig{}
 			primaryCreateInfo.Tsig = tsig
 
 			if val, ok := tsigData["tsig_key_name"]; ok {
@@ -251,18 +250,18 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 
 		if val, ok := createInfoData["restrict_ip"]; ok && val.(*schema.Set).Len() > 0 {
 			restrictIPDataList := val.(*schema.Set).List()
-			restrictIPList := make([]*ultradns.RestrictIp, len(restrictIPDataList))
+			restrictIPList := make([]*zone.RestrictIP, len(restrictIPDataList))
 			primaryCreateInfo.RestrictIPList = restrictIPList
 			for i, d := range restrictIPDataList {
 				restrictIPData := d.(map[string]interface{})
-				restrictIP := ultradns.RestrictIp{}
+				restrictIP := zone.RestrictIP{}
 
 				if val, ok := restrictIPData["start_ip"]; ok {
-					restrictIP.StartIp = val.(string)
+					restrictIP.StartIP = val.(string)
 				}
 
 				if val, ok := restrictIPData["end_ip"]; ok {
-					restrictIP.EndIp = val.(string)
+					restrictIP.EndIP = val.(string)
 				}
 
 				if val, ok := restrictIPData["cidr"]; ok {
@@ -270,7 +269,7 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 				}
 
 				if val, ok := restrictIPData["single_ip"]; ok {
-					restrictIP.SingleIp = val.(string)
+					restrictIP.SingleIP = val.(string)
 				}
 
 				if val, ok := restrictIPData["comment"]; ok {
@@ -282,12 +281,12 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 
 		if val, ok := createInfoData["notify_addresses"]; ok && val.(*schema.Set).Len() > 0 {
 			notifyAddressDataList := val.(*schema.Set).List()
-			notifyAddressList := make([]*ultradns.NotifyAddress, len(notifyAddressDataList))
+			notifyAddressList := make([]*zone.NotifyAddress, len(notifyAddressDataList))
 			primaryCreateInfo.NotifyAddresses = notifyAddressList
 
 			for i, d := range notifyAddressDataList {
 				notifyAddressData := d.(map[string]interface{})
-				notifyAddress := ultradns.NotifyAddress{}
+				notifyAddress := zone.NotifyAddress{}
 
 				if val, ok := notifyAddressData["notify_address"]; ok {
 					notifyAddress.NotifyAddress = val.(string)
@@ -305,10 +304,10 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *ultradns.PrimaryZone {
 	return primaryCreateInfo
 }
 
-func getSecondaryCreateInfo(rd *schema.ResourceData) *ultradns.SecondaryZone {
-	nameServerIPList := &ultradns.NameServerIpList{}
-	primaryNameServers := &ultradns.PrimaryNameServers{NameServerIpList: nameServerIPList}
-	secondaryCreateInfo := &ultradns.SecondaryZone{PrimaryNameServers: primaryNameServers}
+func getSecondaryCreateInfo(rd *schema.ResourceData) *zone.SecondaryZone {
+	nameServerIPList := &zone.NameServerIPList{}
+	primaryNameServers := &zone.PrimaryNameServers{NameServerIPList: nameServerIPList}
+	secondaryCreateInfo := &zone.SecondaryZone{PrimaryNameServers: primaryNameServers}
 
 	if val, ok := rd.GetOk("secondary_create_info"); ok && val.(*schema.Set).Len() > 0 {
 		createInfoData := val.(*schema.Set).List()[0].(map[string]interface{})
@@ -319,11 +318,11 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *ultradns.SecondaryZone {
 
 		if val, ok := createInfoData["primary_name_server_1"]; ok && val.(*schema.Set).Len() > 0 {
 			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
-			nameServer := &ultradns.NameServerIp{}
-			secondaryCreateInfo.PrimaryNameServers.NameServerIpList.NameServerIp1 = nameServer
+			nameServer := &zone.NameServer{}
+			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP1 = nameServer
 
 			if val, ok := nameServerData["ip"]; ok {
-				nameServer.Ip = val.(string)
+				nameServer.IP = val.(string)
 			}
 
 			if val, ok := nameServerData["tsig_key"]; ok {
@@ -341,11 +340,11 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *ultradns.SecondaryZone {
 
 		if val, ok := createInfoData["primary_name_server_2"]; ok && val.(*schema.Set).Len() > 0 {
 			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
-			nameServer := &ultradns.NameServerIp{}
-			secondaryCreateInfo.PrimaryNameServers.NameServerIpList.NameServerIp2 = nameServer
+			nameServer := &zone.NameServer{}
+			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP2 = nameServer
 
 			if val, ok := nameServerData["ip"]; ok {
-				nameServer.Ip = val.(string)
+				nameServer.IP = val.(string)
 			}
 
 			if val, ok := nameServerData["tsig_key"]; ok {
@@ -363,11 +362,11 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *ultradns.SecondaryZone {
 
 		if val, ok := createInfoData["primary_name_server_3"]; ok && val.(*schema.Set).Len() > 0 {
 			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
-			nameServer := &ultradns.NameServerIp{}
-			secondaryCreateInfo.PrimaryNameServers.NameServerIpList.NameServerIp3 = nameServer
+			nameServer := &zone.NameServer{}
+			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP3 = nameServer
 
 			if val, ok := nameServerData["ip"]; ok {
-				nameServer.Ip = val.(string)
+				nameServer.IP = val.(string)
 			}
 
 			if val, ok := nameServerData["tsig_key"]; ok {
@@ -386,8 +385,8 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *ultradns.SecondaryZone {
 	return secondaryCreateInfo
 }
 
-func getAliasCreateInfo(rd *schema.ResourceData) *ultradns.AliasZone {
-	aliasCreateInfo := &ultradns.AliasZone{}
+func getAliasCreateInfo(rd *schema.ResourceData) *zone.AliasZone {
+	aliasCreateInfo := &zone.AliasZone{}
 
 	if val, ok := rd.GetOk("alias_create_info"); ok && val.(*schema.Set).Len() > 0 {
 		data := val.(*schema.Set).List()[0].(map[string]interface{})

@@ -8,14 +8,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/provider"
-	"github.com/ultradns/ultradns-go-sdk/ultradns"
+	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/ultradns-go-sdk/pkg/client"
 )
 
 var (
 	TestUsername  = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME")
 	testPassword  = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD")
 	testHost      = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
-	testVersion   = os.Getenv("ULTRADNS_UNIT_TEST_API_VERSION")
 	testUserAgent = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
 )
 
@@ -32,13 +32,27 @@ func init() {
 
 func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	var diags diag.Diagnostics
-	client, err := ultradns.NewClient(TestUsername, testPassword, testHost, testVersion, testUserAgent)
+
+	cnf := client.Config{
+		Username:  TestUsername,
+		Password:  testPassword,
+		HostURL:   testHost,
+		UserAgent: testUserAgent,
+	}
+
+	client, err := client.NewClient(cnf)
 
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
 
-	return client, diags
+	service, err := service.NewService(client)
+
+	if err != nil {
+		return nil, diag.FromErr(err)
+	}
+
+	return service, diags
 }
 
 func PreCheck(t *testing.T) {
@@ -52,10 +66,6 @@ func PreCheck(t *testing.T) {
 
 	if testHost == "" {
 		t.Fatal("host required for creating test client")
-	}
-
-	if testVersion == "" {
-		t.Fatal("version required for creating test client")
 	}
 
 	if testUserAgent == "" {
