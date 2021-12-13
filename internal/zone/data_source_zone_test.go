@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"testing"
 
+	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
-	"github.com/ultradns/ultradns-go-sdk/pkg/test"
 )
 
 func TestAccZoneDataSource(t *testing.T) {
-	zoneName := fmt.Sprintf("test-acc-%s.com.", test.GetRandomString())
+	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
 	tc := resource.TestCase{
 		PreCheck:     func() { acctest.PreCheck(t) },
 		Providers:    acctest.TestAccProviders,

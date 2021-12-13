@@ -11,6 +11,7 @@ replace github.com/ultradns/ultradns-go-sdk v0.0.8-alpha => ../ultradns-go-sdk
 
 require (
 	github.com/agext/levenshtein v1.2.2 // indirect
+	github.com/apparentlymart/go-cidr v1.0.1 // indirect
 	github.com/apparentlymart/go-textseg v1.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

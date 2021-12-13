@@ -54,20 +54,6 @@ func dataSourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta inter
 		}
 	}
 
-	// if zlr.ResultInfo != nil {
-	// 	if err := rd.Set("total_count", zlr.ResultInfo.TotalCount); err != nil {
-	// 		return diag.FromErr(err)
-	// 	}
-
-	// 	if err := rd.Set("returned_count", zlr.ResultInfo.ReturnedCount); err != nil {
-	// 		return diag.FromErr(err)
-	// 	}
-
-	// 	if err := rd.Set("offset", zlr.ResultInfo.Offset); err != nil {
-	// 		return diag.FromErr(err)
-	// 	}
-	// }
-
 	if zlr.CursorInfo != nil {
 		if err := rd.Set("next", zlr.CursorInfo.Next); err != nil {
 			return diag.FromErr(err)

@@ -33,10 +33,9 @@ func providerConfigureContext(ctx context.Context, rd *schema.ResourceData) (int
 	var diags diag.Diagnostics
 
 	cnf := client.Config{
-		Username: rd.Get("username").(string),
-		Password: rd.Get("password").(string),
-		HostURL:  rd.Get("hosturl").(string),
-		//APIVersion: rd.Get("apiversion").(string),
+		Username:  rd.Get("username").(string),
+		Password:  rd.Get("password").(string),
+		HostURL:   rd.Get("hosturl").(string),
 		UserAgent: rd.Get("useragent").(string),
 	}
 
