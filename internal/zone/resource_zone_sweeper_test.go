@@ -21,12 +21,15 @@ func testAccZoneSweeper(r string) error {
 	services := acctest.TestAccProvider.Meta().(*service.Service)
 	cursor := ""
 	initial := true
+
 	for {
 		query := testAccGetZoneQueryString(cursor)
 		_, zoneList, err := services.ZoneService.ListZone(query)
+
 		if err != nil {
 			return err
 		}
+
 		for _, zone := range zoneList.Zones {
 			if strings.HasPrefix(zone.Properties.Name, "test-acc") {
 				_, er := services.ZoneService.DeleteZone(zone.Properties.Name)
@@ -35,9 +38,11 @@ func testAccZoneSweeper(r string) error {
 				}
 			}
 		}
+
 		if zoneList.CursorInfo.Next == "" && !initial {
 			return nil
 		}
+
 		initial = false
 		cursor = zoneList.CursorInfo.Next
 	}

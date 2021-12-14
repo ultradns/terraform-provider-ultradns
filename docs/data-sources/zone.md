@@ -14,8 +14,7 @@ Use this data source to get detailed information for your zones.
 
 ```terraform
 data "ultradns_zone" "zone" {
-     limit = 1
-     query = "name:example.com."
+    name = "example.com."
 }
 ```
 
@@ -24,42 +23,41 @@ data "ultradns_zone" "zone" {
 
 The following arguments are supported:
 
-* `query` - (Optional) (String) The query used to construct the list.
-* `sort` - (Optional) (String) The sort column name used to order the list.
-* `reverse` - (Optional) (Boolean) Whether the list is ascending (false) or descending (true).
-* `limit` - (Optional) (Integer) The maximum number of rows requested.
-* `offset` - (Optional) (Integer) The position in the list for the first returned element (0 based).
+* `name` - (Required) (String) A fully qualified domain name(FQDN) is required.
+
 
 ## Attributes Reference
 
 In addition to all of the arguments above, the following attributes are exported:
 
-* `total_count` - (Computed) (Integer) Count of all zones in the system for the specified query.
-* `returned_count` - (Computed) (Integer) The number of zones returned.
-* `zones` - (Computed) (List) List of the returned zones. Each item in the list matches the structure below.
-
-Structure of each item in list `zones`:
-
-* `name` - (Computed) (String)	Name of the zone, with trailing dots.
 * `account_name` - (Computed) (String) Name of the account.
 * `type` - (Computed) (String) Type of zone. Valid values are PRIMARY, SECONDARY or ALIAS.
 * `status` - (Computed) (String) Displays the status of the zone.
 * `dnssec_status` - (Computed) (String) Whether or not the zone is signed with DNSSEC. Valid values are `SIGNED` or `UNSIGNED`.
 * `owner` - (Computed) (String) Name of the user that created the zone.
 * `resource_record_count` - (Computed) (Integer) Number of records in the zone.
-* `last_modified_time` - (Computed) (String) The last date and time the zone was modified, represented in ISO8601 format(`yyyy-MM-ddTHH:mmZ`).
+* `last_modified_time` - (Computed) (String) The last date and time the zone was modified, represented in ISO8601 format(`yyyy-MM-ddTHH:mmZ`).<br/>
 Example: `2021-12-07T11:25Z`.
+
+#### When `type` is "PRIMARY" below attributes will be exported.
+
 * `inherit` - (Computed) (String) Defines whether this zone should inherit the zone transfer values from the Account, and also specifies which values to inherit.
-* `notification_email_address` - (Optional) (String) The Notification Email for a secondary zone.
-* `original_zone_name` - (Required) (String) The name of the zone being aliased. The existing zone must be owned by the same account as the new zone.
-* `tsig` - (Optional) (Block Set, Max: 1) Nested block describing the TSIG information for the primary zone. The structure of this block is described below.
-* `restrict_ip` - (Optional) (Block Set) Nested block describing the list of IP ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
-* `notify_addresses` - (Optional) (Block Set) Nested block describing the IP Addresses that are notified when updates are made to the primary zone. The structure of this block is described below.
+* `tsig` - (Computed) (Block Set, Max: 1) Nested block describing the TSIG information for the primary zone. The structure of this block is described below.
+* `restrict_ip` - (Computed) (Block Set) Nested block describing the list of IP ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
+* `notify_addresses` - (Computed) (Block Set) Nested block describing the IP Addresses that are notified when updates are made to the primary zone. The structure of this block is described below.
 * `registrar_info` - (Computed) (Block Set) Nested block describing information about the name server configuration for this zone. The structure of this block is described below.
+
+#### When `type` is "SECONDARY" below attributes will be exported.
+
+* `primary_name_server_1` - (Computed) (Block Set) The structure of this block is similar to the block <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> as described below. It is the info of primary name server.
+* `primary_name_server_2` - (Computed) (Block Set) The structure of this block is similar to the block <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> as described below. It is the info of first backup primary name server.
+* `primary_name_server_3` - (Computed) (Block Set) The structure of this block is similar to the block <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> as described below. It is the info of second backup primary name server.
+* `notification_email_address` - (Computed) (String) The Notification Email for a secondary zone.
 * `transfer_status_details` - (Computed) (Block Set) Nested block describing the zone transfer details. The structure of this block is described below.
-* `primary_name_server_1` - (Computed) (Block Set) Nested block describing the primary name servers of the source zone for the secondary zone. The structure of this block (`name_server`) is described below.
-* `primary_name_server_2` - (Computed) (Block Set)Nested block describing the primary name servers of the source zone for the secondary zone. The structure of this block (`name_server`) is described below.
-* `primary_name_server_3` - (Computed) (Block Set) Nested block describing the primary name servers of the source zone for the secondary zone. The structure of this block (`name_server`) is described below.
+
+#### When `type` is "ALIAS" below attributes will be exported.
+
+* `original_zone_name` - (Computed) (String) The name of the zone being aliased. The existing zone must be owned by the same account as the new zone.
 
 ### Nested `name_server` block has the following structure:
 

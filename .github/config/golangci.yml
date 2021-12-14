@@ -1,0 +1,50 @@
+linters-settings:
+  funlen:
+    lines: 150
+    statements: 80
+  nestif:
+    min-complexity: 50
+  gocognit:
+    min-complexity: 100
+  gocyclo:
+    min-complexity: 50
+  cyclop:
+    max-complexity: 50
+
+linters:
+  enable-all: true
+  # enable:
+  #   - nestif
+  disable:
+    # deprecated linters
+    - golint
+    - interfacer
+    - scopelint
+    - maligned
+
+    # suppress type assertion warnings since we assert the same we passed
+    - forcetypeassert
+    # all struct has omitempty, so all fields in struct are not required
+    - exhaustivestruct
+    # disable gofumpt since it has conflict with wsl(white space letter) linter
+    - gofumpt
+    # integration tests need to done in sequential manner
+    - paralleltest
+    # need to allow single character variable name
+    - varnamelen
+    # return the error need not to wrap
+    - wrapcheck
+    # default value needs to be provided as integer literal
+    - gomnd
+
+    #later check
+    - gochecknoglobals
+    - bodyclose
+    - lll # should reduce line length or configure max length of line
+    - noctx
+    - gochecknoinits
+
+    
+
+
+  fast: false

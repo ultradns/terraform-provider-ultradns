@@ -12,12 +12,12 @@ import (
 func TestAccZoneDataSource(t *testing.T) {
 	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
 	tc := resource.TestCase{
-		PreCheck:     func() { acctest.PreCheck(t) },
+		PreCheck:     func() { acctest.TestPreCheck(t) },
 		Providers:    acctest.TestAccProviders,
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourceZone(zoneName, acctest.TestUsername),
+				Config: testAccDataSourceZone(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists("ultradns_zone.primarydata"),
 					resource.TestCheckResourceAttr("data.ultradns_zone.testzone", "limit", "1"),
@@ -25,7 +25,7 @@ func TestAccZoneDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_zone.testzone", "zones.#", "1"),
 					resource.TestCheckResourceAttr("data.ultradns_zone.testzone", "zones.0.name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_zone.testzone", "zones.0.account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr("data.ultradns_zone.testzone", "zones.0.type", "PRIMARY"),
+					resource.TestCheckResourceAttr("data.ultradns_zone.testzone", "zones.0.type", primaryZoneType),
 				),
 			},
 		},
@@ -33,12 +33,10 @@ func TestAccZoneDataSource(t *testing.T) {
 	resource.Test(t, tc)
 }
 
-func testAccDataSourceZone(zoneName, accountName string) string {
+func testAccDataSourceZone(zoneName string) string {
 	return fmt.Sprintf(`
 	data "ultradns_zone" "testzone" {
-		limit = 1
-		reverse = true
-		query = "name:%s"
+		name = %s"
 	}
 	`, zoneName)
 }

@@ -8,45 +8,52 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+)
+
+const (
+	primaryZoneType   = "PRIMARY"
+	secondaryZoneType = "SECONDARY"
+	aliasZoneType     = "ALIAS"
 )
 
 func TestAccZoneResource(t *testing.T) {
 	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
 	tc := resource.TestCase{
-		PreCheck:     func() { acctest.PreCheck(t) },
+		PreCheck:     func() { acctest.TestPreCheck(t) },
 		Providers:    acctest.TestAccProviders,
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccZonePrimary_create_new(zoneName, acctest.TestUsername),
+				Config: testAccZonePrimaryCreateNew(zoneName, acctest.TestUsername),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists("ultradns_zone.primary"),
 					resource.TestCheckResourceAttr("ultradns_zone.primary", "name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_zone.primary", "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr("ultradns_zone.primary", "type", "PRIMARY"),
+					resource.TestCheckResourceAttr("ultradns_zone.primary", "type", primaryZoneType),
 				),
 			},
 			{
-				Config: testAccZoneSecondary_create_new("d100-permission.com.", acctest.TestUsername),
+				Config: testAccZoneSecondaryCreateNew("d100-permission.com.", acctest.TestUsername),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists("ultradns_zone.secondary"),
 					resource.TestCheckResourceAttr("ultradns_zone.secondary", "name", "d100-permission.com."),
 					resource.TestCheckResourceAttr("ultradns_zone.secondary", "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr("ultradns_zone.secondary", "type", "SECONDARY"),
+					resource.TestCheckResourceAttr("ultradns_zone.secondary", "type", secondaryZoneType),
 				),
 			},
 			{
-				Config: testAccZoneAlias_create_new(zoneName, acctest.TestUsername),
+				Config: testAccZoneAliasCreateNew(zoneName, acctest.TestUsername),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists("ultradns_zone.alias"),
 					resource.TestCheckResourceAttr("ultradns_zone.alias", "name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_zone.alias", "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr("ultradns_zone.alias", "type", "ALIAS"),
+					resource.TestCheckResourceAttr("ultradns_zone.alias", "type", aliasZoneType),
 				),
 			},
 			{
-				Config: testAccZone_import(zoneName, acctest.TestUsername),
+				Config: testAccZoneImport(zoneName, acctest.TestUsername),
 			},
 			{
 				ResourceName:     "ultradns_zone.importdata",
@@ -62,7 +69,7 @@ func testAccCheckZoneExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return helper.DataNotFoundError(n)
 		}
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
@@ -73,19 +80,19 @@ func testAccCheckZoneExists(n string) resource.TestCheckFunc {
 		}
 
 		if zoneResponse.Properties == nil {
-			return fmt.Errorf("zone properties are nil")
+			return helper.DataNilError("zone properties")
 		}
 
 		if zoneResponse.Properties.Name != rs.Primary.ID {
-			return fmt.Errorf("zone name mismactched expected : %v - returned : %v", rs.Primary.ID, zoneResponse.Properties.Name)
+			return helper.MismatchError("zone name", rs.Primary.ID, zoneResponse.Properties.Name)
 		}
 
 		if zoneTypeExpected, ok := rs.Primary.Attributes["type"]; !ok || zoneTypeExpected != zoneResponse.Properties.Type {
-			return fmt.Errorf("zone type mismactched expected : %v - returned : %v", zoneTypeExpected, zoneResponse.Properties.Type)
+			return helper.MismatchError("zone type", zoneTypeExpected, zoneResponse.Properties.Type)
 		}
 
 		if zoneAccountExpected, ok := rs.Primary.Attributes["account_name"]; !ok || zoneAccountExpected != zoneResponse.Properties.AccountName {
-			return fmt.Errorf("zone account mismactched expected : %v - returned : %v", zoneAccountExpected, zoneResponse.Properties.AccountName)
+			return helper.MismatchError("zone account", zoneAccountExpected, zoneResponse.Properties.AccountName)
 		}
 
 		return nil
@@ -100,12 +107,15 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		res, zoneResponse, err := services.ZoneService.ReadZone(rs.Primary.ID)
+
 		if err == nil {
 			if zoneResponse.Properties != nil && zoneResponse.Properties.Name == rs.Primary.ID {
-				return fmt.Errorf("zone %v not destroyed!", rs.Primary.ID)
+				return fmt.Errorf("zone %v not destroyed.", rs.Primary.ID)
 			}
+
 			return nil
 		}
+
 		if res.StatusCode != 404 {
 			return err
 		}
@@ -118,22 +128,27 @@ func testAccZoneImportStateCheck(zoneName, accountName string) func(is []*terraf
 	return func(is []*terraform.InstanceState) error {
 		if len(is) > 0 {
 			state := is[0]
+
 			if zoneName != state.ID {
-				return fmt.Errorf("zone name mismactched expected : %v - returned : %v", zoneName, state.ID)
+				return helper.MismatchError("zone name", zoneName, state.ID)
 			}
+
 			if accountName != state.Attributes["account_name"] {
-				return fmt.Errorf("zone account mismactched expected : %v - returned : %v", accountName, state.Attributes["account_name"])
+				return helper.MismatchError("account name", accountName, state.Attributes["account_name"])
 			}
-			if "PRIMARY" != state.Attributes["type"] {
-				return fmt.Errorf("zone type mismactched expected : %v - returned : %v", "PRIMARY", state.Attributes["type"])
+
+			if primaryZoneType != state.Attributes["type"] {
+				return helper.MismatchError("zone type", primaryZoneType, state.Attributes["type"])
 			}
+
 			return nil
 		}
+
 		return fmt.Errorf("length of instance state is %v while checking import state", len(is))
 	}
 }
 
-func testAccZonePrimary_create_new(zoneName, accountName string) string {
+func testAccZonePrimaryCreateNew(zoneName, accountName string) string {
 	return fmt.Sprintf(`
 	resource "ultradns_zone" "primary" {
 		name        = "%s"
@@ -163,7 +178,7 @@ func testAccZonePrimary_create_new(zoneName, accountName string) string {
 	`, zoneName, accountName)
 }
 
-func testAccZoneSecondary_create_new(zoneName, accountName string) string {
+func testAccZoneSecondaryCreateNew(zoneName, accountName string) string {
 	return fmt.Sprintf(`
 	resource "ultradns_zone" "secondary" {
 		name        = "%s"
@@ -178,7 +193,7 @@ func testAccZoneSecondary_create_new(zoneName, accountName string) string {
 	`, zoneName, accountName)
 }
 
-func testAccZoneAlias_create_new(zoneName, accountName string) string {
+func testAccZoneAliasCreateNew(zoneName, accountName string) string {
 	return fmt.Sprintf(`
 	resource "ultradns_zone" "alias" {
 		name        = "%s"
@@ -192,7 +207,7 @@ func testAccZoneAlias_create_new(zoneName, accountName string) string {
 	`, zoneName, accountName)
 }
 
-func testAccZone_import(zoneName, accountName string) string {
+func testAccZoneImport(zoneName, accountName string) string {
 	return fmt.Sprintf(`
 	resource "ultradns_zone" "importdata" {
 		name = "%s"

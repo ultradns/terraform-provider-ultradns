@@ -16,5 +16,25 @@ variable "ultradns_host_url" {
 
 variable "ultradns_primary_zone_name" {
   type        = string
-  description = "zone name for testing the provider"
+  description = "primary zone name for testing the provider"
+}
+
+variable "ultradns_secondary_zone_name" {
+  type        = string
+  description = "secondary zone name for testing the provider"
+}
+
+variable "ultradns_alias_zone_name" {
+  type        = string
+  description = "alias zone name for testing the provider"
+}
+
+variable "ultradns_primary_name_server" {
+  type        = string
+  description = "primary name server for testing the provider"
+}
+
+variable "ultradns_notification_email_address" {
+  type        = string
+  description = "notification email address for testing the provider"
 }

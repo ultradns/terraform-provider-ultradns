@@ -29,42 +29,28 @@ func dataSourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta int
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(rrSetKeyData.URI())
+	rd.SetId(resList.ZoneName)
 
-	if resList.QueryInfo != nil {
-		if err := rd.Set("query", resList.QueryInfo.Query); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("sort", resList.QueryInfo.Sort); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("reverse", resList.QueryInfo.Reverse); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("limit", resList.QueryInfo.Limit); err != nil {
-			return diag.FromErr(err)
-		}
-	}
-
-	if resList.ResultInfo != nil {
-		if err := rd.Set("total_count", resList.ResultInfo.TotalCount); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("returned_count", resList.ResultInfo.ReturnedCount); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("offset", resList.ResultInfo.Offset); err != nil {
-			return diag.FromErr(err)
-		}
-	}
-
-	if err := rd.Set("record_sets", flattenRRSets(resList.RRSets)); err != nil {
+	if err := rd.Set("zone_name", resList.ZoneName); err != nil {
 		return diag.FromErr(err)
+	}
+
+	if len(resList.RRSets) > 0 {
+		if err := rd.Set("owner_name", resList.RRSets[0].OwnerName); err != nil {
+			return diag.FromErr(err)
+		}
+
+		if err := rd.Set("record_type", getRecordTypeString(resList.RRSets[0].RRType)); err != nil {
+			return diag.FromErr(err)
+		}
+
+		if err := rd.Set("ttl", resList.RRSets[0].TTL); err != nil {
+			return diag.FromErr(err)
+		}
+
+		if err := rd.Set("record_data", flattenRecordData(resList.RRSets[0].RData)); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	return diags

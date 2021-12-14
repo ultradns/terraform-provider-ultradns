@@ -55,7 +55,7 @@ func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.Resour
 	return service, diags
 }
 
-func PreCheck(t *testing.T) {
+func TestPreCheck(t *testing.T) {
 	if TestUsername == "" {
 		t.Fatal("username required for creating test client")
 	}
@@ -71,5 +71,4 @@ func PreCheck(t *testing.T) {
 	if testUserAgent == "" {
 		t.Fatal("user agent required for creating test client")
 	}
-
 }

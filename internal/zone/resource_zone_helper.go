@@ -1,14 +1,12 @@
 package zone
 
 import (
-	"fmt"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
 func flattenPrimaryZone(zr *zone.Response, rd *schema.ResourceData) *schema.Set {
-
 	set := &schema.Set{
 		F: schema.HashResource(primaryZoneCreateInfoResource()),
 	}
@@ -34,7 +32,6 @@ func flattenPrimaryZone(zr *zone.Response, rd *schema.ResourceData) *schema.Set 
 		}
 
 		primaryCreateInfo["notify_addresses"] = s
-
 	}
 
 	if len(zr.RestrictIPList) > 0 {
@@ -55,7 +52,6 @@ func flattenPrimaryZone(zr *zone.Response, rd *schema.ResourceData) *schema.Set 
 		}
 
 		primaryCreateInfo["restrict_ip"] = s
-
 	}
 
 	if zr.Tsig != nil {
@@ -103,6 +99,7 @@ func flattenSecondaryZone(zr *zone.Response, rd *schema.ResourceData) *schema.Se
 			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIPList.NameServerIP1))
 			secondaryCreateInfo["primary_name_server_1"] = s
 		}
+
 		if zr.PrimaryNameServers.NameServerIPList.NameServerIP2 != nil {
 			s := &schema.Set{
 				F: schema.HashResource(nameServerResource()),
@@ -110,6 +107,7 @@ func flattenSecondaryZone(zr *zone.Response, rd *schema.ResourceData) *schema.Se
 			s.Add(getNameServer(zr.PrimaryNameServers.NameServerIPList.NameServerIP2))
 			secondaryCreateInfo["primary_name_server_2"] = s
 		}
+
 		if zr.PrimaryNameServers.NameServerIPList.NameServerIP3 != nil {
 			s := &schema.Set{
 				F: schema.HashResource(nameServerResource()),
@@ -118,12 +116,13 @@ func flattenSecondaryZone(zr *zone.Response, rd *schema.ResourceData) *schema.Se
 			secondaryCreateInfo["primary_name_server_3"] = s
 		}
 	}
+
 	set.Add(secondaryCreateInfo)
 
 	return set
 }
 
-func flattenAliasZone(zr *zone.Response, rd *schema.ResourceData) *schema.Set {
+func flattenAliasZone(zr *zone.Response) *schema.Set {
 	set := &schema.Set{
 		F: schema.HashResource(aliasZoneCreateInfoResource()),
 	}
@@ -142,15 +141,18 @@ func getNameServer(ns *zone.NameServer) map[string]interface{} {
 	nameserver["tsig_key"] = ns.TsigKey
 	nameserver["tsig_key_value"] = ns.TsigKeyValue
 	nameserver["tsig_algorithm"] = ns.TsigAlgorithm
+
 	return nameserver
 }
 
 func validateZoneName(i interface{}, s string) (warns []string, errs []error) {
 	zoneName := i.(string)
+
 	if len(zoneName) > 0 {
 		if lastChar := zoneName[len(zoneName)-1]; lastChar != '.' {
-			errs = append(errs, fmt.Errorf("zone name must be a FQDN"))
+			errs = append(errs, helper.ZoneNameValidationError())
 		}
 	}
+
 	return
 }

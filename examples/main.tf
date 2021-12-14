@@ -34,6 +34,27 @@ resource "ultradns_zone" "primary" {
     }
 }
 
+resource "ultradns_zone" "secondary" {
+    name        = "${var.ultradns_secondary_zone_name}"
+    account_name = "${var.ultradns_username}"
+    type        = "SECONDARY"
+    secondary_create_info {
+        primary_name_server_1 {
+            ip = "${var.ultradns_primary_name_server}"
+        } 
+        notification_email_address = "${var.ultradns_notification_email_address}"
+    }
+}
+
+resource "ultradns_zone" "alias" {
+    name        = "${var.ultradns_alias_zone_name}"
+    account_name = "${var.ultradns_username}"
+    type        = "ALIAS"
+    alias_create_info {
+        original_zone_name = "${resource.ultradns_zone.primary.id}"
+  }
+}
+
 resource "ultradns_record" "a" {
     zone_name = "${resource.ultradns_zone.primary.id}"
     owner_name = "a"
@@ -90,15 +111,12 @@ resource "ultradns_record" "ptr" {
     record_data = ["google.com."]
 }
 
-data "ultradns_record" "all" {
-    depends_on = [resource.ultradns_record.ptr]
+data "ultradns_record" "record_a" {
     zone_name = "${resource.ultradns_zone.primary.id}"
-    # owner_name = "www"
-    # record_type = "1"
+    owner_name = "${resource.ultradns_record.a.owner_name}"
+    record_type = "${resource.ultradns_record.a.record_type}"
 }
 
-data "ultradns_zone" "all" {
-    # query = "name:${var.ultradns_primary_zone_name}"
-    # cursor = "fjpMQVNU"
-    limit = 1
+data "ultradns_zone" "zone" {
+    name = "${resource.ultradns_zone.primary.id}"
 }

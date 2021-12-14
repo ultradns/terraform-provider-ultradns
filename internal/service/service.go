@@ -13,7 +13,9 @@ type Service struct {
 
 func NewService(c *client.Client) (*Service, error) {
 	service := &Service{}
+
 	var err error
+
 	if service.ZoneService, err = zone.Get(c); err != nil {
 		return nil, err
 	}

@@ -49,11 +49,11 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 
 	if err != nil {
 		rd.SetId("")
+
 		return nil
 	}
 
 	if zr.Properties != nil {
-
 		if err := rd.Set("name", zr.Properties.Name); err != nil {
 			return diag.FromErr(err)
 		}
@@ -86,18 +86,6 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 			return diag.FromErr(err)
 		}
 
-		if zr.RegistrarInfo != nil {
-			if err := rd.Set("registrar_info", flattenRegistrarInfo(zr.RegistrarInfo)); err != nil {
-				return diag.FromErr(err)
-			}
-		}
-
-		if zr.TransferStatusDetails != nil {
-			if err := rd.Set("transfer_status_details", flattenTransferStatusDetails(zr.TransferStatusDetails)); err != nil {
-				return diag.FromErr(err)
-			}
-		}
-
 		switch zr.Properties.Type {
 		case "PRIMARY":
 			if err := rd.Set("primary_create_info", flattenPrimaryZone(zr, rd)); err != nil {
@@ -108,11 +96,24 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 				return diag.FromErr(err)
 			}
 		case "ALIAS":
-			if err := rd.Set("alias_create_info", flattenAliasZone(zr, rd)); err != nil {
+			if err := rd.Set("alias_create_info", flattenAliasZone(zr)); err != nil {
 				return diag.FromErr(err)
 			}
 		}
 	}
+
+	if zr.RegistrarInfo != nil {
+		if err := rd.Set("registrar_info", flattenRegistrarInfo(zr.RegistrarInfo)); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
+	if zr.TransferStatusDetails != nil {
+		if err := rd.Set("transfer_status_details", flattenTransferStatusDetails(zr.TransferStatusDetails)); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
 	return diags
 }
 
@@ -138,20 +139,24 @@ func resourceZoneDelete(ctx context.Context, rd *schema.ResourceData, meta inter
 	zoneID := rd.Id()
 
 	_, err := services.ZoneService.DeleteZone(zoneID)
+
 	if err != nil {
 		rd.SetId("")
+
 		return diag.FromErr(err)
 	}
 
 	rd.SetId("")
+
 	return diags
 }
 
 func newZone(rd *schema.ResourceData) *zone.Zone {
-
 	var zoneType string
+
 	zoneData := &zone.Zone{}
 	properties := &zone.Properties{}
+
 	if val, ok := rd.GetOk("name"); ok {
 		properties.Name = val.(string)
 	}
@@ -179,6 +184,7 @@ func newZone(rd *schema.ResourceData) *zone.Zone {
 	}
 
 	zoneData.Properties = properties
+
 	return zoneData
 }
 
@@ -252,6 +258,7 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *zone.PrimaryZone {
 			restrictIPDataList := val.(*schema.Set).List()
 			restrictIPList := make([]*zone.RestrictIP, len(restrictIPDataList))
 			primaryCreateInfo.RestrictIPList = restrictIPList
+
 			for i, d := range restrictIPDataList {
 				restrictIPData := d.(map[string]interface{})
 				restrictIP := zone.RestrictIP{}
@@ -275,6 +282,7 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *zone.PrimaryZone {
 				if val, ok := restrictIPData["comment"]; ok {
 					restrictIP.Comment = val.(string)
 				}
+
 				restrictIPList[i] = &restrictIP
 			}
 		}
@@ -299,8 +307,8 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *zone.PrimaryZone {
 				notifyAddressList[i] = &notifyAddress
 			}
 		}
-
 	}
+
 	return primaryCreateInfo
 }
 
@@ -382,6 +390,7 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *zone.SecondaryZone {
 			}
 		}
 	}
+
 	return secondaryCreateInfo
 }
 
@@ -392,5 +401,6 @@ func getAliasCreateInfo(rd *schema.ResourceData) *zone.AliasZone {
 		data := val.(*schema.Set).List()[0].(map[string]interface{})
 		aliasCreateInfo.OriginalZoneName = data["original_zone_name"].(string)
 	}
+
 	return aliasCreateInfo
 }

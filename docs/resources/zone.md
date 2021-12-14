@@ -21,17 +21,6 @@ resource "ultradns_zone" "primary" {
     type        = "PRIMARY"
     primary_create_info {
         create_type = "NEW"
-    }
-}
-```
-
-```terraform
-resource "ultradns_zone" "primary" {
-    name        = "example.com."
-    account_name = "account"
-    type        = "PRIMARY"
-    primary_create_info {
-        create_type = "NEW"
         restrict_ip{
             single_ip = "192.168.1.1"
         }
@@ -54,13 +43,43 @@ resource "ultradns_zone" "primary" {
 }
 ```
 
+### Create Secondary Zone
+
+```terraform
+resource "ultradns_zone" "secondary" {
+    name        = "example.com."
+    account_name = "account"
+    type        = "SECONDARY"
+    secondary_create_info {
+        primary_name_server_1 {
+            ip = "192.168.1.1"
+        } 
+        notification_email_address = "test@example.com"
+    }
+}
+```
+
+### Create Alias Zone
+
+```terraform
+resource "ultradns_zone" "alias" {
+    name        = "example.com."
+    account_name = "account"
+    type        = "ALIAS"
+    alias_create_info {
+        original_zone_name = "ultradns.com."
+  }
+}
+```
+
+
 ## Argument Reference
 
 The following arguments are supported:
 
 * `name` - (Required) (String) A fully qualified domain name(FQDN) is required.
 * `account_name` - (Required) (String) 	Name of the account.
-* `type` - (Required) (String) This is the type of the zone.    Valid values are `PRIMARY`, `SECONDARY` or `ALIAS`.
+* `type` - (Required) (String) This is the type of the zone. Valid values are `PRIMARY`, `SECONDARY` or `ALIAS`.
 * `change_comment` - (Optional) (String) This is used to provide comments on updates.
 * `primary_create_info` - (Optional) (Block Set, Max: 1) Nested block describing the info of primary zone. The structure of this block is described below.
 * `secondary_create_info` - (Optional) (Block Set, Max: 1)
@@ -68,9 +87,9 @@ Nested block describing the info of secondary zone. The structure of this block 
 * `alias_create_info` - (Optional) (Block Set, Max: 1)
 Nested block describing the info of alias zone. The structure of this block is described below.
 
-#### When `type` is "PRIMARY" `primary_create_info` needs to be provided.
-#### When `type` is "SECONDARY" `secondary_create_info` needs to be provided.
-#### When `type` is "ALIAS" `alias_create_info` needs to be provided.
+#### When `type` is "PRIMARY" <a href="#nested-primary_create_info-block-has-the-following-structure">`primary_create_info`</a> needs to be provided.
+#### When `type` is "SECONDARY" <a href="#nested-secondary_create_info-block-has-the-following-structure">`secondary_create_info`</a> needs to be provided.
+#### When `type` is "ALIAS" <a href="#nested-alias_create_info-block-has-the-following-structure">`alias_create_info`</a> needs to be provided.
 
 ### Nested `primary_create_info` block has the following structure:
 
@@ -121,6 +140,7 @@ Nested block describing the info of alias zone. The structure of this block is d
 
 * `original_zone_name` - (Required) (String) The name of the zone being aliased. The existing zone must be owned by the same account as the new zone.
 
+
 ## Attributes Reference
 
 In addition to all arguments above, the following attributes are exported:
@@ -134,8 +154,8 @@ Example: `2021-12-07T11:25Z`.
 * `registrar_info` - (Computed) (Block Set) Nested block describing information about the name server configuration for this zone. The structure of this block is described below.
 * `transfer_status_details` - (Computed) (Block Set) Nested block describing the zone transfer details. The structure of this block is described below.
 
-#### When `type` is "PRIMARY" `registrar_info` will be exported.
-#### When `type` is "SECONDARY" `transfer_status_details` will be exported.
+#### When `type` is "PRIMARY" <a href="#nested-registrar_info-block-has-the-following-structure">`registrar_info`</a> will be exported.
+#### When `type` is "SECONDARY" <a href="#nested-transfer_status_details-block-has-the-following-structure">`transfer_status_details`</a> will be exported.
 
 ### Nested `registrar_info` block has the following structure:
 
@@ -157,7 +177,7 @@ Example: `2022-08-17 03:59:59.0`.
 Example: `03/18/21 10:20:34 AM GMT`.
 * `next_refresh` - (Computed) (String) Displays the date (`MM/dd/yy HH:mm:ss tt vvv`) when the next transfer attempt or refresh is.<br/>
 Example: `03/18/21 10:20:34 AM GMT`.
-* `last_refresh_status` - (Computed) (String) Displays the status of the last transfer that was attempted. Valid values are `IN_PROGRESS`, `FAILED`, `SUCCESSFUL`
+* `last_refresh_status` - (Computed) (String) Displays the status of the last transfer that was attempted. Valid values are `IN_PROGRESS`, `FAILED`, `SUCCESSFUL`.
 * `last_refresh_status_message` - (Computed) (String) Displays the last transfer’s status message. This is currently shown as failure reason.
 
 ## Import
@@ -167,5 +187,3 @@ Zones can be imported using their name (must be a FQDN), e.g.,
 ```
 $ terraform import ultradns_zone.example "example.com." 
 ```
-
-
