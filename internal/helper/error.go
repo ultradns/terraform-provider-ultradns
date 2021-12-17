@@ -8,7 +8,7 @@ import (
 var (
 	errMismatchData = errors.New("mismatched")
 	errZoneName     = errors.New("zone name must be a FQDN")
-	errDataNotFound = errors.New("not found")
+	errNotFound     = errors.New("not found")
 	errNil          = errors.New("nil")
 )
 
@@ -20,8 +20,8 @@ func ZoneNameValidationError() error {
 	return fmt.Errorf("%w", errZoneName)
 }
 
-func DataNotFoundError(key string) error {
-	return fmt.Errorf("%s %w", key, errDataNotFound)
+func ResourceNotFoundError(key string) error {
+	return fmt.Errorf("resource - %s %w", key, errNotFound)
 }
 
 func DataNilError(key string) error {

@@ -68,7 +68,7 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 		recordTypeAfter := resList.RRSets[0].RRType
 
 		if rrset.GetRRTypeFullString(recordTypeBefore) != recordTypeAfter {
-			if err := rd.Set("record_type", resList.RRSets[0].RRType); err != nil {
+			if err := rd.Set("record_type", getRecordTypeString(resList.RRSets[0].RRType)); err != nil {
 				return diag.FromErr(err)
 			}
 		}

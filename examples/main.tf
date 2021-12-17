@@ -111,12 +111,12 @@ resource "ultradns_record" "ptr" {
     record_data = ["google.com."]
 }
 
+data "ultradns_zone" "zone" {
+    name = "${resource.ultradns_zone.primary.id}"
+}
+
 data "ultradns_record" "record_a" {
     zone_name = "${resource.ultradns_zone.primary.id}"
     owner_name = "${resource.ultradns_record.a.owner_name}"
     record_type = "${resource.ultradns_record.a.record_type}"
-}
-
-data "ultradns_zone" "zone" {
-    name = "${resource.ultradns_zone.primary.id}"
 }

@@ -19,38 +19,28 @@ func init() {
 
 func testAccZoneSweeper(r string) error {
 	services := acctest.TestAccProvider.Meta().(*service.Service)
-	cursor := ""
-	initial := true
+	query := testAccGetZoneQueryString("test-acc")
+	_, zoneList, err := services.ZoneService.ListZone(query)
 
-	for {
-		query := testAccGetZoneQueryString(cursor)
-		_, zoneList, err := services.ZoneService.ListZone(query)
+	if err != nil {
+		return err
+	}
 
-		if err != nil {
-			return err
-		}
-
-		for _, zone := range zoneList.Zones {
-			if strings.HasPrefix(zone.Properties.Name, "test-acc") {
-				_, er := services.ZoneService.DeleteZone(zone.Properties.Name)
-				if er != nil {
-					log.Printf("error destroying %s during sweep: %s", zone.Properties.Name, er)
-				}
+	for _, zone := range zoneList.Zones {
+		if strings.HasPrefix(zone.Properties.Name, "test-acc") {
+			_, er := services.ZoneService.DeleteZone(zone.Properties.Name)
+			if er != nil {
+				log.Printf("error destroying %s during sweep: %s", zone.Properties.Name, er)
 			}
 		}
-
-		if zoneList.CursorInfo.Next == "" && !initial {
-			return nil
-		}
-
-		initial = false
-		cursor = zoneList.CursorInfo.Next
 	}
+
+	return nil
 }
 
-func testAccGetZoneQueryString(cursor string) *helper.QueryInfo {
+func testAccGetZoneQueryString(zonePrefix string) *helper.QueryInfo {
 	return &helper.QueryInfo{
-		Limit:  1000,
-		Cursor: cursor,
+		Limit: 1000,
+		Query: "name:" + zonePrefix,
 	}
 }

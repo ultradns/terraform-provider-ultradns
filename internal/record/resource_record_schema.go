@@ -12,12 +12,10 @@ func resourceRecordSchema() map[string]*schema.Schema {
 		"owner_name": {
 			Type:     schema.TypeString,
 			Required: true,
-			ForceNew: true,
 		},
 		"record_type": {
 			Type:     schema.TypeString,
 			Required: true,
-			ForceNew: true,
 		},
 		"ttl": {
 			Type:     schema.TypeInt,

@@ -13,86 +13,93 @@ import (
 )
 
 const (
-	primaryZoneType   = "PRIMARY"
-	secondaryZoneType = "SECONDARY"
-	aliasZoneType     = "ALIAS"
+	primaryZoneType     = "PRIMARY"
+	secondaryZoneType   = "SECONDARY"
+	aliasZoneType       = "ALIAS"
+	defaultCount        = "2"
+	defaultZoneStatus   = "ACTIVE"
+	defaultDNSSECStatus = "UNSIGNED"
 )
 
-func TestAccZoneResource(t *testing.T) {
+func TestAccResourceZonePrimary(t *testing.T) {
 	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
-	tc := resource.TestCase{
+	resourceName := "ultradns_zone.primary"
+
+	testCase := resource.TestCase{
 		PreCheck:     func() { acctest.TestPreCheck(t) },
 		Providers:    acctest.TestAccProviders,
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccZonePrimaryCreateNew(zoneName, acctest.TestUsername),
+				Config: testAccResourceZonePrimary(zoneName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckZoneExists("ultradns_zone.primary"),
-					resource.TestCheckResourceAttr("ultradns_zone.primary", "name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_zone.primary", "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr("ultradns_zone.primary", "type", primaryZoneType),
+					testAccCheckZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
+					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestUsername),
+					resource.TestCheckResourceAttr(resourceName, "type", primaryZoneType),
+					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
+					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
+					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
+					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(resourceName, "primary_create_info.0.notify_addresses.#", defaultCount),
+					resource.TestCheckResourceAttr(resourceName, "primary_create_info.0.restrict_ip.#", defaultCount),
 				),
 			},
 			{
-				Config: testAccZoneSecondaryCreateNew("d100-permission.com.", acctest.TestUsername),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckZoneExists("ultradns_zone.secondary"),
-					resource.TestCheckResourceAttr("ultradns_zone.secondary", "name", "d100-permission.com."),
-					resource.TestCheckResourceAttr("ultradns_zone.secondary", "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr("ultradns_zone.secondary", "type", secondaryZoneType),
-				),
-			},
-			{
-				Config: testAccZoneAliasCreateNew(zoneName, acctest.TestUsername),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckZoneExists("ultradns_zone.alias"),
-					resource.TestCheckResourceAttr("ultradns_zone.alias", "name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_zone.alias", "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr("ultradns_zone.alias", "type", aliasZoneType),
-				),
-			},
-			{
-				Config: testAccZoneImport(zoneName, acctest.TestUsername),
-			},
-			{
-				ResourceName:     "ultradns_zone.importdata",
-				ImportState:      true,
-				ImportStateCheck: testAccZoneImportStateCheck(zoneName, acctest.TestUsername),
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"primary_create_info.0.create_type"},
 			},
 		},
 	}
-	resource.Test(t, tc)
+	resource.ParallelTest(t, testCase)
 }
 
-func testAccCheckZoneExists(n string) resource.TestCheckFunc {
+func TestAccResourceZoneAlias(t *testing.T) {
+	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
+	resourceName := "ultradns_zone.alias"
+
+	testCase := resource.TestCase{
+		PreCheck:     func() { acctest.TestPreCheck(t) },
+		Providers:    acctest.TestAccProviders,
+		CheckDestroy: testAccCheckZoneDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccResourceZoneAlias(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
+					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestUsername),
+					resource.TestCheckResourceAttr(resourceName, "type", aliasZoneType),
+					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
+					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
+					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
+					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	}
+	resource.ParallelTest(t, testCase)
+}
+
+func testAccCheckZoneExists(resourceName string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
+		rs, ok := s.RootModule().Resources[resourceName]
 		if !ok {
-			return helper.DataNotFoundError(n)
+			return helper.ResourceNotFoundError(resourceName)
 		}
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
-		_, zoneResponse, err := services.ZoneService.ReadZone(rs.Primary.ID)
+		_, _, err := services.ZoneService.ReadZone(rs.Primary.ID)
 
 		if err != nil {
 			return err
-		}
-
-		if zoneResponse.Properties == nil {
-			return helper.DataNilError("zone properties")
-		}
-
-		if zoneResponse.Properties.Name != rs.Primary.ID {
-			return helper.MismatchError("zone name", rs.Primary.ID, zoneResponse.Properties.Name)
-		}
-
-		if zoneTypeExpected, ok := rs.Primary.Attributes["type"]; !ok || zoneTypeExpected != zoneResponse.Properties.Type {
-			return helper.MismatchError("zone type", zoneTypeExpected, zoneResponse.Properties.Type)
-		}
-
-		if zoneAccountExpected, ok := rs.Primary.Attributes["account_name"]; !ok || zoneAccountExpected != zoneResponse.Properties.AccountName {
-			return helper.MismatchError("zone account", zoneAccountExpected, zoneResponse.Properties.AccountName)
 		}
 
 		return nil
@@ -106,49 +113,19 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 		}
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
-		res, zoneResponse, err := services.ZoneService.ReadZone(rs.Primary.ID)
+		_, zoneResponse, err := services.ZoneService.ReadZone(rs.Primary.ID)
 
 		if err == nil {
 			if zoneResponse.Properties != nil && zoneResponse.Properties.Name == rs.Primary.ID {
 				return fmt.Errorf("zone %v not destroyed.", rs.Primary.ID)
 			}
-
-			return nil
-		}
-
-		if res.StatusCode != 404 {
-			return err
 		}
 	}
 
 	return nil
 }
 
-func testAccZoneImportStateCheck(zoneName, accountName string) func(is []*terraform.InstanceState) error {
-	return func(is []*terraform.InstanceState) error {
-		if len(is) > 0 {
-			state := is[0]
-
-			if zoneName != state.ID {
-				return helper.MismatchError("zone name", zoneName, state.ID)
-			}
-
-			if accountName != state.Attributes["account_name"] {
-				return helper.MismatchError("account name", accountName, state.Attributes["account_name"])
-			}
-
-			if primaryZoneType != state.Attributes["type"] {
-				return helper.MismatchError("zone type", primaryZoneType, state.Attributes["type"])
-			}
-
-			return nil
-		}
-
-		return fmt.Errorf("length of instance state is %v while checking import state", len(is))
-	}
-}
-
-func testAccZonePrimaryCreateNew(zoneName, accountName string) string {
+func testAccResourceZonePrimary(zoneName string) string {
 	return fmt.Sprintf(`
 	resource "ultradns_zone" "primary" {
 		name        = "%s"
@@ -162,11 +139,6 @@ func testAccZonePrimaryCreateNew(zoneName, accountName string) string {
 			notify_addresses {
 				notify_address = "192.168.1.2"
 			}
-			tsig {
-				tsig_key_name = "0-0-0-0-0antony.com.0.3276735349282751.key."
-				tsig_key_value = "ZWFlY2U1MTBlNTZhYTRmM2Y0NGQ5MTlmYTdmZTE0Njc="
-				tsig_algorithm  = "hmac-md5"
-			}
 			restrict_ip {
 				single_ip = "192.168.1.3"
 			}
@@ -175,50 +147,31 @@ func testAccZonePrimaryCreateNew(zoneName, accountName string) string {
 			}
 		}
 	}
-	`, zoneName, accountName)
+	`, zoneName, acctest.TestUsername)
 }
 
-func testAccZoneSecondaryCreateNew(zoneName, accountName string) string {
+func testAccResourceZoneAlias(zoneName string) string {
 	return fmt.Sprintf(`
-	resource "ultradns_zone" "secondary" {
+	resource "ultradns_zone" "alias_primary" {
 		name        = "%s"
 		account_name = "%s"
-		type        = "SECONDARY"
-		secondary_create_info {
-			primary_name_server_1 {
-				ip = "e2e-bind-useast1a01-01.dev.ultradns.net"
-			}
+		type        = "PRIMARY"
+		primary_create_info {
+			create_type = "NEW"
 		}
 	}
-	`, zoneName, accountName)
-}
 
-func testAccZoneAliasCreateNew(zoneName, accountName string) string {
-	return fmt.Sprintf(`
 	resource "ultradns_zone" "alias" {
 		name        = "%s"
 		account_name = "%s"
 		type        = "ALIAS"
-	  
 		alias_create_info {
-			  original_zone_name = "0-0-0-0-0antony.com."
+			  original_zone_name = "${resource.ultradns_zone.alias_primary.id}"
 		}
 	  }
-	`, zoneName, accountName)
+	`, testAccGetPrimaryZoneNameForAlias(zoneName), acctest.TestUsername, zoneName, acctest.TestUsername)
 }
 
-func testAccZoneImport(zoneName, accountName string) string {
-	return fmt.Sprintf(`
-	resource "ultradns_zone" "importdata" {
-		name = "%s"
-		account_name = "%s"
-		type = "PRIMARY"
-		primary_create_info {
-			create_type = "NEW"
-			notify_addresses {
-				notify_address = "192.168.1.1"
-			}
-		}
-	}
-	`, zoneName, accountName)
+func testAccGetPrimaryZoneNameForAlias(zoneName string) string {
+	return fmt.Sprintf("%s/%sin-addr.arpa.", zoneName, zoneName)
 }
