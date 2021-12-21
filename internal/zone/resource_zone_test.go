@@ -117,7 +117,7 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 
 		if err == nil {
 			if zoneResponse.Properties != nil && zoneResponse.Properties.Name == rs.Primary.ID {
-				return fmt.Errorf("zone %v not destroyed.", rs.Primary.ID)
+				return fmt.Errorf("zone %v not destroyed.\n", rs.Primary.ID)
 			}
 		}
 	}

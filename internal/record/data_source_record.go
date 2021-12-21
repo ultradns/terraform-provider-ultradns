@@ -29,7 +29,7 @@ func dataSourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta int
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(resList.ZoneName)
+	rd.SetId(rrSetKeyData.ID())
 
 	if err := rd.Set("zone_name", resList.ZoneName); err != nil {
 		return diag.FromErr(err)

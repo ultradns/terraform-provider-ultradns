@@ -37,7 +37,6 @@ linters:
     # default value needs to be provided as integer literal
     - gomnd
 
-    #later check
     - gochecknoglobals
     - bodyclose
     - lll # should reduce line length or configure max length of line

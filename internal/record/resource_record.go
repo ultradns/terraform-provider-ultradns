@@ -46,8 +46,7 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
-	rrSetKeyID := rd.Id()
-	rrSetKey := getRRSetKey(rrSetKeyID)
+	rrSetKey := GetRRSetKey(rd.Id())
 	_, resList, err := services.RecordService.ReadRecord(rrSetKey)
 
 	if resList != nil && resList.ResultInfo != nil && resList.ResultInfo.ReturnedCount > 0 && len(resList.RRSets) > 0 {
@@ -100,7 +99,7 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 func resourceRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	services := meta.(*service.Service)
 	rrSetData := newRRSet(rd)
-	rrSetKeyData := getRRSetKey(rd.Id())
+	rrSetKeyData := GetRRSetKey(rd.Id())
 
 	_, err := services.RecordService.UpdateRecord(rrSetKeyData, rrSetData)
 
@@ -115,7 +114,7 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
-	rrSetKeyData := getRRSetKey(rd.Id())
+	rrSetKeyData := GetRRSetKey(rd.Id())
 
 	_, err := services.RecordService.DeleteRecord(rrSetKeyData)
 
@@ -175,7 +174,7 @@ func newRRSetKey(rd *schema.ResourceData) *rrset.RRSetKey {
 	return rrSetKeyData
 }
 
-func getRRSetKey(id string) *rrset.RRSetKey {
+func GetRRSetKey(id string) *rrset.RRSetKey {
 	rrSetKeyData := &rrset.RRSetKey{}
 	splitStringData := strings.Split(id, ":")
 
