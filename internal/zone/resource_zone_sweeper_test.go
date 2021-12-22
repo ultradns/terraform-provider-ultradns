@@ -10,6 +10,8 @@ import (
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 )
 
+const testZoneSweeperPrefix = "test-acc"
+
 func init() {
 	resource.AddTestSweepers("ultradns_zone", &resource.Sweeper{
 		Name: "ultradns_zone",
@@ -19,7 +21,7 @@ func init() {
 
 func testAccZoneSweeper(r string) error {
 	services := acctest.TestAccProvider.Meta().(*service.Service)
-	query := testAccGetZoneQueryString("test-acc")
+	query := testAccGetZoneSweeperQueryString()
 	_, zoneList, err := services.ZoneService.ListZone(query)
 
 	if err != nil {
@@ -27,7 +29,7 @@ func testAccZoneSweeper(r string) error {
 	}
 
 	for _, zone := range zoneList.Zones {
-		if strings.HasPrefix(zone.Properties.Name, "test-acc") {
+		if strings.HasPrefix(zone.Properties.Name, testZoneSweeperPrefix) {
 			_, er := services.ZoneService.DeleteZone(zone.Properties.Name)
 			if er != nil {
 				log.Printf("error destroying %s during sweep: %s", zone.Properties.Name, er)
@@ -38,9 +40,9 @@ func testAccZoneSweeper(r string) error {
 	return nil
 }
 
-func testAccGetZoneQueryString(zonePrefix string) *helper.QueryInfo {
+func testAccGetZoneSweeperQueryString() *helper.QueryInfo {
 	return &helper.QueryInfo{
 		Limit: 1000,
-		Query: "name:" + zonePrefix,
+		Query: "name:" + testZoneSweeperPrefix,
 	}
 }
