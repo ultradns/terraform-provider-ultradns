@@ -23,7 +23,7 @@ data "ultradns_zone" "zone" {
 
 The following arguments are supported:
 
-* `name` - (Required) (String) A fully qualified domain name(FQDN) is required.
+* `name` - (Required) (String) Name of the zone.
 
 
 ## Attributes Reference

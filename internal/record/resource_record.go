@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/rrset"
 )
 
@@ -50,24 +51,26 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	_, resList, err := services.RecordService.ReadRecord(rrSetKey)
 
 	if resList != nil && resList.ResultInfo != nil && resList.ResultInfo.ReturnedCount > 0 && len(resList.RRSets) > 0 {
-		if err := rd.Set("zone_name", resList.ZoneName); err != nil {
-			return diag.FromErr(err)
-		}
+		currentSchemaZoneName := rd.Get("zone_name").(string)
 
-		ownerNameBefore := rd.Get("owner_name").(string)
-		ownerNameAfter := resList.RRSets[0].OwnerName
-
-		if ownerNameBefore != ownerNameAfter && ownerNameBefore+"."+resList.ZoneName != ownerNameAfter {
-			if err := rd.Set("owner_name", ownerNameAfter); err != nil {
+		if helper.GetZoneFQDN(currentSchemaZoneName) != helper.GetZoneFQDN(resList.ZoneName) {
+			if err := rd.Set("zone_name", resList.ZoneName); err != nil {
 				return diag.FromErr(err)
 			}
 		}
 
-		recordTypeBefore := rd.Get("record_type").(string)
-		recordTypeAfter := resList.RRSets[0].RRType
+		currentSchemaOwnerName := rd.Get("owner_name").(string)
 
-		if rrset.GetRRTypeFullString(recordTypeBefore) != recordTypeAfter {
-			if err := rd.Set("record_type", getRecordTypeString(resList.RRSets[0].RRType)); err != nil {
+		if helper.GetOwnerFQDN(currentSchemaOwnerName, resList.ZoneName) != resList.RRSets[0].OwnerName {
+			if err := rd.Set("owner_name", resList.RRSets[0].OwnerName); err != nil {
+				return diag.FromErr(err)
+			}
+		}
+
+		currentSchemaRecordType := rd.Get("record_type").(string)
+
+		if helper.GetRecordTypeFullString(currentSchemaRecordType) != resList.RRSets[0].RRType {
+			if err := rd.Set("record_type", helper.GetRecordTypeString(resList.RRSets[0].RRType)); err != nil {
 				return diag.FromErr(err)
 			}
 		}
@@ -76,13 +79,7 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 			return diag.FromErr(err)
 		}
 
-		set := &schema.Set{F: schema.HashString}
-
-		for _, val := range resList.RRSets[0].RData {
-			set.Add(val)
-		}
-
-		if err := rd.Set("record_data", set); err != nil {
+		if err := rd.Set("record_data", flattenRecordData(resList.RRSets[0].RData)); err != nil {
 			return diag.FromErr(err)
 		}
 	}
@@ -181,7 +178,7 @@ func GetRRSetKey(id string) *rrset.RRSetKey {
 	if len(splitStringData) == 3 {
 		rrSetKeyData.Name = splitStringData[0]
 		rrSetKeyData.Zone = splitStringData[1]
-		rrSetKeyData.Type = getRecordTypeString(splitStringData[2])
+		rrSetKeyData.Type = helper.GetRecordTypeString(splitStringData[2])
 	}
 
 	return rrSetKeyData

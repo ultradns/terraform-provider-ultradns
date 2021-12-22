@@ -7,10 +7,9 @@ import (
 func resourceZoneSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
-			Type:         schema.TypeString,
-			Required:     true,
-			ForceNew:     true,
-			ValidateFunc: validateZoneName,
+			Type:     schema.TypeString,
+			Required: true,
+			ForceNew: true,
 		},
 		"account_name": {
 			Type:     schema.TypeString,
@@ -90,9 +89,8 @@ func primaryZoneCreateInfoResource() *schema.Resource {
 				Default:  false,
 			},
 			"original_zone_name": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validateZoneName,
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 			"inherit": {
 				Type:     schema.TypeString,
@@ -157,9 +155,8 @@ func aliasZoneCreateInfoResource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"original_zone_name": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validateZoneName,
+				Type:     schema.TypeString,
+				Required: true,
 			},
 		},
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
-	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/record"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 )
@@ -136,7 +136,7 @@ func testAccCheckRecordExists(resourceName string) resource.TestCheckFunc {
 		rs, ok := s.RootModule().Resources[resourceName]
 
 		if !ok {
-			return helper.ResourceNotFoundError(resourceName)
+			return errors.ResourceNotFoundError(resourceName)
 		}
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)

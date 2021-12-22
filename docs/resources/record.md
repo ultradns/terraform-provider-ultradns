@@ -29,7 +29,7 @@ resource "ultradns_record" "www" {
 
 The following arguments are supported:
 
-* `zone_name` - (Required) (String) A fully qualified domain name(FQDN) is required.
+* `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either fully qualified domain name (FQDN) or relative domain name. If a FQDN, it must be contained within the zone name FQDN.
 * `record_type` - (Required) (String) Must be formatted as the well-known resource record type (A, AAAA, TXT, etc.) ot the corresponding number for the type, between 1 and 65535.<br/>
 Below are suported resource record type with its corresponding number:<br/>

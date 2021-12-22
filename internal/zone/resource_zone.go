@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
@@ -34,7 +35,8 @@ func resourceZoneCreate(ctx context.Context, rd *schema.ResourceData, meta inter
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(zone.Properties.Name)
+	id := helper.GetZoneFQDN(zone.Properties.Name)
+	rd.SetId(id)
 
 	return resourceZoneRead(ctx, rd, meta)
 }
@@ -45,7 +47,7 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 	services := meta.(*service.Service)
 	zoneID := rd.Id()
 
-	_, zr, err := services.ZoneService.ReadZone(zoneID)
+	_, zoneResponse, err := services.ZoneService.ReadZone(zoneID)
 
 	if err != nil {
 		rd.SetId("")
@@ -53,64 +55,36 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 		return nil
 	}
 
-	if zr.Properties != nil {
-		if err := rd.Set("name", zr.Properties.Name); err != nil {
+	if zoneResponse.RegistrarInfo != nil {
+		if err := flattenRegistrarInfo(zoneResponse.RegistrarInfo, rd); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
+	if zoneResponse.TransferStatusDetails != nil {
+		if err := flattenTransferStatusDetails(zoneResponse.TransferStatusDetails, rd); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
+	if zoneResponse.Properties != nil {
+		if err := flattenZoneProperties(zoneResponse, rd); err != nil {
 			return diag.FromErr(err)
 		}
 
-		if err := rd.Set("account_name", zr.Properties.AccountName); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("type", zr.Properties.Type); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("dnssec_status", zr.Properties.DNSSecStatus); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("resource_record_count", zr.Properties.ResourceRecordCount); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("last_modified_time", zr.Properties.LastModifiedDateTime); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("status", zr.Properties.Status); err != nil {
-			return diag.FromErr(err)
-		}
-
-		if err := rd.Set("owner", zr.Properties.Owner); err != nil {
-			return diag.FromErr(err)
-		}
-
-		switch zr.Properties.Type {
+		switch zoneResponse.Properties.Type {
 		case "PRIMARY":
-			if err := rd.Set("primary_create_info", flattenPrimaryZone(zr, rd)); err != nil {
+			if err := flattenPrimaryZone(zoneResponse, rd); err != nil {
 				return diag.FromErr(err)
 			}
 		case "SECONDARY":
-			if err := rd.Set("secondary_create_info", flattenSecondaryZone(zr, rd)); err != nil {
+			if err := flattenSecondaryZone(zoneResponse, rd); err != nil {
 				return diag.FromErr(err)
 			}
 		case "ALIAS":
-			if err := rd.Set("alias_create_info", flattenAliasZone(zr)); err != nil {
+			if err := flattenAliasZone(zoneResponse, rd); err != nil {
 				return diag.FromErr(err)
 			}
-		}
-	}
-
-	if zr.RegistrarInfo != nil {
-		if err := rd.Set("registrar_info", flattenRegistrarInfo(zr.RegistrarInfo)); err != nil {
-			return diag.FromErr(err)
-		}
-	}
-
-	if zr.TransferStatusDetails != nil {
-		if err := rd.Set("transfer_status_details", flattenTransferStatusDetails(zr.TransferStatusDetails)); err != nil {
-			return diag.FromErr(err)
 		}
 	}
 
@@ -119,11 +93,11 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 
 func resourceZoneUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	services := meta.(*service.Service)
-	zoneID := rd.Id()
+	zoneName := rd.Id()
 
 	zone := newZone(rd)
 
-	_, err := services.ZoneService.UpdateZone(zoneID, zone)
+	_, err := services.ZoneService.UpdateZone(zoneName, zone)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -136,9 +110,9 @@ func resourceZoneDelete(ctx context.Context, rd *schema.ResourceData, meta inter
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
-	zoneID := rd.Id()
+	zoneName := rd.Id()
 
-	_, err := services.ZoneService.DeleteZone(zoneID)
+	_, err := services.ZoneService.DeleteZone(zoneName)
 
 	if err != nil {
 		rd.SetId("")
@@ -152,9 +126,28 @@ func resourceZoneDelete(ctx context.Context, rd *schema.ResourceData, meta inter
 }
 
 func newZone(rd *schema.ResourceData) *zone.Zone {
-	var zoneType string
-
 	zoneData := &zone.Zone{}
+	properties := getZoneProperties(rd)
+
+	if val, ok := rd.GetOk("change_comment"); ok {
+		zoneData.ChangeComment = val.(string)
+	}
+
+	switch properties.Type {
+	case "PRIMARY":
+		zoneData.PrimaryCreateInfo = getPrimaryCreateInfo(rd)
+	case "SECONDARY":
+		zoneData.SecondaryCreateInfo = getSecondaryCreateInfo(rd)
+	case "ALIAS":
+		zoneData.AliasCreateInfo = getAliasCreateInfo(rd)
+	}
+
+	zoneData.Properties = properties
+
+	return zoneData
+}
+
+func getZoneProperties(rd *schema.ResourceData) *zone.Properties {
 	properties := &zone.Properties{}
 
 	if val, ok := rd.GetOk("name"); ok {
@@ -167,25 +160,9 @@ func newZone(rd *schema.ResourceData) *zone.Zone {
 
 	if val, ok := rd.GetOk("type"); ok {
 		properties.Type = val.(string)
-		zoneType = val.(string)
 	}
 
-	if val, ok := rd.GetOk("change_comment"); ok {
-		zoneData.ChangeComment = val.(string)
-	}
-
-	switch zoneType {
-	case "PRIMARY":
-		zoneData.PrimaryCreateInfo = getPrimaryCreateInfo(rd)
-	case "SECONDARY":
-		zoneData.SecondaryCreateInfo = getSecondaryCreateInfo(rd)
-	case "ALIAS":
-		zoneData.AliasCreateInfo = getAliasCreateInfo(rd)
-	}
-
-	zoneData.Properties = properties
-
-	return zoneData
+	return properties
 }
 
 func getPrimaryCreateInfo(rd *schema.ResourceData) *zone.PrimaryZone {
@@ -212,100 +189,22 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *zone.PrimaryZone {
 
 		if val, ok := createInfoData["name_server"]; ok && val.(*schema.Set).Len() > 0 {
 			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
-			nameServer := &zone.NameServer{}
-			primaryCreateInfo.NameServer = nameServer
-
-			if val, ok := nameServerData["ip"]; ok {
-				nameServer.IP = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_key"]; ok {
-				nameServer.TsigKey = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_key_value"]; ok {
-				nameServer.TsigKeyValue = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_algorithm"]; ok {
-				nameServer.TsigAlgorithm = val.(string)
-			}
+			primaryCreateInfo.NameServer = getNameServer(nameServerData)
 		}
 
 		if val, ok := createInfoData["tsig"]; ok && val.(*schema.Set).Len() > 0 {
 			tsigData := val.(*schema.Set).List()[0].(map[string]interface{})
-			tsig := &zone.Tsig{}
-			primaryCreateInfo.Tsig = tsig
-
-			if val, ok := tsigData["tsig_key_name"]; ok {
-				tsig.TsigKeyName = val.(string)
-			}
-
-			if val, ok := tsigData["tsig_key_value"]; ok {
-				tsig.TsigKeyValue = val.(string)
-			}
-
-			if val, ok := tsigData["tsig_algorithm"]; ok {
-				tsig.TsigAlgorithm = val.(string)
-			}
-
-			if val, ok := tsigData["description"]; ok {
-				tsig.Description = val.(string)
-			}
+			primaryCreateInfo.Tsig = getTsig(tsigData)
 		}
 
 		if val, ok := createInfoData["restrict_ip"]; ok && val.(*schema.Set).Len() > 0 {
 			restrictIPDataList := val.(*schema.Set).List()
-			restrictIPList := make([]*zone.RestrictIP, len(restrictIPDataList))
-			primaryCreateInfo.RestrictIPList = restrictIPList
-
-			for i, d := range restrictIPDataList {
-				restrictIPData := d.(map[string]interface{})
-				restrictIP := zone.RestrictIP{}
-
-				if val, ok := restrictIPData["start_ip"]; ok {
-					restrictIP.StartIP = val.(string)
-				}
-
-				if val, ok := restrictIPData["end_ip"]; ok {
-					restrictIP.EndIP = val.(string)
-				}
-
-				if val, ok := restrictIPData["cidr"]; ok {
-					restrictIP.Cidr = val.(string)
-				}
-
-				if val, ok := restrictIPData["single_ip"]; ok {
-					restrictIP.SingleIP = val.(string)
-				}
-
-				if val, ok := restrictIPData["comment"]; ok {
-					restrictIP.Comment = val.(string)
-				}
-
-				restrictIPList[i] = &restrictIP
-			}
+			primaryCreateInfo.RestrictIPList = getRestrictIPList(restrictIPDataList)
 		}
 
 		if val, ok := createInfoData["notify_addresses"]; ok && val.(*schema.Set).Len() > 0 {
 			notifyAddressDataList := val.(*schema.Set).List()
-			notifyAddressList := make([]*zone.NotifyAddress, len(notifyAddressDataList))
-			primaryCreateInfo.NotifyAddresses = notifyAddressList
-
-			for i, d := range notifyAddressDataList {
-				notifyAddressData := d.(map[string]interface{})
-				notifyAddress := zone.NotifyAddress{}
-
-				if val, ok := notifyAddressData["notify_address"]; ok {
-					notifyAddress.NotifyAddress = val.(string)
-				}
-
-				if val, ok := notifyAddressData["description"]; ok {
-					notifyAddress.Description = val.(string)
-				}
-
-				notifyAddressList[i] = &notifyAddress
-			}
+			primaryCreateInfo.NotifyAddresses = getNotifyAddresses(notifyAddressDataList)
 		}
 	}
 
@@ -326,68 +225,17 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *zone.SecondaryZone {
 
 		if val, ok := createInfoData["primary_name_server_1"]; ok && val.(*schema.Set).Len() > 0 {
 			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
-			nameServer := &zone.NameServer{}
-			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP1 = nameServer
-
-			if val, ok := nameServerData["ip"]; ok {
-				nameServer.IP = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_key"]; ok {
-				nameServer.TsigKey = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_key_value"]; ok {
-				nameServer.TsigKeyValue = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_algorithm"]; ok {
-				nameServer.TsigAlgorithm = val.(string)
-			}
+			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP1 = getNameServer(nameServerData)
 		}
 
 		if val, ok := createInfoData["primary_name_server_2"]; ok && val.(*schema.Set).Len() > 0 {
 			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
-			nameServer := &zone.NameServer{}
-			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP2 = nameServer
-
-			if val, ok := nameServerData["ip"]; ok {
-				nameServer.IP = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_key"]; ok {
-				nameServer.TsigKey = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_key_value"]; ok {
-				nameServer.TsigKeyValue = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_algorithm"]; ok {
-				nameServer.TsigAlgorithm = val.(string)
-			}
+			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP2 = getNameServer(nameServerData)
 		}
 
 		if val, ok := createInfoData["primary_name_server_3"]; ok && val.(*schema.Set).Len() > 0 {
 			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
-			nameServer := &zone.NameServer{}
-			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP3 = nameServer
-
-			if val, ok := nameServerData["ip"]; ok {
-				nameServer.IP = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_key"]; ok {
-				nameServer.TsigKey = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_key_value"]; ok {
-				nameServer.TsigKeyValue = val.(string)
-			}
-
-			if val, ok := nameServerData["tsig_algorithm"]; ok {
-				nameServer.TsigAlgorithm = val.(string)
-			}
+			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP3 = getNameServer(nameServerData)
 		}
 	}
 
@@ -403,4 +251,110 @@ func getAliasCreateInfo(rd *schema.ResourceData) *zone.AliasZone {
 	}
 
 	return aliasCreateInfo
+}
+
+func getNameServer(nameServerData map[string]interface{}) *zone.NameServer {
+	nameServer := &zone.NameServer{}
+
+	if val, ok := nameServerData["ip"]; ok {
+		nameServer.IP = val.(string)
+	}
+
+	if val, ok := nameServerData["tsig_key"]; ok {
+		nameServer.TsigKey = val.(string)
+	}
+
+	if val, ok := nameServerData["tsig_key_value"]; ok {
+		nameServer.TsigKeyValue = val.(string)
+	}
+
+	if val, ok := nameServerData["tsig_algorithm"]; ok {
+		nameServer.TsigAlgorithm = val.(string)
+	}
+
+	return nameServer
+}
+
+func getTsig(tsigData map[string]interface{}) *zone.Tsig {
+	tsig := &zone.Tsig{}
+
+	if val, ok := tsigData["tsig_key_name"]; ok {
+		tsig.TsigKeyName = val.(string)
+	}
+
+	if val, ok := tsigData["tsig_key_value"]; ok {
+		tsig.TsigKeyValue = val.(string)
+	}
+
+	if val, ok := tsigData["tsig_algorithm"]; ok {
+		tsig.TsigAlgorithm = val.(string)
+	}
+
+	if val, ok := tsigData["description"]; ok {
+		tsig.Description = val.(string)
+	}
+
+	return tsig
+}
+
+func getRestrictIPList(restrictIPDataList []interface{}) []*zone.RestrictIP {
+	restrictIPList := make([]*zone.RestrictIP, len(restrictIPDataList))
+
+	for i, d := range restrictIPDataList {
+		restrictIPData := d.(map[string]interface{})
+		restrictIPList[i] = getRestrictIP(restrictIPData)
+	}
+
+	return restrictIPList
+}
+
+func getRestrictIP(restrictIPData map[string]interface{}) *zone.RestrictIP {
+	restrictIP := &zone.RestrictIP{}
+
+	if val, ok := restrictIPData["start_ip"]; ok {
+		restrictIP.StartIP = val.(string)
+	}
+
+	if val, ok := restrictIPData["end_ip"]; ok {
+		restrictIP.EndIP = val.(string)
+	}
+
+	if val, ok := restrictIPData["cidr"]; ok {
+		restrictIP.Cidr = val.(string)
+	}
+
+	if val, ok := restrictIPData["single_ip"]; ok {
+		restrictIP.SingleIP = val.(string)
+	}
+
+	if val, ok := restrictIPData["comment"]; ok {
+		restrictIP.Comment = val.(string)
+	}
+
+	return restrictIP
+}
+
+func getNotifyAddresses(notifyAddressDataList []interface{}) []*zone.NotifyAddress {
+	notifyAddressList := make([]*zone.NotifyAddress, len(notifyAddressDataList))
+
+	for i, d := range notifyAddressDataList {
+		notifyAddressData := d.(map[string]interface{})
+		notifyAddressList[i] = getNotifyAddress(notifyAddressData)
+	}
+
+	return notifyAddressList
+}
+
+func getNotifyAddress(notifyAddressData map[string]interface{}) *zone.NotifyAddress {
+	notifyAddress := &zone.NotifyAddress{}
+
+	if val, ok := notifyAddressData["notify_address"]; ok {
+		notifyAddress.NotifyAddress = val.(string)
+	}
+
+	if val, ok := notifyAddressData["description"]; ok {
+		notifyAddress.Description = val.(string)
+	}
+
+	return notifyAddress
 }

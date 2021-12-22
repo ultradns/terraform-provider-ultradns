@@ -77,7 +77,7 @@ resource "ultradns_zone" "alias" {
 
 The following arguments are supported:
 
-* `name` - (Required) (String) A fully qualified domain name(FQDN) is required.
+* `name` - (Required) (String) Name of the zone.
 * `account_name` - (Required) (String) 	Name of the account.
 * `type` - (Required) (String) This is the type of the zone. Valid values are `PRIMARY`, `SECONDARY` or `ALIAS`.
 * `change_comment` - (Optional) (String) This is used to provide comments on updates.

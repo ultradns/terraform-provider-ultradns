@@ -7,7 +7,6 @@ func resourceRecordSchema() map[string]*schema.Schema {
 		"zone_name": {
 			Type:     schema.TypeString,
 			Required: true,
-			ForceNew: true,
 		},
 		"owner_name": {
 			Type:     schema.TypeString,
