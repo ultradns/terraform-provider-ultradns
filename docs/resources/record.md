@@ -12,7 +12,7 @@ Use this resource to manage standard DNS records in UltraDNS
 
 ## Example Usage
 
-### Create DNS record of type A
+### Create DNS record of type A (1)
 
 ```terraform
 resource "ultradns_record" "www" {
@@ -24,6 +24,77 @@ resource "ultradns_record" "www" {
 }
 ```
 
+### Create DNS record of type AAAA (28)
+
+```terraform
+resource "ultradns_record" "aaaa" {
+    zone_name = "example.com."
+    owner_name = "aaaa"
+    record_type = "28"
+    ttl = 120
+    record_data = ["2001:db8:85a3:0:0:8a2e:370:7334"]
+}
+```
+
+### Create DNS record of type CNAME (5)
+
+```terraform
+resource "ultradns_record" "cname" {
+    zone_name = "example.com."
+    owner_name = "cname"
+    record_type = "CNAME"
+    ttl = 120
+    record_data = ["google.com."]
+}
+```
+
+### Create DNS record of type MX (15)
+
+```terraform
+resource "ultradns_record" "mx" {
+    zone_name = "example.com."
+    owner_name = "mx"
+    record_type = "15"
+    ttl = 120
+    record_data = ["2 google.com."]
+}
+```
+
+### Create DNS record of type SRV (33)
+
+```terraform
+resource "ultradns_record" "srv" {
+    zone_name = "example.com."
+    owner_name = "srv"
+    record_type = "SRV"
+    ttl = 120
+    record_data = ["5 6 7 google.com."]
+}
+```
+
+### Create DNS record of type TXT (16)
+
+```terraform
+resource "ultradns_record" "txt" {
+    zone_name = "example.com."
+    owner_name = "txt"
+    record_type = "16"
+    ttl = 120
+    record_data = ["google.com."]
+}
+```
+
+### Create DNS record of type PTR (12)
+
+```terraform
+resource "ultradns_record" "ptr" {
+    zone_name = "example.com."
+    owner_name = "192.168.1.1"
+    record_type = "PTR"
+    ttl = 120
+    record_data = ["google.com."]
+}
+```
 
 ## Argument Reference
 
@@ -47,11 +118,11 @@ Also for MX, NS, CNAME, PTR, and APEXALIAS record types, the data value cannot b
 
 ## Import
 
-Records can be imported by combining thier `owner_name`, `zone_name`, `record_type` using semicolen.<br/>
+Records can be imported by combining thier `owner_name`, `zone_name`, `record_type` using colen.<br/>
 Example : www.example.com.:example.com.:A (1).
 
-**NOTE**
- : `owner_name`, `zone_name` must be FQDN and `record_type` should have the type with corresponding number as shown in the above example.
+
+-> For import, the `owner_name`, `zone_name` must be FQDN and `record_type` should have the type with corresponding number as shown in the above example.
 
 e.g.,
 ```

@@ -35,7 +35,7 @@ The following methods are supported when providing the credential configuration 
 ### Static Credentials
 Hard-coded credentials are not recommended in any Terraform configuration.
 
-Static credentials can be provided by adding an `username`, `password`, `hosturl`, `useragent`
+Static credentials can be provided by adding an `username`, `password`, `hosturl` 
 in-line in the ultradns provider block:
 
 Usage:
@@ -50,7 +50,7 @@ provider "ultradns" {
 
 ### Environment Variables
 
-You can provide your credentials via the `ULTRADNS_USERNAME`,`ULTRADNS_PASSWORD` ,`ULTRADNS_HOST_URL`,`ULTRADNS_USER_AGENT` environment variables, representing your username, password, hosturl, api version, user agent respectively.
+You can provide your credentials via the `ULTRADNS_USERNAME`,`ULTRADNS_PASSWORD` ,`ULTRADNS_HOST_URL`  environment variables, representing your username, password, hosturl respectively.
 
 Usage:
 
@@ -62,7 +62,6 @@ provider "ultradns" {}
 $ export ULTRADNS_USERNAME="ULTRADNS_USERNAME"
 $ export ULTRADNS_PASSWORD="ULTRADNS_PASSWORD"
 $ export ULTRADNS_HOST_URL="ULTRADNS_HOST_URL"
-$ export ULTRADNS_USER_AGENT="ULTRADNS_USER_AGENT"
 $ terraform plan
 ```
 
@@ -79,6 +78,3 @@ $ terraform plan
 
 * `hosturl` - This is the url for ultradns rest api. It must be provided, but
   it can also be sourced from the `ULTRADNS_HOST_URL` environment variables.
-
-* `useragent` - This is the user agent for ultradns rest api. It is an optional and can be provided static or 
-  can also be sourced from the `ULTRADNS_USER_AGENT` environment variables.

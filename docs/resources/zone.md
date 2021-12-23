@@ -78,7 +78,7 @@ resource "ultradns_zone" "alias" {
 The following arguments are supported:
 
 * `name` - (Required) (String) Name of the zone.
-* `account_name` - (Required) (String) 	Name of the account.
+* `account_name` - (Required) (String) 	Name of the account. It must be provided, but it can also be sourced from the `ULTRADNS_ACCOUNT` environment variable.
 * `type` - (Required) (String) This is the type of the zone. Valid values are `PRIMARY`, `SECONDARY` or `ALIAS`.
 * `change_comment` - (Optional) (String) This is used to provide comments on updates.
 * `primary_create_info` - (Optional) (Block Set, Max: 1) Nested block describing the info of primary zone. The structure of this block is described below.

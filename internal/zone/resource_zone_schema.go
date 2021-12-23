@@ -12,9 +12,10 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			ForceNew: true,
 		},
 		"account_name": {
-			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			ForceNew:    true,
+			DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_ACCOUNT", nil),
 		},
 		"type": {
 			Type:     schema.TypeString,

@@ -58,7 +58,7 @@ resource "ultradns_zone" "alias" {
 resource "ultradns_record" "a" {
     zone_name = "${resource.ultradns_zone.primary.id}"
     owner_name = "a"
-    record_type = "A"
+    record_type = "1"
     ttl = 120
     record_data = ["192.168.1.1"]
 }
