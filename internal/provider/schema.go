@@ -23,11 +23,5 @@ func providerSchema() map[string]*schema.Schema {
 			Optional:    true,
 			DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_HOST_URL", nil),
 		},
-		"useragent": {
-			Type:        schema.TypeString,
-			Description: "User agent for UltraDNS rest api.",
-			Optional:    true,
-			DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_USER_AGENT", "terraform-provider-ultrdns"),
-		},
 	}
 }

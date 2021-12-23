@@ -65,7 +65,10 @@ func TestAccResourceZoneSecondary(t *testing.T) {
 	resourceName := "ultradns_zone.secondary"
 
 	testCase := resource.TestCase{
-		PreCheck:     func() { testAccPreCheckForSecondaryZone(t, zoneName) },
+		PreCheck: func() {
+			acctest.TestPreCheck(t)
+			acctest.CreateOxfrZone(zoneName)
+		},
 		Providers:    acctest.TestAccProviders,
 		CheckDestroy: testAccCheckZoneDestroyForSecondaryZone(zoneName),
 		Steps: []resource.TestStep{
@@ -81,11 +84,6 @@ func TestAccResourceZoneSecondary(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
 					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
 				),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	}
@@ -154,7 +152,7 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 
 		if err == nil {
 			if zoneResponse.Properties != nil && zoneResponse.Properties.Name == rs.Primary.ID {
-				return fmt.Errorf("zone %v not destroyed.\n", rs.Primary.ID)
+				return errors.ResourceNotDestroyedError(rs.Primary.ID)
 			}
 		}
 	}
@@ -162,13 +160,9 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccPreCheckForSecondaryZone(t *testing.T, zoneName string) {
-	acctest.TestPreCheck(t)
-	acctest.CreateOxfrZone(zoneName)
-}
-
 func testAccCheckZoneDestroyForSecondaryZone(zoneName string) func(s *terraform.State) error {
 	acctest.DeleteOxfrZone(zoneName)
+
 	return testAccCheckZoneDestroy
 }
 

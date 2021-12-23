@@ -31,8 +31,10 @@ func dataSourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta int
 
 	rd.SetId(rrSetKeyData.ID())
 
-	if err = flattenRecord(resList, rd); err != nil {
-		return diag.FromErr(err)
+	if len(resList.RRSets) > 0 {
+		if err = flattenRecord(resList, rd); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	return diags

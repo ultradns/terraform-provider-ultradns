@@ -56,8 +56,10 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 		return nil
 	}
 
-	if err = flattenRecord(resList, rd); err != nil {
-		return diag.FromErr(err)
+	if len(resList.RRSets) > 0 {
+		if err = flattenRecord(resList, rd); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	return diags

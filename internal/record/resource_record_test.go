@@ -149,7 +149,7 @@ func testAccCheckRecordDestroy(s *terraform.State) error {
 
 		if err == nil {
 			if len(recordResponse.RRSets) > 0 && recordResponse.RRSets[0].OwnerName == rrSetKey.Name {
-				return fmt.Errorf("record - %v not destroyed.", rs.Primary.ID)
+				return errors.ResourceNotDestroyedError(rs.Primary.ID)
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/record"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/terraform-provider-ultradns/internal/version"
 	"github.com/ultradns/terraform-provider-ultradns/internal/zone"
 	"github.com/ultradns/ultradns-go-sdk/pkg/client"
 )
@@ -36,7 +37,7 @@ func providerConfigureContext(ctx context.Context, rd *schema.ResourceData) (int
 		Username:  rd.Get("username").(string),
 		Password:  rd.Get("password").(string),
 		HostURL:   rd.Get("hosturl").(string),
-		UserAgent: rd.Get("useragent").(string),
+		UserAgent: version.GetProviderVersion(),
 	}
 
 	client, err := client.NewClient(cnf)

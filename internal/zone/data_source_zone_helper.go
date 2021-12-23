@@ -101,6 +101,28 @@ func flattenTransferStatusDetails(transferDetailsData *zone.TransferStatusDetail
 	return nil
 }
 
+func flattenPrimaryNameServers(nameServerIPListData *zone.NameServerIPList, rd *schema.ResourceData) error {
+	if nameServerIPListData.NameServerIP1 != nil {
+		if err := rd.Set("primary_name_server_1", flattenNameServer(nameServerIPListData.NameServerIP1)); err != nil {
+			return err
+		}
+	}
+
+	if nameServerIPListData.NameServerIP2 != nil {
+		if err := rd.Set("primary_name_server_2", flattenNameServer(nameServerIPListData.NameServerIP2)); err != nil {
+			return err
+		}
+	}
+
+	if nameServerIPListData.NameServerIP3 != nil {
+		if err := rd.Set("primary_name_server_3", flattenNameServer(nameServerIPListData.NameServerIP3)); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func flattenNameServer(nameServerData *zone.NameServer) *schema.Set {
 	set := &schema.Set{F: zeroIndexHash}
 	nameServer := make(map[string]interface{})
