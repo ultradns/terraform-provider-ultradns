@@ -3,6 +3,7 @@ package zone_test
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -72,7 +73,7 @@ func TestAccResourceZoneSecondary(t *testing.T) {
 				Config: testAccResourceZoneSecondary(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
+					resource.TestCheckResourceAttr(resourceName, "name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestUsername),
 					resource.TestCheckResourceAttr(resourceName, "type", secondaryZoneType),
 					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
@@ -208,7 +209,7 @@ func testAccResourceZoneSecondary(zoneName string) string {
 			} 
 		}
 	}
-	`, zoneName, acctest.TestUsername, testNameServer)
+	`, strings.TrimSuffix(zoneName, "."), acctest.TestUsername, testNameServer)
 }
 
 func testAccResourceZoneAlias(zoneName string) string {

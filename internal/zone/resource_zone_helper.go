@@ -118,9 +118,9 @@ func flattenAliasZone(zoneResponse *zone.Response, rd *schema.ResourceData) erro
 		aliasCreateInfo = val.(*schema.Set).List()[0].(map[string]interface{})
 	}
 
-	currentSchemaOriginalZoneName := aliasCreateInfo["original_zone_name"].(string)
+	currentSchemaOriginalZoneName, ok := aliasCreateInfo["original_zone_name"].(string)
 
-	if helper.GetZoneFQDN(currentSchemaOriginalZoneName) != zoneResponse.OriginalZoneName {
+	if !ok || helper.GetZoneFQDN(currentSchemaOriginalZoneName) != zoneResponse.OriginalZoneName {
 		aliasCreateInfo["original_zone_name"] = zoneResponse.OriginalZoneName
 	}
 

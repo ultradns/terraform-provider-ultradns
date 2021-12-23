@@ -2,6 +2,7 @@ package record_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -21,7 +22,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: testAccDataSourceRecordA(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("data.ultradns_record.data_a"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_a", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_a", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_a", "record_type", "A"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_a", "ttl", "120"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_a", "record_data.0", "192.168.1.1"),
@@ -41,7 +42,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: testAccDataSourceRecordCNAME(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("data.ultradns_record.data_cname"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "record_type", "CNAME"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "ttl", "120"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "record_data.0", "google.com."),
@@ -61,7 +62,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: testAccDataSourceRecordSRV(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("data.ultradns_record.data_srv"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "record_type", "SRV"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "ttl", "120"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "record_data.0", "5 6 7 google.com."),
@@ -71,7 +72,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: testAccDataSourceRecordTXT(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("data.ultradns_record.data_txt"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "record_type", "TXT"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "ttl", "120"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "record_data.0", "google.com."),
@@ -81,7 +82,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: testAccDataSourceRecordPTR(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("data.ultradns_record.data_ptr"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "record_type", "PTR"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "ttl", "120"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "record_data.0", "google.com."),
@@ -97,11 +98,11 @@ func testAccDataSourceRecordA(zoneName string) string {
 	%s
 
 	data "ultradns_record" "data_a" {
-		zone_name = "${resource.ultradns_record.a.zone_name}"
+		zone_name = "%s"
 		owner_name = "${resource.ultradns_record.a.owner_name}"
 		record_type = "A"
 	}
-	`, testAccResourceRecordA(zoneName))
+	`, testAccResourceRecordA(zoneName), strings.TrimSuffix(zoneName, "."))
 }
 
 func testAccDataSourceRecordAAAA(zoneName string) string {
@@ -109,11 +110,11 @@ func testAccDataSourceRecordAAAA(zoneName string) string {
 	%s
 
 	data "ultradns_record" "data_aaaa" {
-		zone_name = "${resource.ultradns_record.aaaa.zone_name}"
+		zone_name = "%s"
 		owner_name = "${resource.ultradns_record.aaaa.owner_name}"
 		record_type = "AAAA"
 	}
-	`, testAccResourceRecordAAAA(zoneName))
+	`, testAccResourceRecordAAAA(zoneName), zoneName)
 }
 
 func testAccDataSourceRecordCNAME(zoneName string) string {
@@ -121,11 +122,11 @@ func testAccDataSourceRecordCNAME(zoneName string) string {
 	%s
 
 	data "ultradns_record" "data_cname" {
-		zone_name = "${resource.ultradns_record.cname.zone_name}"
+		zone_name = "%s"
 		owner_name = "${resource.ultradns_record.cname.owner_name}"
 		record_type = "CNAME"
 	}
-	`, testAccResourceRecordCNAME(zoneName))
+	`, testAccResourceRecordCNAME(zoneName), strings.TrimSuffix(zoneName, "."))
 }
 
 func testAccDataSourceRecordMX(zoneName string) string {
@@ -145,11 +146,11 @@ func testAccDataSourceRecordSRV(zoneName string) string {
 	%s
 
 	data "ultradns_record" "data_srv" {
-		zone_name = "${resource.ultradns_record.srv.zone_name}"
+		zone_name = "%s"
 		owner_name = "${resource.ultradns_record.srv.owner_name}"
 		record_type = "SRV"
 	}
-	`, testAccResourceRecordSRV(zoneName))
+	`, testAccResourceRecordSRV(zoneName), strings.TrimSuffix(zoneName, "."))
 }
 
 func testAccDataSourceRecordTXT(zoneName string) string {
@@ -169,9 +170,9 @@ func testAccDataSourceRecordPTR(zoneName string) string {
 	%s
 
 	data "ultradns_record" "data_ptr" {
-		zone_name = "${resource.ultradns_record.ptr.zone_name}"
+		zone_name = "%s"
 		owner_name = "${resource.ultradns_record.ptr.owner_name}"
 		record_type = "PTR"
 	}
-	`, testAccResourceRecordPTR(zoneName))
+	`, testAccResourceRecordPTR(zoneName), strings.TrimSuffix(zoneName, "."))
 }

@@ -2,6 +2,7 @@ package record_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -40,16 +41,11 @@ func TestAccResourceRecord(t *testing.T) {
 				Config: testAccResourceRecordAAAA(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("ultradns_record.aaaa"),
-					resource.TestCheckResourceAttr("ultradns_record.aaaa", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.aaaa", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("ultradns_record.aaaa", "record_type", "AAAA"),
 					resource.TestCheckResourceAttr("ultradns_record.aaaa", "ttl", "120"),
 					resource.TestCheckResourceAttr("ultradns_record.aaaa", "record_data.0", "2001:db8:85a3:0:0:8a2e:370:7334"),
 				),
-			},
-			{
-				ResourceName:      "ultradns_record.aaaa",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 			{
 				Config: testAccResourceRecordCNAME(zoneName),
@@ -77,11 +73,6 @@ func TestAccResourceRecord(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      "ultradns_record.mx",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-			{
 				Config: testAccResourceRecordSRV(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("ultradns_record.srv"),
@@ -100,16 +91,11 @@ func TestAccResourceRecord(t *testing.T) {
 				Config: testAccResourceRecordTXT(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("ultradns_record.txt"),
-					resource.TestCheckResourceAttr("ultradns_record.txt", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.txt", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "record_type", "TXT"),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "ttl", "120"),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "record_data.0", "google.com."),
 				),
-			},
-			{
-				ResourceName:      "ultradns_record.txt",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 			{
 				Config: testAccResourceRecordPTR(zoneName),
@@ -203,13 +189,13 @@ func testAccResourceRecordAAAA(zoneName string) string {
 	%s
 
 	resource "ultradns_record" "aaaa" {
-		zone_name = "${resource.ultradns_zone.primary_record.id}"
+		zone_name = "%s"
 		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
 		record_type = "AAAA"
 		ttl = 120
 		record_data = ["2001:db8:85a3:0:0:8a2e:370:7334"]
 	}
-	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
+	`, testAccResourceZonePrimary(zoneName), strings.TrimSuffix(zoneName, "."), tfacctest.RandString(3))
 }
 
 func testAccResourceRecordCNAME(zoneName string) string {
@@ -232,7 +218,7 @@ func testAccResourceRecordMX(zoneName string) string {
 
 	resource "ultradns_record" "mx" {
 		zone_name = "${resource.ultradns_zone.primary_record.id}"
-		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
+		owner_name = "%s"
 		record_type = "MX"
 		ttl = 120
 		record_data = ["2 google.com."]
@@ -259,13 +245,13 @@ func testAccResourceRecordTXT(zoneName string) string {
 	%s
 
 	resource "ultradns_record" "txt" {
-		zone_name = "${resource.ultradns_zone.primary_record.id}"
-		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
+		zone_name = "%s"
+		owner_name = "%s"
 		record_type = "TXT"
 		ttl = 120
 		record_data = ["google.com."]
 	}
-	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
+	`, testAccResourceZonePrimary(zoneName), strings.TrimSuffix(zoneName, "."), tfacctest.RandString(3))
 }
 
 func testAccResourceRecordPTR(zoneName string) string {
