@@ -13,3 +13,12 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+#terraform files for testing
+terraform/
+examples/.terraform/
+examples/.terraform.*
+examples/terraform.*
+examples/*.sh
+
+
