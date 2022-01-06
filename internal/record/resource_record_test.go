@@ -54,7 +54,7 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.cname", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.cname", "record_type", "CNAME"),
 					resource.TestCheckResourceAttr("ultradns_record.cname", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.cname", "record_data.0", "google.com."),
+					resource.TestCheckResourceAttr("ultradns_record.cname", "record_data.0", "example.com."),
 				),
 			},
 			{
@@ -69,7 +69,7 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.mx", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.mx", "record_type", "MX"),
 					resource.TestCheckResourceAttr("ultradns_record.mx", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.mx", "record_data.0", "2 google.com."),
+					resource.TestCheckResourceAttr("ultradns_record.mx", "record_data.0", "2 example.com."),
 				),
 			},
 			{
@@ -79,7 +79,7 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.srv", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.srv", "record_type", "SRV"),
 					resource.TestCheckResourceAttr("ultradns_record.srv", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.srv", "record_data.0", "5 6 7 google.com."),
+					resource.TestCheckResourceAttr("ultradns_record.srv", "record_data.0", "5 6 7 example.com."),
 				),
 			},
 			{
@@ -94,7 +94,7 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.txt", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "record_type", "TXT"),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.txt", "record_data.0", "google.com."),
+					resource.TestCheckResourceAttr("ultradns_record.txt", "record_data.0", "example.com."),
 				),
 			},
 			{
@@ -104,7 +104,7 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.ptr", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.ptr", "record_type", "PTR"),
 					resource.TestCheckResourceAttr("ultradns_record.ptr", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.ptr", "record_data.0", "google.com."),
+					resource.TestCheckResourceAttr("ultradns_record.ptr", "record_data.0", "example.com."),
 				),
 			},
 			{
@@ -207,7 +207,7 @@ func testAccResourceRecordCNAME(zoneName string) string {
 		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
 		record_type = "CNAME"
 		ttl = 120
-		record_data = ["google.com."]
+		record_data = ["example.com."]
 	}
 	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
 }
@@ -221,7 +221,7 @@ func testAccResourceRecordMX(zoneName string) string {
 		owner_name = "%s"
 		record_type = "MX"
 		ttl = 120
-		record_data = ["2 google.com."]
+		record_data = ["2 example.com."]
 	}
 	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
 }
@@ -235,7 +235,7 @@ func testAccResourceRecordSRV(zoneName string) string {
 		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
 		record_type = "SRV"
 		ttl = 120
-		record_data = ["5 6 7 google.com."]
+		record_data = ["5 6 7 example.com."]
 	}
 	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
 }
@@ -249,7 +249,7 @@ func testAccResourceRecordTXT(zoneName string) string {
 		owner_name = "%s"
 		record_type = "TXT"
 		ttl = 120
-		record_data = ["google.com."]
+		record_data = ["example.com."]
 	}
 	`, testAccResourceZonePrimary(zoneName), strings.TrimSuffix(zoneName, "."), tfacctest.RandString(3))
 }
@@ -263,7 +263,7 @@ func testAccResourceRecordPTR(zoneName string) string {
 		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
 		record_type = "PTR"
 		ttl = 120
-		record_data = ["google.com."]
+		record_data = ["example.com."]
 	}
 	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
 }

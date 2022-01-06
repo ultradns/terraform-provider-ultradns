@@ -45,7 +45,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "record_type", "CNAME"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "ttl", "120"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "record_data.0", "google.com."),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_cname", "record_data.0", "example.com."),
 				),
 			},
 			{
@@ -55,7 +55,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_record.data_mx", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_mx", "record_type", "MX"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_mx", "ttl", "120"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_mx", "record_data.0", "2 google.com."),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_mx", "record_data.0", "2 example.com."),
 				),
 			},
 			{
@@ -65,7 +65,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "record_type", "SRV"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "ttl", "120"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "record_data.0", "5 6 7 google.com."),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "record_data.0", "5 6 7 example.com."),
 				),
 			},
 			{
@@ -75,7 +75,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "record_type", "TXT"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "ttl", "120"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "record_data.0", "google.com."),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_txt", "record_data.0", "example.com."),
 				),
 			},
 			{
@@ -85,7 +85,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "zone_name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "record_type", "PTR"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "ttl", "120"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "record_data.0", "google.com."),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_ptr", "record_data.0", "example.com."),
 				),
 			},
 		},
