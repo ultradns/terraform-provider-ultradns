@@ -114,7 +114,7 @@ Below are the supported resource record type with its corresponding number:<br/>
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
 * `record_data` - (Required) (String List) The data for the record displayed as the BIND presentation format for the specified RRTYPE.<br/>
 Example : For a SRV record, the format of data is ["priority weight port target"] (["2 2 523 example.com."])<br/>
-Additionally for MX, CNAME and PTR record types, the data value must be a FQDN, as it cannot be relative to the zone name.<br/>
+Additionally for MX, CNAME, and PTR record types, the data value must be a FQDN, as it cannot be relative to the zone name.<br/>
 
 ## Import
 
