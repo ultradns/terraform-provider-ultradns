@@ -28,11 +28,11 @@ The following arguments are supported:
 
 ## Attributes Reference
 
-In addition to all of the arguments above, the following attributes are exported:
+In addition to the arguments above, the following attributes are exported:
 
 * `account_name` - (Computed) (String) Name of the account.
-* `type` - (Computed) (String) Type of zone. Valid values are PRIMARY, SECONDARY or ALIAS.
-* `status` - (Computed) (String) Displays the status of the zone.
+* `type` - (Computed) (String) Type of zone. Valid values are `PRIMARY`, `SECONDARY` or `ALIAS`.
+* `status` - (Computed) (String) Displays the status of the zone. Valid values are `ACTIVE`, `SUSPENDED` or `ERROR`.
 * `dnssec_status` - (Computed) (String) Whether or not the zone is signed with DNSSEC. Valid values are `SIGNED` or `UNSIGNED`.
 * `owner` - (Computed) (String) Name of the user that created the zone.
 * `resource_record_count` - (Computed) (Integer) Number of records in the zone.
@@ -41,7 +41,8 @@ Example: `2021-12-07T11:25Z`.
 
 #### When `type` is "PRIMARY" below attributes will be exported.
 
-* `inherit` - (Computed) (String) Defines whether this zone should inherit the zone transfer values from the Account, and also specifies which values to inherit.
+* `inherit` - (Computed) (String) Describes the inherited zone transfer values from the Account. Valid values are `ALL`, `NONE`, any combination of `IP_RANGE`, `NOTIFY_IP`, `TSIG`. Multiple values are seperated with a comma.<br/>
+Example: `IP_RANGE, NOTIFY_IP`
 * `tsig` - (Computed) (Block Set, Max: 1) Nested block describing the TSIG information for the primary zone. The structure of this block is described below.
 * `restrict_ip` - (Computed) (Block Set) Nested block describing the list of IP ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
 * `notify_addresses` - (Computed) (Block Set) Nested block describing the IP Addresses that are notified when updates are made to the primary zone. The structure of this block is described below.
@@ -49,9 +50,9 @@ Example: `2021-12-07T11:25Z`.
 
 #### When `type` is "SECONDARY" below attributes will be exported.
 
-* `primary_name_server_1` - (Computed) (Block Set) The structure of this block is similar to the block <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> as described below. It is the info of primary name server.
-* `primary_name_server_2` - (Computed) (Block Set) The structure of this block is similar to the block <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> as described below. It is the info of first backup primary name server.
-* `primary_name_server_3` - (Computed) (Block Set) The structure of this block is similar to the block <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> as described below. It is the info of second backup primary name server.
+* `primary_name_server_1` - (Computed) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described below. It is the info of primary name server.
+* `primary_name_server_2` - (Computed) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described below. It is the info of first backup primary name server.
+* `primary_name_server_3` - (Computed) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described below. It is the info of second backup primary name server.
 * `notification_email_address` - (Computed) (String) The Notification Email for a secondary zone.
 * `transfer_status_details` - (Computed) (Block Set) Nested block describing the zone transfer details. The structure of this block is described below.
 
@@ -96,7 +97,7 @@ Example: `2022-08-17 03:59:59.0`.
 ### Nested `registrar_info.name_servers` block has the following structure:
 
 * `ok` - (Computed) (List String) List of UltraDNS name servers that are configured for this domain.
-* `unknown` - (Computed) (List String) List of name servers that are configured for this domain, but are not UltraDNS-managed name servers.
+* `unknown` - (Computed) (List String) List of name servers that are configured for this domain, but are not UltraDNS managed name servers.
 * `missing` - (Computed) (List String) List of UltraDNS name servers that should be configured for this domain, but are not.
 * `incorrect` - (Computed) (List String) List of any obsolete UltraDNS name servers that are still configured for this zone.
 

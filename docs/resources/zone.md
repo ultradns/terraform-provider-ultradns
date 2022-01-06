@@ -95,21 +95,24 @@ Nested block describing the info of alias zone. The structure of this block is d
 
 * `create_type` - (Required) (String) Indicates the method for creating the primary zone. Valid values are `NEW`, `COPY`, `TRANSFER`.
 * `force_import` - (Optional) (Boolean) Indicates whether or not to move existing records from zones into this new zone. Default set to false.
-* `original_zone_name` - (Optional) (String) The name of the zone being copied. The existing zone must be owned by the same account as the new zone. It needs to be provided if `create_type` is "COPY".
-* `inherit` - (Optional) (String) Defines whether this zone should inherit the zone transfer values from the Account, and also specifies which values to inherit.
-* `name_server` - (Optional) (Block Set, Max: 1) Nested block describing the Primary zone's name server. It needs to be provided if `create_type` is "TRANSFER".
+* `original_zone_name` - (Optional) (String) The name of the zone being copied. The existing zone must be owned by the same account as the new zone. It needs to be provided if <a href="#create_type">`create_type`</a> is `COPY`.
+* `inherit` - (Optional) (String) Defines whether this zone should inherit the zone transfer values from the Account, and also specifies which values to inherit. Valid values are `ALL`, `NONE`, any combination of `IP_RANGE`, `NOTIFY_IP`, `TSIG`. Separate multiple values with a comma.<br/>
+Example: `IP_RANGE, NOTIFY_IP`
+* `name_server` - (Optional) (Block Set, Max: 1) Nested block describing the Primary zone's name server. It needs to be provided if <a href="#create_type">`create_type`</a> is `TRANSFER`.
 * `tsig` - (Optional) (Block Set, Max: 1) Nested block describing the TSIG information for the primary zone. The structure of this block is described below.
 * `restrict_ip` - (Optional) (Block Set) Nested block describing the list of IP ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
 * `notify_addresses` - (Optional) (Block Set) Nested block describing the addresses that are notified when updates are made to the primary zone. The structure of this block is described below.
 
 ### Nested `name_server` block has the following structure:
 
-* `ip` - (Required) (String) The IP address of the primary name server for the source zone.
+* `ip` - (Required) (String) The IPv4 or IPv6 address of the primary name server for the source zone.
 * `tsig_key` - (Optional) (String) The name of the TSIG key, if TSIG is enabled for this name server.
 * `tsig_key_value` - (Optional) (String) The TSIG key’s value, if TSIG is enabled for this name server.
 * `tsig_algorithm` - (Optional) (String) The hash algorithm used to generate the TSIG key. Valid values are `hmac-md5`, `hmac-sha1`, `hmac-sha224`, `hmac-sha256`, `hmac-sha384`, `hmac-sha512`.
 
 ### Nested `tsig` block has the following structure:
+
+The following tsig values are required if TSIG is enabled for the zone.
 
 * `tsig_key_name` - (Required) (String) The name of the TSIG key for the zone.
 * `tsig_key_value` - (Required) (String) The value of the TSIG key for the zone.
@@ -118,8 +121,8 @@ Nested block describing the info of alias zone. The structure of this block is d
 
 ### Nested `restrict_ip` block has the following structure:
 
-* `start_ip` - (Optional) (String) The start of the IP range that is allowed to transfer this primary zone out using zone transfer protocol.
-* `end_ip` - (Optional) (String) The end of the IP range that is allowed to transfer this primary zone out using zone transfer protocol.
+* `start_ip` - (Optional) (String) The start of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
+* `end_ip` - (Optional) (String) The end of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
 * `cidr` - (Optional) (String) The IP Address ranges specified in CIDR.
 * `single_ip` - (Optional) (String) The IP Address that is allowed to transfer this primary zone out using zone transfer protocol.
 * `comment` - (Optional) (String) A description of this range of IP addresses.
@@ -131,9 +134,9 @@ Nested block describing the info of alias zone. The structure of this block is d
 
 ### Nested `secondary_create_info` block has the following structure:
 
-* `primary_name_server_1` - (Required) (Block Set) The structure of this block is similar to the block <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> as described above. It is the info of primary name server.
-* `primary_name_server_2` - (Optional) (Block Set) The structure of this block is similar to the block <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> as described above. It is the info of first backup primary name server.
-* `primary_name_server_3` - (Optional) (Block Set) The structure of this block is similar to the block <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> as described above. It is the info of second backup primary name server.
+* `primary_name_server_1` - (Required) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described above. It is the info of primary name server.
+* `primary_name_server_2` - (Optional) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described above. It is the info of first backup primary name server.
+* `primary_name_server_3` - (Optional) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described above. It is the info of second backup primary name server.
 * `notification_email_address` - (Optional) (String) The Notification Email for a secondary zone.
 
 ### Nested `alias_create_info` block has the following structure:
@@ -167,7 +170,7 @@ Example: `2022-08-17 03:59:59.0`.
 ### Nested `registrar_info.name_servers` block has the following structure:
 
 * `ok` - (Computed) (List String) List of UltraDNS name servers that are configured for this domain.
-* `unknown` - (Computed) (List String) List of name servers that are configured for this domain, but are not UltraDNS-managed name servers.
+* `unknown` - (Computed) (List String) List of name servers that are configured for this domain, but are not UltraDNS managed name servers.
 * `missing` - (Computed) (List String) List of UltraDNS name servers that should be configured for this domain, but are not.
 * `incorrect` - (Computed) (List String) List of any obsolete UltraDNS name servers that are still configured for this zone.
 

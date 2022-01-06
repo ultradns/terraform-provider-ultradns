@@ -38,6 +38,6 @@ Below are suported resource record type with its corresponding number:<br/>
 
 In addition to all of the arguments above, the following attributes are exported:
 
-* `ttl` - (Computed) (Integer) The time to live (in seconds) for for the record. Must be a value between 0 and 2147483647, inclusive.
-* `record_data` - (Computed) (String List) The data for the record. It is the BIND presentation format for the specified rrtype.<br/>
-Example : For SRV record, the format of data is ["priority weight port target"] (["2 2 523 example.com."]).
+* `ttl` - (Computed) (Integer) The time to live (in seconds)  for the record. Must be a value between 0 and 2147483647, inclusive.
+* `record_data` - (Computed) (String List) The data for the record displayed as the BIND presentation format for the specified RRTYPE.<br/>
+Example : For a SRV record, the format of data is ["priority weight port target"] (["2 2 523 example.com."]).
