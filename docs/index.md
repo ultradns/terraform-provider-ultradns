@@ -67,8 +67,7 @@ $ terraform plan
 
 ## Argument Reference
 
- The following arguments are supported in the UltraDNS
- `provider` block:
+ The following arguments are supported in the UltraDNS `provider` block:
 
 * `username` - This is the username for UltraDNS REST API. It must be provided, but
   it can also be sourced from the `ULTRADNS_USERNAME` environment variable.

@@ -100,14 +100,14 @@ Nested block describing the info of alias zone. The structure of this block is d
 Example: `IP_RANGE, NOTIFY_IP`
 * `name_server` - (Optional) (Block Set, Max: 1) Nested block describing the Primary zone's name server. It needs to be provided if <a href="#create_type">`create_type`</a> is `TRANSFER`.
 * `tsig` - (Optional) (Block Set, Max: 1) Nested block describing the TSIG information for the primary zone. The structure of this block is described below.
-* `restrict_ip` - (Optional) (Block Set) Nested block describing the list of IP ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
+* `restrict_ip` - (Optional) (Block Set) Nested block describing the list of IPv4 or IPv6 ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
 * `notify_addresses` - (Optional) (Block Set) Nested block describing the addresses that are notified when updates are made to the primary zone. The structure of this block is described below.
 
 ### Nested `name_server` block has the following structure:
 
 * `ip` - (Required) (String) The IPv4 or IPv6 address of the primary name server for the source zone.
-* `tsig_key` - (Optional) (String) The name of the TSIG key, if TSIG is enabled for this name server.
-* `tsig_key_value` - (Optional) (String) The TSIG key’s value, if TSIG is enabled for this name server.
+* `tsig_key` - (Optional) (String) If TSIG is enabled for this name server, the name of the TSIG key.
+* `tsig_key_value` - (Optional) (String) If TSIG is enabled for this name server, the TSIG key’s value.
 * `tsig_algorithm` - (Optional) (String) The hash algorithm used to generate the TSIG key. Valid values are `hmac-md5`, `hmac-sha1`, `hmac-sha224`, `hmac-sha256`, `hmac-sha384`, `hmac-sha512`.
 
 ### Nested `tsig` block has the following structure:
@@ -124,12 +124,12 @@ The following tsig values are required if TSIG is enabled for the zone.
 * `start_ip` - (Optional) (String) The start of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
 * `end_ip` - (Optional) (String) The end of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
 * `cidr` - (Optional) (String) The IP Address ranges specified in CIDR.
-* `single_ip` - (Optional) (String) The IP Address that is allowed to transfer this primary zone out using zone transfer protocol.
+* `single_ip` - (Optional) (String) The IPv4 or IPv6 Address that is allowed to transfer this primary zone out using zone transfer protocol.
 * `comment` - (Optional) (String) A description of this range of IP addresses.
 
 ### Nested `notify_addresses` block has the following structure:
 
-* `notify_address` - (Required) (String) The IP Address that is notified when the primary zone is updated.
+* `notify_address` - (Required) (String) The IPv4 Address that is notified when the primary zone is updated.
 * `description` - (Optional) (String) A description of this IP Address.
 
 ### Nested `secondary_create_info` block has the following structure:

@@ -44,8 +44,8 @@ Example: `2021-12-07T11:25Z`.
 * `inherit` - (Computed) (String) Describes the inherited zone transfer values from the Account. Valid values are `ALL`, `NONE`, any combination of `IP_RANGE`, `NOTIFY_IP`, `TSIG`. Multiple values are seperated with a comma.<br/>
 Example: `IP_RANGE, NOTIFY_IP`
 * `tsig` - (Computed) (Block Set, Max: 1) Nested block describing the TSIG information for the primary zone. The structure of this block is described below.
-* `restrict_ip` - (Computed) (Block Set) Nested block describing the list of IP ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
-* `notify_addresses` - (Computed) (Block Set) Nested block describing the IP Addresses that are notified when updates are made to the primary zone. The structure of this block is described below.
+* `restrict_ip` - (Computed) (Block Set) Nested block describing the list of IPv4 or IPv6 ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
+* `notify_addresses` - (Computed) (Block Set) Nested block describing the IPv4 Addresses that are notified when updates are made to the primary zone. The structure of this block is described below.
 * `registrar_info` - (Computed) (Block Set) Nested block describing information about the name server configuration for this zone. The structure of this block is described below.
 
 #### When `type` is "SECONDARY" below attributes will be exported.
@@ -62,9 +62,9 @@ Example: `IP_RANGE, NOTIFY_IP`
 
 ### Nested `name_server` block has the following structure:
 
-* `ip` - (Required) (String) The IP address of the primary name server for the source zone.
-* `tsig_key` - (Optional) (String) The name of the TSIG key, if TSIG is enabled for this name server.
-* `tsig_key_value` - (Optional) (String) The TSIG key’s value, if TSIG is enabled for this name server.
+* `ip` - (Required) (String) The IPv4 or IPv6 address of the primary name server for the source zone.
+* `tsig_key` - (Optional) (String) If TSIG is enabled for this name server, the name of the TSIG key.
+* `tsig_key_value` - (Optional) (String) If TSIG is enabled for this name server, the TSIG key’s value.
 * `tsig_algorithm` - (Optional) (String) The hash algorithm used to generate the TSIG key. Valid values are `hmac-md5`, `hmac-sha1`, `hmac-sha224`, `hmac-sha256`, `hmac-sha384`, `hmac-sha512`.
 
 ### Nested `tsig` block has the following structure:
@@ -76,15 +76,15 @@ Example: `IP_RANGE, NOTIFY_IP`
 
 ### Nested `restrict_ip` block has the following structure:
 
-* `start_ip` - (Optional) (String) The start of the IP range that is allowed to transfer this primary zone out using zone transfer protocol.
-* `end_ip` - (Optional) (String) The end of the IP range that is allowed to transfer this primary zone out using zone transfer protocol.
+* `start_ip` - (Optional) (String) The start of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
+* `end_ip` - (Optional) (String) The end of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
 * `cidr` - (Optional) (String) The IP Address ranges specified in CIDR.
-* `single_ip` - (Optional) (String) The IP Address that is allowed to transfer this primary zone out using zone transfer protocol.
+* `single_ip` - (Optional) (String) The IPv4 or IPv6 Address that is allowed to transfer this primary zone out using zone transfer protocol.
 * `comment` - (Optional) (String) A description of this range of IP addresses.
 
 ### Nested `notify_addresses` block has the following structure:
 
-* `notify_address` - (Required) (String) The IP Address that is notified when the primary zone is updated.
+* `notify_address` - (Required) (String) The IPv4 Address that is notified when the primary zone is updated.
 * `description` - (Optional) (String) A description of this address.
 
 ### Nested `registrar_info` block has the following structure:

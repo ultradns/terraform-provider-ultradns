@@ -101,7 +101,7 @@ resource "ultradns_record" "ptr" {
 The following arguments are supported:
 
 * `zone_name` - (Required) (String) Name of the zone.
-* `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name FQDN.
+* `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
 * `record_type` - (Required) (String) Must be formatted as the well-known resource record type (A, AAAA, TXT, etc.) or the corresponding number for the type; between 1 and 65535.<br/>
 Below are the suported resource record type with its corresponding number:<br/>
 `A (1)`
