@@ -39,16 +39,16 @@ In addition to the arguments above, the following attributes are exported:
 * `last_modified_time` - (Computed) (String) The last date and time the zone was modified, represented in ISO8601 format(`yyyy-MM-ddTHH:mmZ`).<br/>
 Example: `2021-12-07T11:25Z`.
 
-#### When `type` is "PRIMARY" below attributes will be exported.
+#### When `type` is "PRIMARY" the below attributes will be exported.
 
-* `inherit` - (Computed) (String) Describes the inherited zone transfer values from the Account. Valid values are `ALL`, `NONE`, any combination of `IP_RANGE`, `NOTIFY_IP`, `TSIG`. Multiple values are seperated with a comma.<br/>
+* `inherit` - (Computed) (String) Describes the inherited zone transfer values from the Account. Valid values are `ALL`, `NONE`, any combination of `IP_RANGE`, `NOTIFY_IP`, `TSIG`. Multiple values are separated with a comma.<br/>
 Example: `IP_RANGE, NOTIFY_IP`
 * `tsig` - (Computed) (Block Set, Max: 1) Nested block describing the TSIG information for the primary zone. The structure of this block is described below.
 * `restrict_ip` - (Computed) (Block Set) Nested block describing the list of IPv4 or IPv6 ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
 * `notify_addresses` - (Computed) (Block Set) Nested block describing the IPv4 Addresses that are notified when updates are made to the primary zone. The structure of this block is described below.
 * `registrar_info` - (Computed) (Block Set) Nested block describing information about the name server configuration for this zone. The structure of this block is described below.
 
-#### When `type` is "SECONDARY" below attributes will be exported.
+#### When `type` is "SECONDARY" the below attributes will be exported.
 
 * `primary_name_server_1` - (Computed) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described below. It is the info of primary name server.
 * `primary_name_server_2` - (Computed) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described below. It is the info of first backup primary name server.
@@ -56,7 +56,7 @@ Example: `IP_RANGE, NOTIFY_IP`
 * `notification_email_address` - (Computed) (String) The Notification Email for a secondary zone.
 * `transfer_status_details` - (Computed) (Block Set) Nested block describing the zone transfer details. The structure of this block is described below.
 
-#### When `type` is "ALIAS" below attributes will be exported.
+#### When `type` is "ALIAS" the below attributes will be exported.
 
 * `original_zone_name` - (Computed) (String) The name of the zone being aliased. The existing zone must be owned by the same account as the new zone.
 
@@ -79,7 +79,7 @@ Example: `IP_RANGE, NOTIFY_IP`
 * `start_ip` - (Optional) (String) The start of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
 * `end_ip` - (Optional) (String) The end of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
 * `cidr` - (Optional) (String) The IP Address ranges specified in CIDR.
-* `single_ip` - (Optional) (String) The IPv4 or IPv6 Address that is allowed to transfer this primary zone out using zone transfer protocol.
+* `single_ip` - (Optional) (String) The IPv4 or IPv6 address that is allowed to transfer this primary zone out using zone transfer protocol.
 * `comment` - (Optional) (String) A description of this range of IP addresses.
 
 ### Nested `notify_addresses` block has the following structure:

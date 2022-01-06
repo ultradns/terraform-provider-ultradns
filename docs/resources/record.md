@@ -3,7 +3,7 @@ subcategory: "RECORD"
 layout: "ultradns"
 page_title: "ULTRADNS: ultradns_record"
 description: |-
-  Manges the standard DNS records in UltraDNS.
+  Manages the standard DNS records in UltraDNS.
 ---
 
 # Resource: ultradns_record
@@ -44,7 +44,7 @@ resource "ultradns_record" "cname" {
     owner_name = "cname"
     record_type = "CNAME"
     ttl = 120
-    record_data = ["google.com."]
+    record_data = ["sample.com."]
 }
 ```
 
@@ -56,7 +56,7 @@ resource "ultradns_record" "mx" {
     owner_name = "mx"
     record_type = "15"
     ttl = 120
-    record_data = ["2 google.com."]
+    record_data = ["2 sample.com."]
 }
 ```
 
@@ -68,7 +68,7 @@ resource "ultradns_record" "srv" {
     owner_name = "srv"
     record_type = "SRV"
     ttl = 120
-    record_data = ["5 6 7 google.com."]
+    record_data = ["5 6 7 sample.com."]
 }
 ```
 
@@ -80,7 +80,7 @@ resource "ultradns_record" "txt" {
     owner_name = "txt"
     record_type = "16"
     ttl = 120
-    record_data = ["google.com."]
+    record_data = ["sample.com."]
 }
 ```
 
@@ -92,7 +92,7 @@ resource "ultradns_record" "ptr" {
     owner_name = "192.168.1.1"
     record_type = "PTR"
     ttl = 120
-    record_data = ["google.com."]
+    record_data = ["sample.com."]
 }
 ```
 
@@ -103,7 +103,7 @@ The following arguments are supported:
 * `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
 * `record_type` - (Required) (String) Must be formatted as the well-known resource record type (A, AAAA, TXT, etc.) or the corresponding number for the type; between 1 and 65535.<br/>
-Below are the suported resource record type with its corresponding number:<br/>
+Below are the supported resource record type with its corresponding number:<br/>
 `A (1)`
 `AAAA (28)`
 `CNAME (5)`
@@ -112,7 +112,7 @@ Below are the suported resource record type with its corresponding number:<br/>
 `TXT (16)`
 `PTR (12)`
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
-* `record_data` - (Required) (String List) The data for the record. Must use the BIND presentation format for the specified rrtype.<br/>
+* `record_data` - (Required) (String List) The data for the record displayed as the BIND presentation format for the specified RRTYPE.<br/>
 Example : For a SRV record, the format of data is ["priority weight port target"] (["2 2 523 example.com."])<br/>
 Additionally for MX, CNAME and PTR record types, the data value must be a FQDN, as it cannot be relative to the zone name.<br/>
 

@@ -3,7 +3,7 @@ subcategory: "ZONE"
 layout: "ultradns"
 page_title: "ULTRADNS: ultradns_zone"
 description: |-
-  Manges the zones in UltraDNS.
+  Manages the zones in UltraDNS.
 ---
 
 # Resource: ultradns_zone
@@ -79,7 +79,7 @@ The following arguments are supported:
 
 * `name` - (Required) (String) Name of the zone.
 * `account_name` - (Required) (String) 	Name of the account. It must be provided, but it can also be sourced from the `ULTRADNS_ACCOUNT` environment variable.
-* `type` - (Required) (String) This is the type of the zone. Valid values are `PRIMARY`, `SECONDARY` or `ALIAS`.
+* `type` - (Required) (String) This is the type of zone. Valid values are `PRIMARY`, `SECONDARY` or `ALIAS`.
 * `change_comment` - (Optional) (String) This is used to provide comments on updates.
 * `primary_create_info` - (Optional) (Block Set, Max: 1) Nested block describing the info of primary zone. The structure of this block is described below.
 * `secondary_create_info` - (Optional) (Block Set, Max: 1)
@@ -124,7 +124,7 @@ The following tsig values are required if TSIG is enabled for the zone.
 * `start_ip` - (Optional) (String) The start of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
 * `end_ip` - (Optional) (String) The end of the IPv4 or IPv6 range that is allowed to transfer this primary zone out using zone transfer protocol.
 * `cidr` - (Optional) (String) The IP Address ranges specified in CIDR.
-* `single_ip` - (Optional) (String) The IPv4 or IPv6 Address that is allowed to transfer this primary zone out using zone transfer protocol.
+* `single_ip` - (Optional) (String) The IPv4 or IPv6 address that is allowed to transfer this primary zone out using zone transfer protocol.
 * `comment` - (Optional) (String) A description of this range of IP addresses.
 
 ### Nested `notify_addresses` block has the following structure:
