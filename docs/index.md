@@ -2,12 +2,12 @@
 layout: "ultradns"
 page_title: "Provider: UltraDNS"
 description: |-
-  The Terraform UltraDNS provider is a plugin for Terraform used to manage UltraDNS resources using Terraform codes. You must configure the provider with the proper credentials before you can use it.
+  The UltraDNS provider is a plugin for Terraform used to manage UltraDNS resources using HashiCorp Configuration Language (HCL). You must configure the provider with the proper credentials before you can use it.
 ---
 
 # UltraDNS Provider
 
-The Terraform UltraDNS provider is a plugin for Terraform used to manage UltraDNS resources using Terraform codes. You must configure the provider with the proper credentials before you can use it.
+The UltraDNS provider is a plugin for <a href="https://www.terraform.io">Terraform</a> used to manage UltraDNS resources using HashiCorp Configuration Language (HCL). You must configure the provider with the proper credentials before you can use it.
 
 ## Example Usage
 
@@ -35,7 +35,7 @@ The following methods are supported when providing the credential configuration 
 ### Static Credentials
 Hard-coded credentials are not recommended in any Terraform configuration.
 
-Static credentials can be provided by adding an `username`, `password`, `hosturl` 
+Static credentials are provided by adding `username`, `password`, `hosturl` 
 in-line in the ultradns provider block:
 
 Usage:
@@ -50,7 +50,7 @@ provider "ultradns" {
 
 ### Environment Variables
 
-You can provide your credentials via the `ULTRADNS_USERNAME`,`ULTRADNS_PASSWORD` ,`ULTRADNS_HOST_URL`  environment variables, representing your username, password, hosturl respectively.
+If using Environment variables, your credentials are provided via the `ULTRADNS_USERNAME`, `ULTRADNS_PASSWORD`, and `ULTRADNS_HOST_URL` Environment variables, which represent your username, password, and hosturl respectively.
 
 Usage:
 
@@ -67,14 +67,13 @@ $ terraform plan
 
 ## Argument Reference
 
- The following arguments are supported in the UltraDNS
- `provider` block:
+ The following arguments are supported in the UltraDNS `provider` block:
 
-* `username` - This is the username for ultradns rest api. It must be provided, but
+* `username` - This is the username for UltraDNS REST API. It must be provided, but
   it can also be sourced from the `ULTRADNS_USERNAME` environment variable.
 
-* `password` - This is the password for ultradns rest api. It must be provided, but
+* `password` - This is the password for UltraDNS REST API. It must be provided, but
   it can also be sourced from the `ULTRADNS_PASSWORD` environment variable.
 
-* `hosturl` - This is the url for ultradns rest api. It must be provided, but
+* `hosturl` - This is the url for UltraDNS REST API. It must be provided, but
   it can also be sourced from the `ULTRADNS_HOST_URL` environment variables.

@@ -3,7 +3,7 @@ subcategory: "RECORD"
 layout: "ultradns"
 page_title: "ULTRADNS: ultradns_record"
 description: |-
-  Manges the standard DNS records in UltraDNS.
+  Manages the standard DNS records in UltraDNS.
 ---
 
 # Resource: ultradns_record
@@ -44,7 +44,7 @@ resource "ultradns_record" "cname" {
     owner_name = "cname"
     record_type = "CNAME"
     ttl = 120
-    record_data = ["google.com."]
+    record_data = ["sample.com."]
 }
 ```
 
@@ -56,7 +56,7 @@ resource "ultradns_record" "mx" {
     owner_name = "mx"
     record_type = "15"
     ttl = 120
-    record_data = ["2 google.com."]
+    record_data = ["2 sample.com."]
 }
 ```
 
@@ -68,7 +68,7 @@ resource "ultradns_record" "srv" {
     owner_name = "srv"
     record_type = "SRV"
     ttl = 120
-    record_data = ["5 6 7 google.com."]
+    record_data = ["5 6 7 sample.com."]
 }
 ```
 
@@ -80,7 +80,7 @@ resource "ultradns_record" "txt" {
     owner_name = "txt"
     record_type = "16"
     ttl = 120
-    record_data = ["google.com."]
+    record_data = ["sample.com."]
 }
 ```
 
@@ -92,7 +92,7 @@ resource "ultradns_record" "ptr" {
     owner_name = "192.168.1.1"
     record_type = "PTR"
     ttl = 120
-    record_data = ["google.com."]
+    record_data = ["sample.com."]
 }
 ```
 
@@ -101,9 +101,9 @@ resource "ultradns_record" "ptr" {
 The following arguments are supported:
 
 * `zone_name` - (Required) (String) Name of the zone.
-* `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either fully qualified domain name (FQDN) or relative domain name. If a FQDN, it must be contained within the zone name FQDN.
-* `record_type` - (Required) (String) Must be formatted as the well-known resource record type (A, AAAA, TXT, etc.) ot the corresponding number for the type, between 1 and 65535.<br/>
-Below are suported resource record type with its corresponding number:<br/>
+* `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
+* `record_type` - (Required) (String) Must be formatted as the well-known resource record type (A, AAAA, TXT, etc.) or the corresponding number for the type; between 1 and 65535.<br/>
+Below are the supported resource record type with its corresponding number:<br/>
 `A (1)`
 `AAAA (28)`
 `CNAME (5)`
@@ -111,18 +111,18 @@ Below are suported resource record type with its corresponding number:<br/>
 `SRV (33)`
 `TXT (16)`
 `PTR (12)`
-* `ttl` - (Optional) (Integer) The time to live (in seconds) for for the record. Must be a value between 0 and 2147483647, inclusive.
-* `record_data` - (Required) (String List) The data for the record. Must use the BIND presentation format for the specified rrtype.<br/>
-Example : For SRV record, the format of data is ["priority weight port target"] (["2 2 523 example.com."])<br/>
-Also for MX, NS, CNAME, PTR, and APEXALIAS record types, the data value cannot be relative to the zone name. It must be a FQDN.<br/>
+* `ttl` - (Optional) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
+* `record_data` - (Required) (String List) The data for the record displayed as the BIND presentation format for the specified RRTYPE.<br/>
+Example : For a SRV record, the format of data is ["priority weight port target"] (["2 2 523 example.com."])<br/>
+Additionally for MX, CNAME, and PTR record types, the data value must be a FQDN, as it cannot be relative to the zone name.<br/>
 
 ## Import
 
-Records can be imported by combining thier `owner_name`, `zone_name`, `record_type` using colen.<br/>
-Example : www.example.com.:example.com.:A (1).
+Records can be imported by combining their `owner_name`, `zone_name`, `record_type` using colon.<br/>
+Example : `www.example.com.:example.com.:A (1)`.
 
 
--> For import, the `owner_name`, `zone_name` must be FQDN and `record_type` should have the type with corresponding number as shown in the above example.
+-> For import, the `owner_name` and `zone_name` must be a FQDN and `record_type` should have the type as well as the corresponding number as shown in the example above.
 
 e.g.,
 ```

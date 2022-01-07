@@ -4,4 +4,4 @@
 
 # Terraform Provider for UltraDNS
 
-The Terraform UltraDNS provider is a plugin for Terraform used to manage UltraDNS resources using Terraform codes.
+The UltraDNS provider is a plugin for Terraform used to manage UltraDNS resources using HashiCorp Configuration Language (HCL).

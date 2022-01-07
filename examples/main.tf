@@ -76,7 +76,7 @@ resource "ultradns_record" "cname" {
     owner_name = "cname"
     record_type = "CNAME"
     ttl = 120
-    record_data = ["google.com."]
+    record_data = ["example.com."]
 }
 
 resource "ultradns_record" "mx" {
@@ -84,7 +84,7 @@ resource "ultradns_record" "mx" {
     owner_name = "mx"
     record_type = "MX"
     ttl = 120
-    record_data = ["2 google.com."]
+    record_data = ["2 example.com."]
 }
 
 resource "ultradns_record" "srv" {
@@ -92,7 +92,7 @@ resource "ultradns_record" "srv" {
     owner_name = "srv"
     record_type = "SRV"
     ttl = 120
-    record_data = ["5 6 7 google.com."]
+    record_data = ["5 6 7 example.com."]
 }
 
 resource "ultradns_record" "txt" {
@@ -100,7 +100,7 @@ resource "ultradns_record" "txt" {
     owner_name = "txt"
     record_type = "TXT"
     ttl = 120
-    record_data = ["google.com."]
+    record_data = ["example.com."]
 }
 
 resource "ultradns_record" "ptr" {
@@ -108,7 +108,7 @@ resource "ultradns_record" "ptr" {
     owner_name = "192.168.1.1"
     record_type = "PTR"
     ttl = 120
-    record_data = ["google.com."]
+    record_data = ["example.com."]
 }
 
 data "ultradns_zone" "zone" {
