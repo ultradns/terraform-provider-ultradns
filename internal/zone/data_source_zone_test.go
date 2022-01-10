@@ -37,16 +37,13 @@ func TestAccDataSourceZonePrimary(t *testing.T) {
 }
 
 func TestAccDataSourceZoneSecondary(t *testing.T) {
-	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
+	zoneName := getRandomSecondaryZoneName()
 	dataSourceName := "data.ultradns_zone.data_secondary"
 
 	testCase := resource.TestCase{
-		PreCheck: func() {
-			acctest.TestPreCheck(t)
-			acctest.CreateOxfrZone(zoneName)
-		},
+		PreCheck:     func() { acctest.TestPreCheck(t) },
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckZoneDestroyForSecondaryZone(zoneName),
+		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDataSourceZoneSecondary(zoneName),

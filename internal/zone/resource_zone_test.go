@@ -1,7 +1,9 @@
 package zone_test
 
 import (
+	"crypto/rand"
 	"fmt"
+	"math/big"
 	"os"
 	"strings"
 	"testing"
@@ -15,12 +17,15 @@ import (
 )
 
 const (
-	primaryZoneType     = "PRIMARY"
-	secondaryZoneType   = "SECONDARY"
-	aliasZoneType       = "ALIAS"
-	defaultCount        = "2"
-	defaultZoneStatus   = "ACTIVE"
-	defaultDNSSECStatus = "UNSIGNED"
+	primaryZoneType        = "PRIMARY"
+	secondaryZoneType      = "SECONDARY"
+	aliasZoneType          = "ALIAS"
+	defaultCount           = "2"
+	defaultZoneStatus      = "ACTIVE"
+	defaultDNSSECStatus    = "UNSIGNED"
+	randSecondaryZoneCount = 50
+	randZoneNamePrefix     = "sdk-go-test-"
+	randZoneNameSuffix     = ".com."
 )
 
 var testNameServer = os.Getenv("ULTRADNS_UNIT_TEST_NAME_SERVER")
@@ -61,16 +66,13 @@ func TestAccResourceZonePrimary(t *testing.T) {
 }
 
 func TestAccResourceZoneSecondary(t *testing.T) {
-	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
+	zoneName := getRandomSecondaryZoneName()
 	resourceName := "ultradns_zone.secondary"
 
 	testCase := resource.TestCase{
-		PreCheck: func() {
-			acctest.TestPreCheck(t)
-			acctest.CreateOxfrZone(zoneName)
-		},
+		PreCheck:     func() { acctest.TestPreCheck(t) },
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckZoneDestroyForSecondaryZone(zoneName),
+		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceZoneSecondary(zoneName),
@@ -160,10 +162,12 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckZoneDestroyForSecondaryZone(zoneName string) func(s *terraform.State) error {
-	acctest.DeleteOxfrZone(zoneName)
+func getRandomSecondaryZoneName() string {
+	if num, err := rand.Int(rand.Reader, big.NewInt(randSecondaryZoneCount)); err == nil {
+		return randZoneNamePrefix + num.String() + randZoneNameSuffix
+	}
 
-	return testAccCheckZoneDestroy
+	return randZoneNamePrefix + "0" + randZoneNameSuffix
 }
 
 func testAccResourceZonePrimary(zoneName string) string {
