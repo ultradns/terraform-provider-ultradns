@@ -52,6 +52,8 @@ jobs:
       - 
         name: Create Release Info
         run: echo "PLUGIN_VERSION=$(cat .plugin-version)" >> $GITHUB_ENV
+      - 
+        run: echo "RELEASE_VERSION=${{ env.PLUGIN_VERSION }}" >> $GITHUB_ENV
       -
         name: Update release version using go generate
         run: go generate internal/version
