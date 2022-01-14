@@ -51,9 +51,7 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
       - 
         name: Create Release Info
-        run: echo "PLUGIN_VERSION=$(cat .plugin-version)" >> $GITHUB_ENV
-      - 
-        run: echo "RELEASE_VERSION=${{ env.PLUGIN_VERSION }}" >> $GITHUB_ENV
+        run: echo "RELEASE_VERSION=$(cat .plugin-version)" >> $GITHUB_ENV
       -
         name: Update release version using go generate
         run: go generate internal/version
@@ -67,8 +65,8 @@ jobs:
         run: |
           git add internal/version/version_generated.go
           git commit -m "version updated"
-          git tag ${{ env.PLUGIN_VERSION }}
-          git push origin ${{ env.PLUGIN_VERSION }}
+          git tag ${{ env.RELEASE_VERSION }}
+          git push origin ${{ env.RELEASE_VERSION }}
       -
         name: Import GPG key
         id: import_gpg
