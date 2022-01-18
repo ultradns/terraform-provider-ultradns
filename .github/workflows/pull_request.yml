@@ -1,10 +1,10 @@
-name: Code_Analysis
+name: Code_Analysis_Workflow
 on: 
   pull_request:
     branches:
-      - main
+      - master
 jobs:
-  Code_Analyze_Job:
+  Code_Analysis_Job:
     runs-on: ubuntu-latest
     environment: test
     steps:
@@ -26,10 +26,10 @@ jobs:
           args: -v --config=./.github/config/golangci.yml
       - 
         name: Running acceptace test
-        run: TF_ACC=1 go test  ./...
+        run: TF_ACC=1 go test -v ./...
         env:
           ULTRADNS_UNIT_TEST_USERNAME: ${{ secrets.ULTRADNS_UNIT_TEST_USERNAME }}
           ULTRADNS_UNIT_TEST_PASSWORD: ${{ secrets.ULTRADNS_UNIT_TEST_PASSWORD }}
           ULTRADNS_UNIT_TEST_HOST_URL: ${{ secrets.ULTRADNS_UNIT_TEST_HOST_URL }}
           ULTRADNS_UNIT_TEST_USER_AGENT: ${{ secrets.ULTRADNS_UNIT_TEST_USER_AGENT }}
-          ULTRADNS_UNIT_TEST_OXFR_HOST_URL: ${{ ULTRADNS_UNIT_TEST_OXFR_HOST_URL }}
+          ULTRADNS_UNIT_TEST_NAME_SERVER: ${{ secrets.ULTRADNS_UNIT_TEST_NAME_SERVER }}
