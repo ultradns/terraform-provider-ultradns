@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/ultradns/ultradns-go-sdk/pkg/client"
+	"github.com/ultradns/ultradns-go-sdk/pkg/rdpool"
 	"github.com/ultradns/ultradns-go-sdk/pkg/record"
 	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
@@ -9,6 +10,7 @@ import (
 type Service struct {
 	ZoneService   *zone.Service
 	RecordService *record.Service
+	RDPoolService *rdpool.Service
 }
 
 func NewService(c *client.Client) (*Service, error) {
@@ -21,6 +23,10 @@ func NewService(c *client.Client) (*Service, error) {
 	}
 
 	if service.RecordService, err = record.Get(c); err != nil {
+		return nil, err
+	}
+
+	if service.RDPoolService, err = rdpool.Get(c); err != nil {
 		return nil, err
 	}
 

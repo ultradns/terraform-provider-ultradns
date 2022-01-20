@@ -1,6 +1,6 @@
 linters-settings:
   funlen:
-    lines: 100
+    lines: 200
     statements: 50
   nestif:
     min-complexity: 10
@@ -36,8 +36,5 @@ linters:
     - lll # should reduce line length or configure max length of line
     - noctx
     - gochecknoinits
-
-    # need to remove once sdk version is released
-    - gomoddirectives
 
   fast: false

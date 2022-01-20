@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/rdpool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/record"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/terraform-provider-ultradns/internal/version"
@@ -22,10 +23,12 @@ func Provider() *schema.Provider {
 		ResourcesMap: map[string]*schema.Resource{
 			"ultradns_zone":   zone.ResourceZone(),
 			"ultradns_record": record.ResourceRecord(),
+			"ultradns_rdpool": rdpool.ResourceRDPool(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"ultradns_zone":   zone.DataSourceZone(),
 			"ultradns_record": record.DataSourceRecord(),
+			"ultradns_rdpool": rdpool.DataSourceRDPool(),
 		},
 	}
 }

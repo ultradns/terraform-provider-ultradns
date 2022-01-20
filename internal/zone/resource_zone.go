@@ -10,12 +10,6 @@ import (
 	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
-const (
-	primaryZoneType   = "PRIMARY"
-	secondaryZoneType = "SECONDARY"
-	aliasZoneType     = "ALIAS"
-)
-
 func ResourceZone() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceZoneCreate,
@@ -79,15 +73,15 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 		}
 
 		switch zoneResponse.Properties.Type {
-		case primaryZoneType:
+		case zone.Primary:
 			if err := flattenPrimaryZone(zoneResponse, rd); err != nil {
 				return diag.FromErr(err)
 			}
-		case secondaryZoneType:
+		case zone.Secondary:
 			if err := flattenSecondaryZone(zoneResponse, rd); err != nil {
 				return diag.FromErr(err)
 			}
-		case aliasZoneType:
+		case zone.Alias:
 			if err := flattenAliasZone(zoneResponse, rd); err != nil {
 				return diag.FromErr(err)
 			}
@@ -140,11 +134,11 @@ func newZone(rd *schema.ResourceData) *zone.Zone {
 	}
 
 	switch properties.Type {
-	case primaryZoneType:
+	case zone.Primary:
 		zoneData.PrimaryCreateInfo = getPrimaryCreateInfo(rd)
-	case secondaryZoneType:
+	case zone.Secondary:
 		zoneData.SecondaryCreateInfo = getSecondaryCreateInfo(rd)
-	case aliasZoneType:
+	case zone.Alias:
 		zoneData.AliasCreateInfo = getAliasCreateInfo(rd)
 	}
 
