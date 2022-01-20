@@ -44,7 +44,7 @@ Usage:
 provider "ultradns" {
  username = "username"
  password = "password"
- hosturl = "https://api.test.ultradns.net/"
+ hosturl = "https://api.ultradns.net/"
 }
 ```
 
