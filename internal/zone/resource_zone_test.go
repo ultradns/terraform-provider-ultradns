@@ -1,37 +1,29 @@
 package zone_test
 
 import (
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"os"
 	"strings"
 	"testing"
 
-	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
 	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
 const (
-	primaryZoneType        = "PRIMARY"
-	secondaryZoneType      = "SECONDARY"
-	aliasZoneType          = "ALIAS"
-	defaultCount           = "2"
-	defaultZoneStatus      = "ACTIVE"
-	defaultDNSSECStatus    = "UNSIGNED"
-	randSecondaryZoneCount = 50
-	randZoneNamePrefix     = "sdk-go-test-"
-	randZoneNameSuffix     = ".com."
+	defaultCount        = "2"
+	defaultZoneStatus   = "ACTIVE"
+	defaultDNSSECStatus = "UNSIGNED"
 )
 
 var testNameServer = os.Getenv("ULTRADNS_UNIT_TEST_NAME_SERVER")
 
 func TestAccResourceZonePrimary(t *testing.T) {
-	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
+	zoneName := acctest.GetRandomZoneName()
 	resourceName := "ultradns_zone.primary"
 
 	testCase := resource.TestCase{
@@ -45,7 +37,7 @@ func TestAccResourceZonePrimary(t *testing.T) {
 					testAccCheckZoneExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
 					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr(resourceName, "type", primaryZoneType),
+					resource.TestCheckResourceAttr(resourceName, "type", zone.Primary),
 					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
@@ -66,7 +58,7 @@ func TestAccResourceZonePrimary(t *testing.T) {
 }
 
 func TestAccResourceZoneSecondary(t *testing.T) {
-	zoneName := getRandomSecondaryZoneName()
+	zoneName := acctest.GetRandomSecondaryZoneName()
 	resourceName := "ultradns_zone.secondary"
 
 	testCase := resource.TestCase{
@@ -80,7 +72,7 @@ func TestAccResourceZoneSecondary(t *testing.T) {
 					testAccCheckZoneExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", strings.TrimSuffix(zoneName, ".")),
 					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr(resourceName, "type", secondaryZoneType),
+					resource.TestCheckResourceAttr(resourceName, "type", zone.Secondary),
 					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
@@ -93,7 +85,7 @@ func TestAccResourceZoneSecondary(t *testing.T) {
 }
 
 func TestAccResourceZoneAlias(t *testing.T) {
-	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
+	zoneName := acctest.GetRandomZoneName()
 	resourceName := "ultradns_zone.alias"
 
 	testCase := resource.TestCase{
@@ -107,12 +99,11 @@ func TestAccResourceZoneAlias(t *testing.T) {
 					testAccCheckZoneExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
 					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr(resourceName, "type", aliasZoneType),
+					resource.TestCheckResourceAttr(resourceName, "type", zone.Alias),
 					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
 					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
-					resource.TestCheckResourceAttr(resourceName, "alias_create_info.0.original_zone_name", testAccGetPrimaryZoneNameForAlias(zoneName)),
 				),
 			},
 			{
@@ -162,14 +153,6 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 	return nil
 }
 
-func getRandomSecondaryZoneName() string {
-	if num, err := rand.Int(rand.Reader, big.NewInt(randSecondaryZoneCount)); err == nil {
-		return randZoneNamePrefix + num.String() + randZoneNameSuffix
-	}
-
-	return randZoneNamePrefix + "0" + randZoneNameSuffix
-}
-
 func testAccResourceZonePrimary(zoneName string) string {
 	return fmt.Sprintf(`
 	resource "ultradns_zone" "primary" {
@@ -211,7 +194,7 @@ func testAccResourceZoneSecondary(zoneName string) string {
 }
 
 func testAccResourceZoneAlias(zoneName string) string {
-	primaryZoneNameForAlias := testAccGetPrimaryZoneNameForAlias(zoneName)
+	primaryZoneNameForAlias := acctest.GetRandomZoneNameWithSpecialChar()
 
 	return fmt.Sprintf(`
 	%s
@@ -225,8 +208,4 @@ func testAccResourceZoneAlias(zoneName string) string {
 		}
 	  }
 	`, testAccResourceZonePrimary(primaryZoneNameForAlias), zoneName, acctest.TestUsername)
-}
-
-func testAccGetPrimaryZoneNameForAlias(zoneName string) string {
-	return fmt.Sprintf("%[1]s/%[1]sin-addr.arpa.", zoneName)
 }

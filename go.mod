@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.10.0
-	github.com/ultradns/ultradns-go-sdk v1.0.0-202201070925-6692cb0
+	github.com/ultradns/ultradns-go-sdk v1.1.0-20220121060046-90b2c3f
 )
 
 require (

@@ -10,7 +10,7 @@ import (
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 )
 
-const testZoneSweeperPrefix = "test-acc"
+const testZoneSweeperPrefix = "terraform-plugin-acc-test-"
 
 func init() {
 	resource.AddTestSweepers("ultradns_zone", &resource.Sweeper{

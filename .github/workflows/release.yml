@@ -54,7 +54,7 @@ jobs:
         run: echo "RELEASE_VERSION=$(cat .plugin-version)" >> $GITHUB_ENV
       -
         name: Update release version using go generate
-        run: go generate internal/version
+        run: go generate ./internal/version
       - 
         name: Setup git config for creating Tag
         run: |
