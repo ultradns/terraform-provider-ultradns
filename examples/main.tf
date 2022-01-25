@@ -91,15 +91,6 @@ resource "ultradns_record" "ptr" {
     record_data = ["example.com."]
 }
 
-## Record Resource of Type HINFO (13)
-resource "ultradns_record" "hinfo" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "hinfo"
-    record_type = "HINFO"
-    ttl = 120
-    record_data = ["\"PC\" \"Linux\"","\"Laptop\" \"Windows\""]
-}
-
 ## Record Resource of Type MX (15)
 resource "ultradns_record" "mx" {
     zone_name = "${resource.ultradns_zone.primary.id}"
@@ -116,15 +107,6 @@ resource "ultradns_record" "txt" {
     record_type = "TXT"
     ttl = 120
     record_data = ["example.com."]
-}
-
-## Record Resource of Type RP (17)
-resource "ultradns_record" "rp" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "${resource.ultradns_zone.primary.id}"
-    record_type = "17"
-    ttl = 120
-    record_data = ["test.example.com. example.128/134.123.178.178.in-addr.arpa."]
 }
 
 ## Record Resource of Type AAAA (28)
@@ -145,15 +127,6 @@ resource "ultradns_record" "srv" {
     record_data = ["5 6 7 example.com."]
 }
 
-## Record Resource of Type NAPTR (35)
-resource "ultradns_record" "naptr" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "naptr"
-    record_type = "NAPTR"
-    ttl = 120
-    record_data = ["1 2 \"3\" \"test\" \"\" test.com."]
-}
-
 ## Record Resource of Type SSHFP (44)
 resource "ultradns_record" "sshfp" {
     zone_name = "${resource.ultradns_zone.primary.id}"
@@ -161,33 +134,6 @@ resource "ultradns_record" "sshfp" {
     record_type = "44"
     ttl = 120
     record_data = ["1 2 54B5E539EAF593AEA410F80737530B71CCDE8B6C3D241184A1372E98BC7EDB37"]
-}
-
-## Record Resource of Type TLSA (52)
-resource "ultradns_record" "tlsa" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "_23._tcp.tlsatest"
-    record_type = "TLSA"
-    ttl = 120
-    record_data = ["0 0 0 aaaaaaaa"]
-}
-
-## Record Resource of Type SPF (99)
-resource "ultradns_record" "spf" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "${resource.ultradns_zone.primary.id}"
-    record_type = "99"
-    ttl = 120
-    record_data = ["v=spf1 ip4:1.2.3.4 ~all"]
-}
-
-## Record Resource of Type CAA (257)
-resource "ultradns_record" "caa" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "caa"
-    record_type = "CAA"
-    ttl = 120
-    record_data = ["1 issue \"asdfsadf\""]
 }
 
 ## Record Resource of Type APEXALIAS (65282)
