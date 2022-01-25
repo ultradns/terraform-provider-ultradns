@@ -1,10 +1,10 @@
-package record
+package rrset
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func dataSourceRecordSchema() map[string]*schema.Schema {
+func DataSourceRRSetSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"zone_name": {
 			Type:     schema.TypeString,

@@ -1,8 +1,8 @@
-package record
+package rrset
 
 import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
-func resourceRecordSchema() map[string]*schema.Schema {
+func ResourceRRSetSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"zone_name": {
 			Type:     schema.TypeString,
@@ -13,8 +13,9 @@ func resourceRecordSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 		"record_type": {
-			Type:     schema.TypeString,
-			Required: true,
+			Type:             schema.TypeString,
+			Required:         true,
+			ValidateDiagFunc: validateRecordType(),
 		},
 		"ttl": {
 			Type:     schema.TypeInt,

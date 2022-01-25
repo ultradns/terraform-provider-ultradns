@@ -46,15 +46,15 @@ func dataSourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	}
 
 	switch zoneResponse.Properties.Type {
-	case primaryZoneType:
+	case zone.Primary:
 		if err := flattenPrimaryZoneInfo(zoneResponse, rd); err != nil {
 			return diag.FromErr(err)
 		}
-	case secondaryZoneType:
+	case zone.Secondary:
 		if err := flattenSecondaryZoneInfo(zoneResponse, rd); err != nil {
 			return diag.FromErr(err)
 		}
-	case aliasZoneType:
+	case zone.Alias:
 		if err := rd.Set("original_zone_name", zoneResponse.OriginalZoneName); err != nil {
 			return diag.FromErr(err)
 		}

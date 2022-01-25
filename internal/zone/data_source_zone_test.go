@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"testing"
 
-	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
+	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
 func TestAccDataSourceZonePrimary(t *testing.T) {
-	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
+	zoneName := acctest.GetRandomZoneName()
 	dataSourceName := "data.ultradns_zone.data_primary"
 
 	testCase := resource.TestCase{
@@ -23,7 +23,7 @@ func TestAccDataSourceZonePrimary(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(dataSourceName, "name", zoneName),
 					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr(dataSourceName, "type", primaryZoneType),
+					resource.TestCheckResourceAttr(dataSourceName, "type", zone.Primary),
 					resource.TestCheckResourceAttr(dataSourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "owner", acctest.TestUsername),
@@ -37,7 +37,7 @@ func TestAccDataSourceZonePrimary(t *testing.T) {
 }
 
 func TestAccDataSourceZoneSecondary(t *testing.T) {
-	zoneName := getRandomSecondaryZoneName()
+	zoneName := acctest.GetRandomSecondaryZoneName()
 	dataSourceName := "data.ultradns_zone.data_secondary"
 
 	testCase := resource.TestCase{
@@ -50,7 +50,7 @@ func TestAccDataSourceZoneSecondary(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(dataSourceName, "name", zoneName),
 					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr(dataSourceName, "type", secondaryZoneType),
+					resource.TestCheckResourceAttr(dataSourceName, "type", zone.Secondary),
 					resource.TestCheckResourceAttr(dataSourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "owner", acctest.TestUsername),
@@ -63,7 +63,7 @@ func TestAccDataSourceZoneSecondary(t *testing.T) {
 }
 
 func TestAccDataSourceZoneAlias(t *testing.T) {
-	zoneName := fmt.Sprintf("test-acc-%s.com.", tfacctest.RandString(5))
+	zoneName := acctest.GetRandomZoneName()
 	dataSourceName := "data.ultradns_zone.data_alias"
 
 	testCase := resource.TestCase{
@@ -76,12 +76,11 @@ func TestAccDataSourceZoneAlias(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(dataSourceName, "name", zoneName),
 					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestUsername),
-					resource.TestCheckResourceAttr(dataSourceName, "type", aliasZoneType),
+					resource.TestCheckResourceAttr(dataSourceName, "type", zone.Alias),
 					resource.TestCheckResourceAttr(dataSourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "owner", acctest.TestUsername),
 					resource.TestCheckResourceAttr(dataSourceName, "resource_record_count", defaultCount),
-					resource.TestCheckResourceAttr(dataSourceName, "original_zone_name", testAccGetPrimaryZoneNameForAlias(zoneName)),
 				),
 			},
 		},

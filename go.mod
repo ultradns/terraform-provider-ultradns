@@ -3,8 +3,9 @@ module github.com/ultradns/terraform-provider-ultradns
 go 1.17
 
 require (
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.10.0
-	github.com/ultradns/ultradns-go-sdk v1.0.0-202201070925-6692cb0
+	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.10.1
+	github.com/ultradns/ultradns-go-sdk v1.1.0-20220121060046-90b2c3f
 )
 
 require (
@@ -19,7 +20,6 @@ require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-checkpoint v0.5.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320 // indirect
 	github.com/hashicorp/go-hclog v0.16.1 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-plugin v1.4.1 // indirect

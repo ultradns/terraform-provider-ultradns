@@ -1,5 +1,5 @@
 ---
-subcategory: "ZONE"
+subcategory: "Zone"
 layout: "ultradns"
 page_title: "ULTRADNS: ultradns_zone"
 description: |-
