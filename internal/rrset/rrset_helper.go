@@ -3,6 +3,8 @@ package rrset
 import (
 	"strings"
 
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/rrset"
@@ -110,4 +112,39 @@ func flattenRRSetData(recordData []string) *schema.Set {
 	}
 
 	return set
+}
+
+func validateRecordType() schema.SchemaValidateDiagFunc {
+	return func(i interface{}, p cty.Path) diag.Diagnostics {
+		var diags diag.Diagnostics
+		var supportedRRType = map[string]bool{
+			"A":         true,
+			"1":         true,
+			"CNAME":     true,
+			"5":         true,
+			"PTR":       true,
+			"12":        true,
+			"MX":        true,
+			"15":        true,
+			"TXT":       true,
+			"16":        true,
+			"AAAA":      true,
+			"28":        true,
+			"SRV":       true,
+			"33":        true,
+			"SSHFP":     true,
+			"44":        true,
+			"APEXALIAS": true,
+			"65282":     true,
+		}
+
+		recordType := i.(string)
+		_, ok := supportedRRType[recordType]
+
+		if !ok {
+			return diag.Errorf("invalid or unsupported record type")
+		}
+
+		return diags
+	}
 }

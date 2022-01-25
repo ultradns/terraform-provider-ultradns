@@ -63,16 +63,6 @@ func TestAccResourceRecord(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceRecordHINFO(zoneName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.hinfo"),
-					resource.TestCheckResourceAttr("ultradns_record.hinfo", "zone_name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_record.hinfo", "record_type", "13"),
-					resource.TestCheckResourceAttr("ultradns_record.hinfo", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.hinfo", "record_data.0", "\"PC\" \"Linux\""),
-				),
-			},
-			{
 				Config: testAccResourceRecordMX(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("ultradns_record.mx"),
@@ -96,21 +86,6 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.txt", "ttl", "120"),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "record_data.0", "example.com."),
 				),
-			},
-			{
-				Config: testAccResourceRecordRP(zoneName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.rp"),
-					resource.TestCheckResourceAttr("ultradns_record.rp", "zone_name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_record.rp", "record_type", "RP"),
-					resource.TestCheckResourceAttr("ultradns_record.rp", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.rp", "record_data.0", "test.example.com. example.128/134.123.178.178.in-addr.arpa."),
-				),
-			},
-			{
-				ResourceName:      "ultradns_record.rp",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 			{
 				Config: testAccResourceRecordAAAA(zoneName),
@@ -138,16 +113,6 @@ func TestAccResourceRecord(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceRecordNAPTR(zoneName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.naptr"),
-					resource.TestCheckResourceAttr("ultradns_record.naptr", "zone_name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_record.naptr", "record_type", "35"),
-					resource.TestCheckResourceAttr("ultradns_record.naptr", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.naptr", "record_data.0", "1 2 \"3\" \"test\" \"\" test.com."),
-				),
-			},
-			{
 				Config: testAccResourceRecordSSHFP(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("ultradns_record.sshfp"),
@@ -161,41 +126,6 @@ func TestAccResourceRecord(t *testing.T) {
 				ResourceName:      "ultradns_record.sshfp",
 				ImportState:       true,
 				ImportStateVerify: true,
-			},
-			{
-				Config: testAccResourceRecordTLSA(zoneName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.tlsa"),
-					resource.TestCheckResourceAttr("ultradns_record.tlsa", "zone_name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_record.tlsa", "record_type", "52"),
-					resource.TestCheckResourceAttr("ultradns_record.tlsa", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.tlsa", "record_data.0", "0 0 0 aaaaaaaa"),
-				),
-			},
-			{
-				Config: testAccResourceRecordSPF(zoneName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.spf"),
-					resource.TestCheckResourceAttr("ultradns_record.spf", "zone_name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_record.spf", "record_type", "SPF"),
-					resource.TestCheckResourceAttr("ultradns_record.spf", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.spf", "record_data.0", "v=spf1 ip4:1.2.3.4 ~all"),
-				),
-			},
-			{
-				ResourceName:      "ultradns_record.spf",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-			{
-				Config: testAccResourceRecordCAA(zoneName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.caa"),
-					resource.TestCheckResourceAttr("ultradns_record.caa", "zone_name", strings.TrimSuffix(zoneName, ".")),
-					resource.TestCheckResourceAttr("ultradns_record.caa", "record_type", "257"),
-					resource.TestCheckResourceAttr("ultradns_record.caa", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_record.caa", "record_data.0", "1 issue \"test\""),
-				),
 			},
 			{
 				Config: testAccResourceRecordAPEXALIAS(zoneName),
@@ -307,20 +237,6 @@ func testAccResourceRecordPTR(zoneName string) string {
 	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
 }
 
-func testAccResourceRecordHINFO(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
-
-	resource "ultradns_record" "hinfo" {
-		zone_name = "${resource.ultradns_zone.primary_record.id}"
-		owner_name = "%s"
-		record_type = "13"
-		ttl = 120
-		record_data = ["\"PC\" \"Linux\""]
-	}
-	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
-}
-
 func testAccResourceRecordMX(zoneName string) string {
 	return fmt.Sprintf(`
 	%s
@@ -345,20 +261,6 @@ func testAccResourceRecordTXT(zoneName string) string {
 		record_type = "16"
 		ttl = 120
 		record_data = ["example.com."]
-	}
-	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
-}
-
-func testAccResourceRecordRP(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
-
-	resource "ultradns_record" "rp" {
-		zone_name = "${resource.ultradns_zone.primary_record.id}"
-		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
-		record_type = "RP"
-		ttl = 120
-		record_data = ["test.example.com. example.128/134.123.178.178.in-addr.arpa."]
 	}
 	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
 }
@@ -391,20 +293,6 @@ func testAccResourceRecordSRV(zoneName string) string {
 	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
 }
 
-func testAccResourceRecordNAPTR(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
-
-	resource "ultradns_record" "naptr" {
-		zone_name = "${resource.ultradns_zone.primary_record.id}"
-		owner_name = "%s"
-		record_type = "35"
-		ttl = 120
-		record_data = ["1 2 \"3\" \"test\" \"\" test.com."]
-	}
-	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
-}
-
 func testAccResourceRecordSSHFP(zoneName string) string {
 	return fmt.Sprintf(`
 	%s
@@ -417,48 +305,6 @@ func testAccResourceRecordSSHFP(zoneName string) string {
 		record_data = ["1 2 54B5E539EAF593AEA410F80737530B71CCDE8B6C3D241184A1372E98BC7EDB37"]
 	}
 	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
-}
-
-func testAccResourceRecordTLSA(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
-
-	resource "ultradns_record" "tlsa" {
-		zone_name = "${resource.ultradns_zone.primary_record.id}"
-		owner_name = "_23._tcp.%s"
-		record_type = "52"
-		ttl = 120
-		record_data = ["0 0 0 aaaaaaaa"]
-	}
-	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
-}
-
-func testAccResourceRecordSPF(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
-
-	resource "ultradns_record" "spf" {
-		zone_name = "${resource.ultradns_zone.primary_record.id}"
-		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
-		record_type = "SPF"
-		ttl = 120
-		record_data = ["v=spf1 ip4:1.2.3.4 ~all"]
-	}
-	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
-}
-
-func testAccResourceRecordCAA(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
-
-	resource "ultradns_record" "caa" {
-		zone_name = "%s"
-		owner_name = "%s"
-		record_type = "257"
-		ttl = 120
-		record_data = ["1 issue \"test\""]
-	}
-	`, testAccResourceZonePrimary(zoneName), strings.TrimSuffix(zoneName, "."), tfacctest.RandString(3))
 }
 
 func testAccResourceRecordAPEXALIAS(zoneName string) string {

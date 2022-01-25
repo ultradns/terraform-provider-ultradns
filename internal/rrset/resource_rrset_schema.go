@@ -13,8 +13,9 @@ func ResourceRRSetSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 		"record_type": {
-			Type:     schema.TypeString,
-			Required: true,
+			Type:             schema.TypeString,
+			Required:         true,
+			ValidateDiagFunc: validateRecordType(),
 		},
 		"ttl": {
 			Type:     schema.TypeInt,

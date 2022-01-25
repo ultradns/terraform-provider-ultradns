@@ -26,12 +26,14 @@ The following arguments are supported:
 * `record_type` - (Required) (String) Must be formatted as the well-known resource record type (A, AAAA, TXT, etc.) or the corresponding number for the type, between 1 and 65535.<br/>
 Below are the supported resource record type with its corresponding number:<br/>
 `A (1)`
-`AAAA (28)`
 `CNAME (5)`
-`MX (15)`
-`SRV (33)`
-`TXT (16)`
 `PTR (12)`
+`MX (15)`
+`TXT (16)`
+`AAAA (28)`
+`SRV (33)`
+`SSHFP (44)`
+`APEXALIAS (65282)`
 
 
 ## Attributes Reference

@@ -48,18 +48,6 @@ resource "ultradns_record" "ptr" {
 }
 ```
 
-### Create DNS record of type HINFO (13)
-
-```terraform
-resource "ultradns_record" "hinfo" {
-    zone_name = "example.com."
-    owner_name = "hinfo"
-    record_type = "HINFO"
-    ttl = 120
-    record_data = ["\"PC\" \"Linux\"","\"Laptop\" \"Windows\""]
-}
-```
-
 ### Create DNS record of type MX (15)
 
 ```terraform
@@ -81,18 +69,6 @@ resource "ultradns_record" "txt" {
     record_type = "TXT"
     ttl = 120
     record_data = ["example.com."]
-}
-```
-
-### Create DNS record of type RP (17)
-
-```terraform
-resource "ultradns_record" "rp" {
-    zone_name = "example.com."
-    owner_name = "example.com."
-    record_type = "17"
-    ttl = 120
-    record_data = ["test.sample.com. sample.128/134.123.178.178.in-addr.arpa."]
 }
 ```
 
@@ -120,18 +96,6 @@ resource "ultradns_record" "srv" {
 }
 ```
 
-### Create DNS record of type NAPTR (35)
-
-```terraform
-resource "ultradns_record" "naptr" {
-    zone_name = "example.com."
-    owner_name = "naptr"
-    record_type = "NAPTR"
-    ttl = 120
-    record_data = ["1 2 \"3\" \"test\" \"\" test.com."]
-}
-```
-
 ### Create DNS record of type SSHFP (44)
 
 ```terraform
@@ -141,42 +105,6 @@ resource "ultradns_record" "sshfp" {
     record_type = "SSHFP"
     ttl = 120
     record_data = ["1 2 54B5E539EAF593AEA410F80737530B71CCDE8B6C3D241184A1372E98BC7EDB37"]
-}
-```
-
-### Create DNS record of type TLSA (52)
-
-```terraform
-resource "ultradns_record" "tlsa" {
-    zone_name = "example.com."
-    owner_name = "_23._tcp.tlsatest"
-    record_type = "52"
-    ttl = 120
-    record_data = ["0 0 0 aaaaaaaa"]
-}
-```
-
-### Create DNS record of type SPF (99)
-
-```terraform
-resource "ultradns_record" "spf" {
-    zone_name = "example.com."
-    owner_name = "example.com."
-    record_type = "SPF"
-    ttl = 120
-    record_data = ["v=spf1 ip4:1.2.3.4 ~all"]
-}
-```
-
-### Create DNS record of type CAA (257)
-
-```terraform
-resource "ultradns_record" "caa" {
-    zone_name = "example.com."
-    owner_name = "caa"
-    record_type = "257"
-    ttl = 120
-    record_data = ["1 issue \"asdfsadf\""]
 }
 ```
 
@@ -203,17 +131,11 @@ Below are the supported resource record type with its corresponding number:<br/>
 `A (1)`
 `CNAME (5)`
 `PTR (12)`
-`HINFO (13)`
 `MX (15)`
 `TXT (16)`
-`RP (17)`
 `AAAA (28)`
 `SRV (33)`
-`NAPTR (35)`
 `SSHFP (44)`
-`TLSA (52)`
-`SPF (99)`
-`CAA (257)`
 `APEXALIAS (65282)`
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
 * `record_data` - (Required) (String List) The data for the record displayed as the BIND presentation format for the specified RRTYPE.<br/>
