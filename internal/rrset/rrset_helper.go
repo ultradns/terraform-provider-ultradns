@@ -117,6 +117,7 @@ func flattenRRSetData(recordData []string) *schema.Set {
 func validateRecordType() schema.SchemaValidateDiagFunc {
 	return func(i interface{}, p cty.Path) diag.Diagnostics {
 		var diags diag.Diagnostics
+
 		var supportedRRType = map[string]bool{
 			"A":         true,
 			"1":         true,
