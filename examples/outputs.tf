@@ -9,3 +9,11 @@ output "record" {
 output "rdpool" {
   value = data.ultradns_rdpool.rdpool
 }
+
+output "sfpool" {
+  value = data.ultradns_sfpool.sfpool
+}
+
+output "slbpool" {
+  value = data.ultradns_slbpool.slbpool
+}

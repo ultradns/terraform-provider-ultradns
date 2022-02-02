@@ -2,64 +2,64 @@ package zone
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
-func flattenTsig(tsigData *zone.Tsig, rd *schema.ResourceData) error {
-	set := &schema.Set{F: zeroIndexHash}
-	tsig := make(map[string]interface{})
-	tsig["tsig_key_name"] = tsigData.TsigKeyName
-	tsig["tsig_key_value"] = tsigData.TsigKeyValue
-	tsig["tsig_algorithm"] = tsigData.TsigAlgorithm
-	tsig["description"] = tsigData.Description
-	set.Add(tsig)
-
-	if err := rd.Set("tsig", set); err != nil {
+func flattenPrimaryZoneInfo(zoneResponse *zone.Response, rd *schema.ResourceData) error {
+	if err := rd.Set("inherit", zoneResponse.Inherit); err != nil {
 		return err
+	}
+
+	if zoneResponse.Tsig != nil {
+		if err := rd.Set("tsig", getTsigSet(zoneResponse.Tsig)); err != nil {
+			return err
+		}
+	}
+
+	if zoneResponse.RestrictIPList != nil {
+		if err := rd.Set("restrict_ip", getRestrictIPListSet(zoneResponse.RestrictIPList)); err != nil {
+			return err
+		}
+	}
+
+	if zoneResponse.NotifyAddresses != nil {
+		if err := rd.Set("notify_addresses", getNotifyAddressesSet(zoneResponse.NotifyAddresses)); err != nil {
+			return err
+		}
+	}
+
+	if zoneResponse.RegistrarInfo != nil {
+		if err := flattenRegistrarInfo(zoneResponse.RegistrarInfo, rd); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func flattenRestrictIPList(restrictIPListData []*zone.RestrictIP, rd *schema.ResourceData) error {
-	set := &schema.Set{F: schema.HashResource(restrictIPResource())}
-
-	for _, restrictIPData := range restrictIPListData {
-		restrictIP := make(map[string]interface{})
-		restrictIP["start_ip"] = restrictIPData.StartIP
-		restrictIP["end_ip"] = restrictIPData.EndIP
-		restrictIP["cidr"] = restrictIPData.Cidr
-		restrictIP["single_ip"] = restrictIPData.SingleIP
-		restrictIP["comment"] = restrictIPData.Comment
-		set.Add(restrictIP)
-	}
-
-	if err := rd.Set("restrict_ip", set); err != nil {
+func flattenSecondaryZoneInfo(zoneResponse *zone.Response, rd *schema.ResourceData) error {
+	if err := rd.Set("notification_email_address", zoneResponse.NotificationEmailAddress); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func flattenNotifyAddresses(notifyAddressesData []*zone.NotifyAddress, rd *schema.ResourceData) error {
-	set := &schema.Set{F: schema.HashResource(notifyAddressResource())}
-
-	for _, notifyAddressData := range notifyAddressesData {
-		notifyAddress := make(map[string]interface{})
-		notifyAddress["notify_address"] = notifyAddressData.NotifyAddress
-		notifyAddress["description"] = notifyAddressData.Description
-		set.Add(notifyAddress)
+	if zoneResponse.TransferStatusDetails != nil {
+		if err := flattenTransferStatusDetails(zoneResponse.TransferStatusDetails, rd); err != nil {
+			return err
+		}
 	}
 
-	if err := rd.Set("notify_addresses", set); err != nil {
-		return err
+	if zoneResponse.PrimaryNameServers != nil && zoneResponse.PrimaryNameServers.NameServerIPList != nil {
+		if err := flattenPrimaryNameServers(zoneResponse.PrimaryNameServers.NameServerIPList, rd); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
 func flattenRegistrarInfo(registrarInfoData *zone.RegistrarInfo, rd *schema.ResourceData) error {
-	set := &schema.Set{F: zeroIndexHash}
+	set := &schema.Set{F: helper.HashSingleSetResource}
 	registrarInfo := make(map[string]interface{})
 	registrarInfo["registrar"] = registrarInfoData.Registrar
 	registrarInfo["who_is_expiration"] = registrarInfoData.WhoIsExpiration
@@ -74,7 +74,7 @@ func flattenRegistrarInfo(registrarInfoData *zone.RegistrarInfo, rd *schema.Reso
 }
 
 func flattenRegistrarInfoNameServers(nameServersList *zone.NameServersList) *schema.Set {
-	set := &schema.Set{F: zeroIndexHash}
+	set := &schema.Set{F: helper.HashSingleSetResource}
 	registrarInfoNameServersList := make(map[string]interface{})
 	registrarInfoNameServersList["ok"] = nameServersList.Ok
 	registrarInfoNameServersList["unknown"] = nameServersList.Unknown
@@ -86,7 +86,7 @@ func flattenRegistrarInfoNameServers(nameServersList *zone.NameServersList) *sch
 }
 
 func flattenTransferStatusDetails(transferDetailsData *zone.TransferStatusDetails, rd *schema.ResourceData) error {
-	set := &schema.Set{F: zeroIndexHash}
+	set := &schema.Set{F: helper.HashSingleSetResource}
 	transferDetails := make(map[string]interface{})
 	transferDetails["last_refresh"] = transferDetailsData.LastRefresh
 	transferDetails["next_refresh"] = transferDetailsData.NextRefresh
@@ -103,38 +103,22 @@ func flattenTransferStatusDetails(transferDetailsData *zone.TransferStatusDetail
 
 func flattenPrimaryNameServers(nameServerIPListData *zone.NameServerIPList, rd *schema.ResourceData) error {
 	if nameServerIPListData.NameServerIP1 != nil {
-		if err := rd.Set("primary_name_server_1", flattenNameServer(nameServerIPListData.NameServerIP1)); err != nil {
+		if err := rd.Set("primary_name_server_1", getNameServerSet(nameServerIPListData.NameServerIP1)); err != nil {
 			return err
 		}
 	}
 
 	if nameServerIPListData.NameServerIP2 != nil {
-		if err := rd.Set("primary_name_server_2", flattenNameServer(nameServerIPListData.NameServerIP2)); err != nil {
+		if err := rd.Set("primary_name_server_2", getNameServerSet(nameServerIPListData.NameServerIP2)); err != nil {
 			return err
 		}
 	}
 
 	if nameServerIPListData.NameServerIP3 != nil {
-		if err := rd.Set("primary_name_server_3", flattenNameServer(nameServerIPListData.NameServerIP3)); err != nil {
+		if err := rd.Set("primary_name_server_3", getNameServerSet(nameServerIPListData.NameServerIP3)); err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-func flattenNameServer(nameServerData *zone.NameServer) *schema.Set {
-	set := &schema.Set{F: zeroIndexHash}
-	nameServer := make(map[string]interface{})
-	nameServer["ip"] = nameServerData.IP
-	nameServer["tsig_key"] = nameServerData.TsigKey
-	nameServer["tsig_key_value"] = nameServerData.TsigKeyValue
-	nameServer["tsig_algorithm"] = nameServerData.TsigAlgorithm
-	set.Add(nameServer)
-
-	return set
-}
-
-func zeroIndexHash(i interface{}) int {
-	return 0
 }

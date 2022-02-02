@@ -9,7 +9,6 @@ func dataSourceZoneSchema() map[string]*schema.Schema {
 		"name": {
 			Type:     schema.TypeString,
 			Required: true,
-			ForceNew: true,
 		},
 		"account_name": {
 			Type:     schema.TypeString,

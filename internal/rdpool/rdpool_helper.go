@@ -13,7 +13,7 @@ import (
 const profileType = "*rdpool.Profile"
 
 func flattenRDPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) error {
-	if err := rrset.FlattenRRSet(resList, rd); err != nil {
+	if err := rrset.FlattenRRSetWithRecordData(resList, rd); err != nil {
 		return err
 	}
 

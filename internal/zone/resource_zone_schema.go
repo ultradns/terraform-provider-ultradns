@@ -2,14 +2,16 @@ package zone
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 )
 
 func resourceZoneSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
-			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: true,
+			Type:             schema.TypeString,
+			Required:         true,
+			ForceNew:         true,
+			DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
 		},
 		"account_name": {
 			Type:        schema.TypeString,
@@ -42,6 +44,7 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			Type:     schema.TypeSet,
 			Optional: true,
 			MaxItems: 1,
+			Set:      helper.HashSingleSetResource,
 			Elem:     aliasZoneCreateInfoResource(),
 		},
 		"dnssec_status": {
@@ -133,7 +136,7 @@ func secondaryZoneCreateInfoResource() *schema.Resource {
 			"primary_name_server_1": {
 				Type:     schema.TypeSet,
 				MaxItems: 1,
-				Optional: true,
+				Required: true,
 				Elem:     nameServerResource(),
 			},
 			"primary_name_server_2": {
@@ -156,8 +159,9 @@ func aliasZoneCreateInfoResource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"original_zone_name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:             schema.TypeString,
+				Required:         true,
+				DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
 			},
 		},
 	}

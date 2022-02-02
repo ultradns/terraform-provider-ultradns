@@ -1,4 +1,4 @@
-package record
+package slbpool
 
 import (
 	"context"
@@ -9,22 +9,22 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 )
 
-func DataSourceRecord() *schema.Resource {
+func DataSourceSLBPool() *schema.Resource {
 	return &schema.Resource{
 
-		ReadContext: dataSourceRecordRead,
+		ReadContext: dataSourceSLBPoolRead,
 
-		Schema: rrset.DataSourceRRSetSchema(),
+		Schema: dataSourceSLBPoolSchema(),
 	}
 }
 
-func dataSourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func dataSourceSLBPoolRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
 
 	rrSetKeyData := rrset.NewRRSetKey(rd)
-	_, resList, err := services.RecordService.ReadRecord(rrSetKeyData)
+	_, resList, err := services.SLBPoolService.ReadSLBPool(rrSetKeyData)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -33,7 +33,7 @@ func dataSourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta int
 	rd.SetId(rrSetKeyData.ID())
 
 	if len(resList.RRSets) > 0 {
-		if err = rrset.FlattenRRSetWithRecordData(resList, rd); err != nil {
+		if err = flattenSLBPool(resList, rd); err != nil {
 			return diag.FromErr(err)
 		}
 	}

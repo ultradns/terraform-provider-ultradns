@@ -3,14 +3,12 @@ package rrset
 import (
 	"strings"
 
-	"github.com/hashicorp/go-cty/cty"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/rrset"
 )
 
-func NewRRSet(rd *schema.ResourceData) *rrset.RRSet {
+func newRRSet(rd *schema.ResourceData) *rrset.RRSet {
 	rrSetData := &rrset.RRSet{}
 
 	if val, ok := rd.GetOk("owner_name"); ok {
@@ -25,6 +23,12 @@ func NewRRSet(rd *schema.ResourceData) *rrset.RRSet {
 		rrSetData.TTL = val.(int)
 	}
 
+	return rrSetData
+}
+
+func NewRRSetWithRecordData(rd *schema.ResourceData) *rrset.RRSet {
+	rrSetData := newRRSet(rd)
+
 	if val, ok := rd.GetOk("record_data"); ok {
 		recordData := val.(*schema.Set).List()
 		rrSetData.RData = make([]string, len(recordData))
@@ -34,6 +38,21 @@ func NewRRSet(rd *schema.ResourceData) *rrset.RRSet {
 		}
 	}
 
+	return rrSetData
+}
+
+func NewRRSetWithRecordDataInfo(rd *schema.ResourceData) *rrset.RRSet {
+	rrSetData := newRRSet(rd)
+
+	if val, ok := rd.GetOk("rdata_info"); ok {
+		rDataInfoList := val.(*schema.Set).List()
+		rrSetData.RData = make([]string, len(rDataInfoList))
+
+		for i, rDataInfoData := range rDataInfoList {
+			rDataInfo := rDataInfoData.(map[string]interface{})
+			rrSetData.RData[i] = rDataInfo["rdata"].(string)
+		}
+	}
 	return rrSetData
 }
 
@@ -69,39 +88,32 @@ func GetRRSetKeyFromID(id string) *rrset.RRSetKey {
 }
 
 func FlattenRRSet(resList *rrset.ResponseList, rd *schema.ResourceData) error {
-	currentSchemaZoneName := rd.Get("zone_name").(string)
 
-	if helper.GetZoneFQDN(currentSchemaZoneName) != helper.GetZoneFQDN(resList.ZoneName) {
-		if err := rd.Set("zone_name", resList.ZoneName); err != nil {
-			return err
-		}
+	if err := rd.Set("zone_name", resList.ZoneName); err != nil {
+		return err
 	}
 
-	currentSchemaOwnerName := rd.Get("owner_name").(string)
-
-	if helper.GetOwnerFQDN(currentSchemaOwnerName, resList.ZoneName) != resList.RRSets[0].OwnerName {
-		if err := rd.Set("owner_name", resList.RRSets[0].OwnerName); err != nil {
-			return err
-		}
+	if err := rd.Set("owner_name", resList.RRSets[0].OwnerName); err != nil {
+		return err
 	}
 
-	currentSchemaRecordType := rd.Get("record_type").(string)
-
-	if helper.GetRecordTypeFullString(currentSchemaRecordType) != resList.RRSets[0].RRType {
-		if err := rd.Set("record_type", helper.GetRecordTypeString(resList.RRSets[0].RRType)); err != nil {
-			return err
-		}
+	if err := rd.Set("record_type", helper.GetRecordTypeString(resList.RRSets[0].RRType)); err != nil {
+		return err
 	}
 
 	if err := rd.Set("ttl", resList.RRSets[0].TTL); err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func FlattenRRSetWithRecordData(resList *rrset.ResponseList, rd *schema.ResourceData) error {
 	if err := rd.Set("record_data", flattenRRSetData(resList.RRSets[0].RData)); err != nil {
 		return err
 	}
 
-	return nil
+	return FlattenRRSet(resList, rd)
 }
 
 func flattenRRSetData(recordData []string) *schema.Set {
@@ -112,40 +124,4 @@ func flattenRRSetData(recordData []string) *schema.Set {
 	}
 
 	return set
-}
-
-func validateRecordType() schema.SchemaValidateDiagFunc {
-	return func(i interface{}, p cty.Path) diag.Diagnostics {
-		var diags diag.Diagnostics
-
-		var supportedRRType = map[string]bool{
-			"A":         true,
-			"1":         true,
-			"CNAME":     true,
-			"5":         true,
-			"PTR":       true,
-			"12":        true,
-			"MX":        true,
-			"15":        true,
-			"TXT":       true,
-			"16":        true,
-			"AAAA":      true,
-			"28":        true,
-			"SRV":       true,
-			"33":        true,
-			"SSHFP":     true,
-			"44":        true,
-			"APEXALIAS": true,
-			"65282":     true,
-		}
-
-		recordType := i.(string)
-		_, ok := supportedRRType[recordType]
-
-		if !ok {
-			return diag.Errorf("invalid or unsupported record type")
-		}
-
-		return diags
-	}
 }

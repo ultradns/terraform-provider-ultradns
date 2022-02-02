@@ -2,17 +2,13 @@ package zone
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
 func flattenZoneProperties(zoneResponse *zone.Response, rd *schema.ResourceData) error {
-	currentSchemaZoneName := rd.Get("name").(string)
-
-	if helper.GetZoneFQDN(currentSchemaZoneName) != zoneResponse.Properties.Name {
-		if err := rd.Set("name", zoneResponse.Properties.Name); err != nil {
-			return err
-		}
+	if err := rd.Set("name", zoneResponse.Properties.Name); err != nil {
+		return err
 	}
 
 	if err := rd.Set("account_name", zoneResponse.Properties.AccountName); err != nil {
@@ -111,19 +107,10 @@ func flattenSecondaryZone(zoneResponse *zone.Response, rd *schema.ResourceData) 
 }
 
 func flattenAliasZone(zoneResponse *zone.Response, rd *schema.ResourceData) error {
-	set := &schema.Set{F: schema.HashResource(aliasZoneCreateInfoResource())}
+	set := &schema.Set{F: helper.HashSingleSetResource}
 	aliasCreateInfo := make(map[string]interface{})
 
-	if val, ok := rd.GetOk("alias_create_info"); ok && val.(*schema.Set).Len() > 0 {
-		aliasCreateInfo = val.(*schema.Set).List()[0].(map[string]interface{})
-	}
-
-	currentSchemaOriginalZoneName, ok := aliasCreateInfo["original_zone_name"].(string)
-
-	if !ok || helper.GetZoneFQDN(currentSchemaOriginalZoneName) != zoneResponse.OriginalZoneName {
-		aliasCreateInfo["original_zone_name"] = zoneResponse.OriginalZoneName
-	}
-
+	aliasCreateInfo["original_zone_name"] = zoneResponse.OriginalZoneName
 	set.Add(aliasCreateInfo)
 
 	if err := rd.Set("alias_create_info", set); err != nil {
@@ -135,12 +122,12 @@ func flattenAliasZone(zoneResponse *zone.Response, rd *schema.ResourceData) erro
 
 func getNameServerSet(nameServerData *zone.NameServer) *schema.Set {
 	set := &schema.Set{F: schema.HashResource(nameServerResource())}
-	nameserver := make(map[string]interface{})
-	nameserver["ip"] = nameServerData.IP
-	nameserver["tsig_key"] = nameServerData.TsigKey
-	nameserver["tsig_key_value"] = nameServerData.TsigKeyValue
-	nameserver["tsig_algorithm"] = nameServerData.TsigAlgorithm
-	set.Add(nameserver)
+	nameServer := make(map[string]interface{})
+	nameServer["ip"] = nameServerData.IP
+	nameServer["tsig_key"] = nameServerData.TsigKey
+	nameServer["tsig_key_value"] = nameServerData.TsigKeyValue
+	nameServer["tsig_algorithm"] = nameServerData.TsigAlgorithm
+	set.Add(nameServer)
 
 	return set
 }

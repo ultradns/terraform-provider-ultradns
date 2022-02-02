@@ -99,7 +99,7 @@ func resourceRDPoolDelete(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func getNewRDPool(rd *schema.ResourceData) *sdkrrset.RRSet {
-	rrSetData := rrset.NewRRSet(rd)
+	rrSetData := rrset.NewRRSetWithRecordData(rd)
 	profile := &rdpool.Profile{}
 	rrSetData.Profile = profile
 
