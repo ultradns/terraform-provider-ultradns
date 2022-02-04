@@ -1,6 +1,8 @@
 package helper
 
 import (
+	"strings"
+
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -26,6 +28,10 @@ func RecordTypeDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 	newRecordType := helper.GetRecordTypeFullString(new)
 
 	return oldRecordType == newRecordType || oldRecordType == new
+}
+
+func URIDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
+	return old == new || old == strings.TrimSuffix(new, "/") || strings.TrimSuffix(old, "/") == new
 }
 
 func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {

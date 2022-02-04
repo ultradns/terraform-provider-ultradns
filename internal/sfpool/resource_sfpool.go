@@ -105,13 +105,13 @@ func getNewSFPoolRRSet(rd *schema.ResourceData) *sdkrrset.RRSet {
 
 	rrSetData.Profile = profile
 
-	if val, ok := rd.GetOk("monitor"); ok && val.(*schema.Set).Len() > 0 {
-		monitorData := val.(*schema.Set).List()[0].(map[string]interface{})
+	if val, ok := rd.GetOk("monitor"); ok {
+		monitorData := val.([]interface{})[0].(map[string]interface{})
 		profile.Monitor = pool.GetMonitor(monitorData)
 	}
 
-	if val, ok := rd.GetOk("backup_record"); ok && val.(*schema.Set).Len() > 0 {
-		backupRecordData := val.(*schema.Set).List()[0].(map[string]interface{})
+	if val, ok := rd.GetOk("backup_record"); ok {
+		backupRecordData := val.([]interface{})[0].(map[string]interface{})
 		profile.BackupRecord = getBackupRecord(backupRecordData)
 	}
 

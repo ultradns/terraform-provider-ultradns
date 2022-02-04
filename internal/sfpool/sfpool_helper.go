@@ -24,16 +24,12 @@ func flattenSFPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) erro
 		return errors.ResourceTypeMismatched(profileType, fmt.Sprintf("%T", profile))
 	}
 
-	if profile.Monitor != nil {
-		if err := rd.Set("monitor", pool.GetMonitorSet(profile.Monitor)); err != nil {
-			return err
-		}
+	if err := rd.Set("monitor", pool.GetMonitorList(profile.Monitor, rd)); err != nil {
+		return err
 	}
 
-	if profile.BackupRecord != nil {
-		if err := rd.Set("backup_record", getBackupRecordSet(profile.BackupRecord)); err != nil {
-			return err
-		}
+	if err := rd.Set("backup_record", getBackupRecordList(profile.BackupRecord, rd)); err != nil {
+		return err
 	}
 
 	if err := rd.Set("region_failure_sensitivity", profile.RegionFailureSensitivity); err != nil {
@@ -55,12 +51,16 @@ func flattenSFPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) erro
 	return nil
 }
 
-func getBackupRecordSet(backupRecordData *sfpool.BackupRecord) *schema.Set {
-	set := &schema.Set{F: schema.HashResource(backupRecordResource())}
-	backupRecord := make(map[string]interface{})
-	backupRecord["rdata"] = backupRecordData.RData
-	backupRecord["description"] = backupRecordData.Description
-	set.Add(backupRecord)
+func getBackupRecordList(backupRecordData *sfpool.BackupRecord, rd *schema.ResourceData) []interface{} {
+	var list []interface{}
 
-	return set
+	if backupRecordData != nil {
+		list = make([]interface{}, 1)
+		backupRecord := make(map[string]interface{})
+		backupRecord["rdata"] = backupRecordData.RData
+		backupRecord["description"] = backupRecordData.Description
+		list[0] = backupRecord
+	}
+
+	return list
 }

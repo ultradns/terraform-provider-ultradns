@@ -27,14 +27,18 @@ func GetMonitor(monitorData map[string]interface{}) *pool.Monitor {
 	return monitor
 }
 
-func GetMonitorSet(monitorData *pool.Monitor) *schema.Set {
-	set := &schema.Set{F: schema.HashResource(MonitorResource())}
-	monitor := make(map[string]interface{})
-	monitor["url"] = monitorData.URL
-	monitor["method"] = monitorData.Method
-	monitor["transmitted_data"] = monitorData.TransmittedData
-	monitor["search_string"] = monitorData.SearchString
-	set.Add(monitor)
+func GetMonitorList(monitorData *pool.Monitor, rd *schema.ResourceData) []interface{} {
+	var list []interface{}
 
-	return set
+	if monitorData != nil {
+		list = make([]interface{}, 1)
+		monitor := make(map[string]interface{})
+		monitor["url"] = monitorData.URL
+		monitor["method"] = monitorData.Method
+		monitor["transmitted_data"] = monitorData.TransmittedData
+		monitor["search_string"] = monitorData.SearchString
+		list[0] = monitor
+	}
+
+	return list
 }

@@ -109,14 +109,14 @@ func FlattenRRSet(resList *rrset.ResponseList, rd *schema.ResourceData) error {
 }
 
 func FlattenRRSetWithRecordData(resList *rrset.ResponseList, rd *schema.ResourceData) error {
-	if err := rd.Set("record_data", flattenRRSetData(resList.RRSets[0].RData)); err != nil {
+	if err := rd.Set("record_data", getRRSetDataSet(resList.RRSets[0].RData)); err != nil {
 		return err
 	}
 
 	return FlattenRRSet(resList, rd)
 }
 
-func flattenRRSetData(recordData []string) *schema.Set {
+func getRRSetDataSet(recordData []string) *schema.Set {
 	set := &schema.Set{F: schema.HashString}
 
 	for _, data := range recordData {

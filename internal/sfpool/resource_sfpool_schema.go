@@ -10,15 +10,15 @@ func resourceSFPoolSchema() map[string]*schema.Schema {
 	sfPoolSchema := rrset.ResourceRRSetSchema()
 
 	sfPoolSchema["monitor"] = &schema.Schema{
-		Type:     schema.TypeSet,
+		Type:     schema.TypeList,
 		MaxItems: 1,
 		Required: true,
 		Elem:     pool.MonitorResource(),
 	}
 	sfPoolSchema["backup_record"] = &schema.Schema{
-		Type:     schema.TypeSet,
+		Type:     schema.TypeList,
 		MaxItems: 1,
-		Required: true,
+		Optional: true,
 		Elem:     backupRecordResource(),
 	}
 	sfPoolSchema["region_failure_sensitivity"] = &schema.Schema{
