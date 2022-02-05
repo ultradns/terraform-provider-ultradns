@@ -120,17 +120,17 @@ func getNewSLBPoolRRSet(rd *schema.ResourceData) *sdkrrset.RRSet {
 		profile.Description = val.(string)
 	}
 
-	if val, ok := rd.GetOk("monitor"); ok && val.(*schema.Set).Len() > 0 {
-		monitorData := val.(*schema.Set).List()[0].(map[string]interface{})
+	if val, ok := rd.GetOk("monitor"); ok {
+		monitorData := val.([]interface{})[0].(map[string]interface{})
 		profile.Monitor = pool.GetMonitor(monitorData)
 	}
 
-	if val, ok := rd.GetOk("all_fail_record"); ok && val.(*schema.Set).Len() > 0 {
-		allFailRecordData := val.(*schema.Set).List()[0].(map[string]interface{})
+	if val, ok := rd.GetOk("all_fail_record"); ok {
+		allFailRecordData := val.([]interface{})[0].(map[string]interface{})
 		profile.AllFailRecord = getAllFailRecord(allFailRecordData)
 	}
 
-	if val, ok := rd.GetOk("rdata_info"); ok && val.(*schema.Set).Len() > 0 {
+	if val, ok := rd.GetOk("rdata_info"); ok {
 		rdataInfoDataList := val.(*schema.Set).List()
 		profile.RDataInfo = getRDataInfoList(rdataInfoDataList)
 	}

@@ -63,18 +63,6 @@ func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
 	return diags
 }
 
-func HashResourceByStringField(key string) schema.SchemaSetFunc {
-	return func(v interface{}) int {
-		if resource, ok := v.(map[string]interface{}); ok {
-			if val, ok := resource[key]; ok {
-				return schema.HashString(val)
-			}
-		}
-
-		return 0
-	}
-}
-
 func HashSingleSetResource(i interface{}) int {
 	return 0
 }

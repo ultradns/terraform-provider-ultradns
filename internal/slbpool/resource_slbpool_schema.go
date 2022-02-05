@@ -2,7 +2,6 @@ package slbpool
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/pool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 )
@@ -33,13 +32,13 @@ func resourceSLBPoolSchema() map[string]*schema.Schema {
 		Computed: true,
 	}
 	slbPoolSchema["monitor"] = &schema.Schema{
-		Type:     schema.TypeSet,
+		Type:     schema.TypeList,
 		MaxItems: 1,
 		Required: true,
 		Elem:     pool.MonitorResource(),
 	}
 	slbPoolSchema["all_fail_record"] = &schema.Schema{
-		Type:     schema.TypeSet,
+		Type:     schema.TypeList,
 		Required: true,
 		MaxItems: 1,
 		Elem:     allFailRecordResource(),
@@ -48,7 +47,6 @@ func resourceSLBPoolSchema() map[string]*schema.Schema {
 		Type:     schema.TypeSet,
 		Required: true,
 		MaxItems: 5,
-		Set:      helper.HashResourceByStringField("rdata"),
 		Elem:     rdataInfoResource(),
 	}
 

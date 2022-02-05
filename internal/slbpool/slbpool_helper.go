@@ -1,18 +1,13 @@
 package slbpool
 
 import (
-	"fmt"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
-	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/pool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	sdkrrset "github.com/ultradns/ultradns-go-sdk/pkg/rrset"
 	"github.com/ultradns/ultradns-go-sdk/pkg/slbpool"
 )
-
-const profileType = "*slbpool.Profile"
 
 func flattenSLBPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) error {
 	if err := rrset.FlattenRRSet(resList, rd); err != nil {
@@ -20,27 +15,22 @@ func flattenSLBPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) err
 	}
 
 	profile, ok := resList.RRSets[0].Profile.(*slbpool.Profile)
+	profileSchema := resList.RRSets[0].Profile.GetContext()
 
-	if !ok {
-		return errors.ResourceTypeMismatched(profileType, fmt.Sprintf("%T", profile))
+	if !ok || slbpool.Schema != profileSchema {
+		return errors.ResourceTypeMismatched(slbpool.Schema, profileSchema)
 	}
 
-	if profile.Monitor != nil {
-		if err := rd.Set("monitor", pool.GetMonitorSet(profile.Monitor)); err != nil {
-			return err
-		}
+	if err := rd.Set("monitor", pool.GetMonitorList(profile.Monitor, rd)); err != nil {
+		return err
 	}
 
-	if profile.AllFailRecord != nil {
-		if err := flattenAllFailRecord(profile.AllFailRecord, rd); err != nil {
-			return err
-		}
+	if err := rd.Set("all_fail_record", getAllFailRecordList(profile.AllFailRecord, rd)); err != nil {
+		return err
 	}
 
-	if len(profile.RDataInfo) > 0 {
-		if err := flattenRDataInfo(resList.RRSets[0], rd); err != nil {
-			return err
-		}
+	if err := rd.Set("rdata_info", getRDataInfoSet(resList.RRSets[0], rd)); err != nil {
+		return err
 	}
 
 	if err := rd.Set("region_failure_sensitivity", profile.RegionFailureSensitivity); err != nil {
@@ -66,8 +56,23 @@ func flattenSLBPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) err
 	return nil
 }
 
-func flattenRDataInfo(rrSetData *sdkrrset.RRSet, rd *schema.ResourceData) error {
-	set := &schema.Set{F: helper.HashResourceByStringField("rdata")}
+func getAllFailRecordList(allFailRecordData *slbpool.AllFailRecord, rd *schema.ResourceData) []interface{} {
+	var list []interface{}
+
+	if allFailRecordData != nil {
+		list = make([]interface{}, 1)
+		allFailRecord := make(map[string]interface{})
+		allFailRecord["rdata"] = allFailRecordData.RData
+		allFailRecord["serving"] = allFailRecordData.Serving
+		allFailRecord["description"] = allFailRecordData.Description
+		list[0] = allFailRecord
+	}
+
+	return list
+}
+
+func getRDataInfoSet(rrSetData *sdkrrset.RRSet, rd *schema.ResourceData) *schema.Set {
+	set := &schema.Set{F: schema.HashResource(rdataInfoResource())}
 
 	rdataInfoListData := rrSetData.Profile.(*slbpool.Profile).RDataInfo
 	for i, rdataInfoData := range rdataInfoListData {
@@ -80,24 +85,5 @@ func flattenRDataInfo(rrSetData *sdkrrset.RRSet, rd *schema.ResourceData) error 
 		set.Add(rdataInfo)
 	}
 
-	if err := rd.Set("rdata_info", set); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func flattenAllFailRecord(allFailRecordData *slbpool.AllFailRecord, rd *schema.ResourceData) error {
-	set := &schema.Set{F: schema.HashResource(allFailRecordResource())}
-	allFailRecord := make(map[string]interface{})
-	allFailRecord["rdata"] = allFailRecordData.RData
-	allFailRecord["serving"] = allFailRecordData.Serving
-	allFailRecord["description"] = allFailRecordData.Description
-	set.Add(allFailRecord)
-
-	if err := rd.Set("all_fail_record", set); err != nil {
-		return err
-	}
-
-	return nil
+	return set
 }
