@@ -9,8 +9,6 @@ import (
 	"github.com/ultradns/ultradns-go-sdk/pkg/sfpool"
 )
 
-const profileType = "*sfpool.Profile"
-
 func flattenSFPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) error {
 	if err := rrset.FlattenRRSetWithRecordData(resList, rd); err != nil {
 		return err
