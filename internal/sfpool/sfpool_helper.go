@@ -1,8 +1,6 @@
 package sfpool
 
 import (
-	"fmt"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/pool"
@@ -19,9 +17,10 @@ func flattenSFPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) erro
 	}
 
 	profile, ok := resList.RRSets[0].Profile.(*sfpool.Profile)
+	profileSchema := resList.RRSets[0].Profile.GetContext()
 
-	if !ok {
-		return errors.ResourceTypeMismatched(profileType, fmt.Sprintf("%T", profile))
+	if !ok || sfpool.Schema != profileSchema {
+		return errors.ResourceTypeMismatched(sfpool.Schema, profileSchema)
 	}
 
 	if err := rd.Set("monitor", pool.GetMonitorList(profile.Monitor, rd)); err != nil {
