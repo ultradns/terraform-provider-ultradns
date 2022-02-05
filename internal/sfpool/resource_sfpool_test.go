@@ -14,6 +14,8 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 )
 
+const zoneResourceName = "primary_sfpool"
+
 func TestAccResourceSFPool(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
 	ownerNameTypeA := tfacctest.RandString(3)
@@ -167,7 +169,7 @@ func testAccResourceSFPoolA(zoneName, ownerName string) string {
 	%s
 	resource "ultradns_sfpool" "a" {
 		zone_name = "${resource.ultradns_zone.primary_sfpool.id}"
-		owner_name = "%s"
+		owner_name = "%s.${resource.ultradns_zone.primary_sfpool.id}"
 		record_type = "A"
 		ttl = 120
 		record_data = ["192.168.1.1"]
@@ -186,7 +188,7 @@ func testAccResourceSFPoolA(zoneName, ownerName string) string {
 			description = "Type A backup record"
 		}
 	}
-	`, acctest.TestAccResourceZonePrimary("primary_sfpool", zoneName), ownerName, strings.TrimSuffix(acctest.TestHost, "/"))
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName, strings.TrimSuffix(acctest.TestHost, "/"))
 }
 
 func testAccResourceUpdateSFPoolA(zoneName, ownerName string) string {
@@ -208,7 +210,7 @@ func testAccResourceUpdateSFPoolA(zoneName, ownerName string) string {
 			rdata = "192.168.1.1"
 		}
 	}
-	`, acctest.TestAccResourceZonePrimary("primary_sfpool", zoneName), ownerName, acctest.TestHost)
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName, acctest.TestHost)
 }
 
 func testAccResourceSFPoolAAAA(zoneName, ownerName string) string {
@@ -216,7 +218,7 @@ func testAccResourceSFPoolAAAA(zoneName, ownerName string) string {
 	%s
 	resource "ultradns_sfpool" "aaaa" {
 		zone_name = "${resource.ultradns_zone.primary_sfpool.id}"
-		owner_name = "%s.${resource.ultradns_zone.primary_sfpool.id}"
+		owner_name = "%s"
 		record_type = "28"
 		ttl = 120
 		record_data = ["aaaa:bbbb:cccc:dddd:eeee:ffff:1111:2222"]
@@ -234,7 +236,7 @@ func testAccResourceSFPoolAAAA(zoneName, ownerName string) string {
 			description = "Type AAAA Backup record"
 		}
 	}
-	`, acctest.TestAccResourceZonePrimary("primary_sfpool", zoneName), ownerName, acctest.TestHost)
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName, acctest.TestHost)
 }
 
 func testAccResourceUpdateSFPoolAAAA(zoneName, ownerName string) string {
@@ -256,5 +258,5 @@ func testAccResourceUpdateSFPoolAAAA(zoneName, ownerName string) string {
 			search_string = "testing"
 		}
 	}
-	`, acctest.TestAccResourceZonePrimary("primary_sfpool", zoneName), ownerName, strings.TrimSuffix(acctest.TestHost, "/"))
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName, strings.TrimSuffix(acctest.TestHost, "/"))
 }

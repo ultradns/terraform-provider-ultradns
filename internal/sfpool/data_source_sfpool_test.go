@@ -1,6 +1,7 @@
 package sfpool_test
 
 import (
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -22,8 +23,8 @@ func TestAccDataSourceSFPool(t *testing.T) {
 					"ultradns_sfpool",
 					"a",
 					zoneName,
-					ownerNameTypeA,
-					"A",
+					ownerNameTypeA+"."+zoneName,
+					"1",
 					testAccResourceSFPoolA(zoneName, ownerNameTypeA),
 				),
 				Check: resource.ComposeTestCheckFunc(
@@ -49,7 +50,7 @@ func TestAccDataSourceSFPool(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_sfpool",
 					"aaaa",
-					zoneName,
+					strings.TrimSuffix(zoneName, "."),
 					ownerNameTypeAAAA,
 					"AAAA",
 					testAccResourceSFPoolAAAA(zoneName, ownerNameTypeAAAA),
