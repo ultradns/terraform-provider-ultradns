@@ -1,16 +1,24 @@
 package zone_test
 
 import (
+	"context"
 	"log"
 	"strings"
+	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 )
 
 const testZoneSweeperPrefix = "terraform-plugin-acc-test-"
+
+func TestMain(m *testing.M) {
+	acctest.TestAccProvider.Configure(context.TODO(), terraform.NewResourceConfigRaw(make(map[string]interface{})))
+	resource.TestMain(m)
+}
 
 func init() {
 	resource.AddTestSweepers("ultradns_zone", &resource.Sweeper{
@@ -31,6 +39,7 @@ func testAccZoneSweeper(r string) error {
 	for _, zone := range zoneList.Zones {
 		if strings.HasPrefix(zone.Properties.Name, testZoneSweeperPrefix) {
 			_, er := services.ZoneService.DeleteZone(zone.Properties.Name)
+
 			if er != nil {
 				log.Printf("error destroying %s during sweep: %s", zone.Properties.Name, er)
 			}
