@@ -34,6 +34,10 @@ func URIDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 	return old == new || old == strings.TrimSuffix(new, "/") || strings.TrimSuffix(old, "/") == new
 }
 
+func DescriptionDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
+	return new == ""
+}
+
 func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
 	var diags diag.Diagnostics
 

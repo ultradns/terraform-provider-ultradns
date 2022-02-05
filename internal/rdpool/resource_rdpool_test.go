@@ -13,23 +13,41 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 )
 
+const zoneResourceName = "primary_rdpool"
+
 func TestAccResourceRDPool(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
-
+	ownerNameTypeA := tfacctest.RandString(3)
+	ownerNameTypeAAAA := tfacctest.RandString(3)
 	testCase := resource.TestCase{
 		PreCheck:     func() { acctest.TestPreCheck(t) },
 		Providers:    acctest.TestAccProviders,
 		CheckDestroy: testAccCheckRDPoolDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceRDPoolA(zoneName),
+				Config: testAccResourceRDPoolA(zoneName, ownerNameTypeA),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRDPoolExists("ultradns_rdpool.a"),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "owner_name", ownerNameTypeA+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "record_type", "A"),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "ttl", "120"),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "record_data.0", "192.168.1.1"),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "order", "FIXED"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "description", "RD Pool Resource of Type A"),
+				),
+			},
+			{
+				Config: testAccResourceUpdateRDPoolA(zoneName, ownerNameTypeA),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRDPoolExists("ultradns_rdpool.a"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "owner_name", ownerNameTypeA+"."+zoneName),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "record_type", "A"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "ttl", "150"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "record_data.0", "192.168.1.2"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "order", "RANDOM"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "description", "RD Pool Resource of Type A"),
 				),
 			},
 			{
@@ -38,14 +56,29 @@ func TestAccResourceRDPool(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceRDPoolAAAA(zoneName),
+				Config: testAccResourceRDPoolAAAA(zoneName, ownerNameTypeAAAA),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRDPoolExists("ultradns_rdpool.aaaa"),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "owner_name", ownerNameTypeAAAA+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "record_type", "AAAA"),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "ttl", "120"),
-					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "record_data.0", "2001:db8:85a3:0:0:8a2e:370:7334"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "record_data.0", "aaaa:bbbb:cccc:dddd:eeee:ffff:1111:2222"),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "order", "ROUND_ROBIN"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "description", ownerNameTypeAAAA+"."+zoneName),
+				),
+			},
+			{
+				Config: testAccResourceUpdateRDPoolAAAA(zoneName, ownerNameTypeAAAA),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRDPoolExists("ultradns_rdpool.aaaa"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "owner_name", ownerNameTypeAAAA+"."+zoneName),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "record_type", "AAAA"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "ttl", "150"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "record_data.0", "aaaa:bbbb:cccc:dddd:eeee:ffff:1111:3333"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "order", "FIXED"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "description", "RD Pool Resource of Type AAAA"),
 				),
 			},
 		},
@@ -93,45 +126,60 @@ func testAccCheckRDPoolDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccResourceZonePrimary(zoneName string) string {
-	return fmt.Sprintf(`
-	resource "ultradns_zone" "primary_rdpool" {
-		name        = "%s"
-		account_name = "%s"
-		type        = "PRIMARY"
-		primary_create_info {
-			create_type = "NEW"
-		}
-	}
-	`, zoneName, acctest.TestUsername)
-}
-
-func testAccResourceRDPoolA(zoneName string) string {
+func testAccResourceRDPoolA(zoneName, ownerName string) string {
 	return fmt.Sprintf(`
 	%s
+	resource "ultradns_rdpool" "a" {
+		zone_name = "${resource.ultradns_zone.primary_rdpool.id}"
+		owner_name = "%s"
+		record_type = "1"
+		ttl = 120
+		record_data = ["192.168.1.1"]
+		order = "FIXED"
+		description = "RD Pool Resource of Type A"
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName)
+}
 
+func testAccResourceUpdateRDPoolA(zoneName, ownerName string) string {
+	return fmt.Sprintf(`
+	%s
 	resource "ultradns_rdpool" "a" {
 		zone_name = "${resource.ultradns_zone.primary_rdpool.id}"
 		owner_name = "%s.${resource.ultradns_zone.primary_rdpool.id}"
 		record_type = "A"
-		ttl = 120
-		record_data = ["192.168.1.1"]
-		order = "FIXED"
+		ttl = 150
+		record_data = ["192.168.1.2"]
+		order = "RANDOM"
 	}
-	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName)
 }
 
-func testAccResourceRDPoolAAAA(zoneName string) string {
+func testAccResourceRDPoolAAAA(zoneName, ownerName string) string {
 	return fmt.Sprintf(`
 	%s
-
 	resource "ultradns_rdpool" "aaaa" {
 		zone_name = "${resource.ultradns_zone.primary_rdpool.id}"
 		owner_name = "%s"
 		record_type = "AAAA"
 		ttl = 120
-		record_data = ["2001:db8:85a3:0:0:8a2e:370:7334"]
+		record_data = ["aaaa:bbbb:cccc:dddd:eeee:ffff:1111:2222"]
 		order = "ROUND_ROBIN"
 	}
-	`, testAccResourceZonePrimary(zoneName), tfacctest.RandString(3))
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName)
+}
+
+func testAccResourceUpdateRDPoolAAAA(zoneName, ownerName string) string {
+	return fmt.Sprintf(`
+	%s
+	resource "ultradns_rdpool" "aaaa" {
+		zone_name = "${resource.ultradns_zone.primary_rdpool.id}"
+		owner_name = "%s"
+		record_type = "28"
+		ttl = 150
+		record_data = ["aaaa:bbbb:cccc:dddd:eeee:ffff:1111:3333"]
+		order = "FIXED"
+		description = "RD Pool Resource of Type AAAA"
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName)
 }

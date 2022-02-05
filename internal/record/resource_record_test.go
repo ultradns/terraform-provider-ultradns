@@ -41,7 +41,7 @@ func TestAccResourceRecord(t *testing.T) {
 				Config: testAccResourceRecordCNAME(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("ultradns_record.cname"),
-					resource.TestCheckResourceAttr("ultradns_record.cname", "zone_name", strings.TrimSuffix(zoneName, ".")),
+					resource.TestCheckResourceAttr("ultradns_record.cname", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.cname", "record_type", "5"),
 					resource.TestCheckResourceAttr("ultradns_record.cname", "ttl", "120"),
 					resource.TestCheckResourceAttr("ultradns_record.cname", "record_data.0", "example.com."),
@@ -131,7 +131,7 @@ func TestAccResourceRecord(t *testing.T) {
 				Config: testAccResourceRecordAPEXALIAS(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRecordExists("ultradns_record.apex"),
-					resource.TestCheckResourceAttr("ultradns_record.apex", "zone_name", strings.TrimSuffix(zoneName, ".")),
+					resource.TestCheckResourceAttr("ultradns_record.apex", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.apex", "record_type", "APEXALIAS"),
 					resource.TestCheckResourceAttr("ultradns_record.apex", "ttl", "120"),
 					resource.TestCheckResourceAttr("ultradns_record.apex", "record_data.0", "example.com."),
