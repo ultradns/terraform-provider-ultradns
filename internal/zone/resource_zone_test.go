@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	zoneResourceName    = "primary"
 	defaultCount        = "2"
 	defaultZoneStatus   = "ACTIVE"
 	defaultDNSSECStatus = "UNSIGNED"
@@ -32,7 +33,7 @@ func TestAccResourceZonePrimary(t *testing.T) {
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceZonePrimary(zoneName),
+				Config: acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
@@ -70,14 +71,38 @@ func TestAccResourceZoneSecondary(t *testing.T) {
 				Config: testAccResourceZoneSecondary(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", strings.TrimSuffix(zoneName, ".")),
+					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
 					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestUsername),
 					resource.TestCheckResourceAttr(resourceName, "type", zone.Secondary),
 					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
 					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.primary_name_server_1.0.ip", testNameServer),
+					resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.notification_email_address", "test@ultradns.com"),
+					resource.TestCheckResourceAttr(resourceName, "transfer_status_details.0.last_refresh_status", "SUCCESSFUL"),
 				),
+			},
+			{
+				Config: testAccResourceUpdateZoneSecondary(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
+					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestUsername),
+					resource.TestCheckResourceAttr(resourceName, "type", zone.Secondary),
+					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
+					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
+					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
+					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.primary_name_server_1.0.ip", testNameServer),
+					resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.notification_email_address", "testing@ultradns.com"),
+					resource.TestCheckResourceAttr(resourceName, "transfer_status_details.0.last_refresh_status", "SUCCESSFUL"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	}
@@ -86,6 +111,7 @@ func TestAccResourceZoneSecondary(t *testing.T) {
 
 func TestAccResourceZoneAlias(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
+	primaryZoneName := acctest.GetRandomZoneNameWithSpecialChar()
 	resourceName := "ultradns_zone.alias"
 
 	testCase := resource.TestCase{
@@ -94,7 +120,7 @@ func TestAccResourceZoneAlias(t *testing.T) {
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceZoneAlias(zoneName),
+				Config: testAccResourceZoneAlias(zoneName, primaryZoneName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
@@ -104,6 +130,7 @@ func TestAccResourceZoneAlias(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
 					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(resourceName, "alias_create_info.0.original_zone_name", primaryZoneName),
 				),
 			},
 			{
@@ -153,7 +180,7 @@ func testAccCheckZoneDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccResourceZonePrimary(zoneName string) string {
+func testAccResourceUpdateZonePrimary(zoneName string) string {
 	return fmt.Sprintf(`
 	resource "ultradns_zone" "primary" {
 		name        = "%s"
@@ -185,6 +212,7 @@ func testAccResourceZoneSecondary(zoneName string) string {
 		account_name = "%s"
 		type        = "SECONDARY"
 		secondary_create_info {
+			notification_email_address = "test@ultradns.com"
 			primary_name_server_1 {
 				ip = "%s"
 			} 
@@ -193,12 +221,25 @@ func testAccResourceZoneSecondary(zoneName string) string {
 	`, strings.TrimSuffix(zoneName, "."), acctest.TestUsername, testNameServer)
 }
 
-func testAccResourceZoneAlias(zoneName string) string {
-	primaryZoneNameForAlias := acctest.GetRandomZoneNameWithSpecialChar()
+func testAccResourceUpdateZoneSecondary(zoneName string) string {
+	return fmt.Sprintf(`
+	resource "ultradns_zone" "secondary" {
+		name        = "%s"
+		account_name = "%s"
+		type        = "SECONDARY"
+		secondary_create_info {
+			notification_email_address = "testing@ultradns.com"
+			primary_name_server_1 {
+				ip = "%s"
+			} 
+		}
+	}
+	`, zoneName, acctest.TestUsername, testNameServer)
+}
 
+func testAccResourceZoneAlias(zoneName, primaryZoneName string) string {
 	return fmt.Sprintf(`
 	%s
-
 	resource "ultradns_zone" "alias" {
 		name        = "%s"
 		account_name = "%s"
@@ -207,5 +248,5 @@ func testAccResourceZoneAlias(zoneName string) string {
 			  original_zone_name = "${resource.ultradns_zone.primary.id}"
 		}
 	  }
-	`, testAccResourceZonePrimary(primaryZoneNameForAlias), zoneName, acctest.TestUsername)
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, primaryZoneName), zoneName, acctest.TestUsername)
 }

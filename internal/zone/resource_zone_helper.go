@@ -2,7 +2,6 @@ package zone
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
@@ -43,28 +42,25 @@ func flattenZoneProperties(zoneResponse *zone.Response, rd *schema.ResourceData)
 }
 
 func flattenPrimaryZone(zoneResponse *zone.Response, rd *schema.ResourceData) error {
-	set := &schema.Set{F: schema.HashResource(primaryZoneCreateInfoResource())}
+	list := make([]interface{}, 1)
 	primaryCreateInfo := make(map[string]interface{})
 
-	if val, ok := rd.GetOk("primary_create_info"); ok && val.(*schema.Set).Len() > 0 {
-		primaryCreateInfo = val.(*schema.Set).List()[0].(map[string]interface{})
+	if val, ok := rd.GetOk("primary_create_info"); ok {
+		primaryCreateInfo = val.([]interface{})[0].(map[string]interface{})
 	}
 
-	if zoneResponse.Tsig != nil {
-		primaryCreateInfo["tsig"] = getTsigSet(zoneResponse.Tsig)
+	primaryCreateInfo["inherit"] = zoneResponse.Inherit
+	primaryCreateInfo["tsig"] = getTsigList(zoneResponse.Tsig)
+	primaryCreateInfo["restrict_ip"] = getRestrictIPListSet(zoneResponse.RestrictIPList)
+	primaryCreateInfo["notify_addresses"] = getNotifyAddressesSet(zoneResponse.NotifyAddresses)
+
+	list[0] = primaryCreateInfo
+
+	if err := rd.Set("primary_create_info", list); err != nil {
+		return err
 	}
 
-	if len(zoneResponse.RestrictIPList) > 0 {
-		primaryCreateInfo["restrict_ip"] = getRestrictIPListSet(zoneResponse.RestrictIPList)
-	}
-
-	if len(zoneResponse.NotifyAddresses) > 0 {
-		primaryCreateInfo["notify_addresses"] = getNotifyAddressesSet(zoneResponse.NotifyAddresses)
-	}
-
-	set.Add(primaryCreateInfo)
-
-	if err := rd.Set("primary_create_info", set); err != nil {
+	if err := rd.Set("registrar_info", getRegistrarInfoList(zoneResponse.RegistrarInfo)); err != nil {
 		return err
 	}
 
@@ -72,34 +68,26 @@ func flattenPrimaryZone(zoneResponse *zone.Response, rd *schema.ResourceData) er
 }
 
 func flattenSecondaryZone(zoneResponse *zone.Response, rd *schema.ResourceData) error {
-	set := &schema.Set{F: schema.HashResource(secondaryZoneCreateInfoResource())}
+	list := make([]interface{}, 1)
 	secondaryCreateInfo := make(map[string]interface{})
-
-	if val, ok := rd.GetOk("secondary_create_info"); ok && val.(*schema.Set).Len() > 0 {
-		secondaryCreateInfo = val.(*schema.Set).List()[0].(map[string]interface{})
-	}
 
 	if zoneResponse.NotificationEmailAddress != "" {
 		secondaryCreateInfo["notification_email_address"] = zoneResponse.NotificationEmailAddress
 	}
 
 	if zoneResponse.PrimaryNameServers != nil && zoneResponse.PrimaryNameServers.NameServerIPList != nil {
-		if zoneResponse.PrimaryNameServers.NameServerIPList.NameServerIP1 != nil {
-			secondaryCreateInfo["primary_name_server_1"] = getNameServerSet(zoneResponse.PrimaryNameServers.NameServerIPList.NameServerIP1)
-		}
-
-		if zoneResponse.PrimaryNameServers.NameServerIPList.NameServerIP2 != nil {
-			secondaryCreateInfo["primary_name_server_2"] = getNameServerSet(zoneResponse.PrimaryNameServers.NameServerIPList.NameServerIP2)
-		}
-
-		if zoneResponse.PrimaryNameServers.NameServerIPList.NameServerIP3 != nil {
-			secondaryCreateInfo["primary_name_server_3"] = getNameServerSet(zoneResponse.PrimaryNameServers.NameServerIPList.NameServerIP3)
-		}
+		secondaryCreateInfo["primary_name_server_1"] = getNameServerList(zoneResponse.PrimaryNameServers.NameServerIPList.NameServerIP1)
+		secondaryCreateInfo["primary_name_server_2"] = getNameServerList(zoneResponse.PrimaryNameServers.NameServerIPList.NameServerIP2)
+		secondaryCreateInfo["primary_name_server_3"] = getNameServerList(zoneResponse.PrimaryNameServers.NameServerIPList.NameServerIP3)
 	}
 
-	set.Add(secondaryCreateInfo)
+	list[0] = secondaryCreateInfo
 
-	if err := rd.Set("secondary_create_info", set); err != nil {
+	if err := rd.Set("secondary_create_info", list); err != nil {
+		return err
+	}
+
+	if err := rd.Set("transfer_status_details", getTransferStatusDetailsList(zoneResponse.TransferStatusDetails)); err != nil {
 		return err
 	}
 
@@ -107,41 +95,48 @@ func flattenSecondaryZone(zoneResponse *zone.Response, rd *schema.ResourceData) 
 }
 
 func flattenAliasZone(zoneResponse *zone.Response, rd *schema.ResourceData) error {
-	set := &schema.Set{F: helper.HashSingleSetResource}
+	list := make([]interface{}, 1)
 	aliasCreateInfo := make(map[string]interface{})
-
 	aliasCreateInfo["original_zone_name"] = zoneResponse.OriginalZoneName
-	set.Add(aliasCreateInfo)
+	list[0] = aliasCreateInfo
 
-	if err := rd.Set("alias_create_info", set); err != nil {
+	if err := rd.Set("alias_create_info", list); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func getNameServerSet(nameServerData *zone.NameServer) *schema.Set {
-	set := &schema.Set{F: schema.HashResource(nameServerResource())}
-	nameServer := make(map[string]interface{})
-	nameServer["ip"] = nameServerData.IP
-	nameServer["tsig_key"] = nameServerData.TsigKey
-	nameServer["tsig_key_value"] = nameServerData.TsigKeyValue
-	nameServer["tsig_algorithm"] = nameServerData.TsigAlgorithm
-	set.Add(nameServer)
+func getNameServerList(nameServerData *zone.NameServer) []interface{} {
+	var list []interface{}
 
-	return set
+	if nameServerData != nil {
+		list = make([]interface{}, 1)
+		nameServer := make(map[string]interface{})
+		nameServer["ip"] = nameServerData.IP
+		nameServer["tsig_key"] = nameServerData.TsigKey
+		nameServer["tsig_key_value"] = nameServerData.TsigKeyValue
+		nameServer["tsig_algorithm"] = nameServerData.TsigAlgorithm
+		list[0] = nameServer
+	}
+
+	return list
 }
 
-func getTsigSet(tsigData *zone.Tsig) *schema.Set {
-	set := &schema.Set{F: schema.HashResource(tsigResource())}
-	tsig := make(map[string]interface{})
-	tsig["tsig_key_name"] = tsigData.TsigKeyName
-	tsig["tsig_key_value"] = tsigData.TsigKeyValue
-	tsig["tsig_algorithm"] = tsigData.TsigAlgorithm
-	tsig["description"] = tsigData.Description
-	set.Add(tsig)
+func getTsigList(tsigData *zone.Tsig) []interface{} {
+	var list []interface{}
 
-	return set
+	if tsigData != nil {
+		list = make([]interface{}, 1)
+		tsig := make(map[string]interface{})
+		tsig["tsig_key_name"] = tsigData.TsigKeyName
+		tsig["tsig_key_value"] = tsigData.TsigKeyValue
+		tsig["tsig_algorithm"] = tsigData.TsigAlgorithm
+		tsig["description"] = tsigData.Description
+		list[0] = tsig
+	}
+
+	return list
 }
 
 func getRestrictIPListSet(restrictIPDataList []*zone.RestrictIP) *schema.Set {
@@ -171,4 +166,51 @@ func getNotifyAddressesSet(notifyAddressDataList []*zone.NotifyAddress) *schema.
 	}
 
 	return set
+}
+
+func getRegistrarInfoList(registrarInfoData *zone.RegistrarInfo) []interface{} {
+	var list []interface{}
+
+	if registrarInfoData != nil {
+		list = make([]interface{}, 1)
+		registrarInfo := make(map[string]interface{})
+		registrarInfo["registrar"] = registrarInfoData.Registrar
+		registrarInfo["who_is_expiration"] = registrarInfoData.WhoIsExpiration
+		registrarInfo["name_servers"] = getRegistrarInfoNameServersList(registrarInfoData.NameServers)
+		list[0] = registrarInfo
+	}
+
+	return list
+}
+
+func getRegistrarInfoNameServersList(nameServersList *zone.NameServersList) []interface{} {
+	var list []interface{}
+
+	if nameServersList != nil {
+		list = make([]interface{}, 1)
+		registrarInfoNameServersList := make(map[string]interface{})
+		registrarInfoNameServersList["ok"] = nameServersList.Ok
+		registrarInfoNameServersList["unknown"] = nameServersList.Unknown
+		registrarInfoNameServersList["missing"] = nameServersList.Missing
+		registrarInfoNameServersList["incorrect"] = nameServersList.Incorrect
+		list[0] = registrarInfoNameServersList
+	}
+
+	return list
+}
+
+func getTransferStatusDetailsList(transferDetailsData *zone.TransferStatusDetails) []interface{} {
+	var list []interface{}
+
+	if transferDetailsData != nil {
+		list = make([]interface{}, 1)
+		transferDetails := make(map[string]interface{})
+		transferDetails["last_refresh"] = transferDetailsData.LastRefresh
+		transferDetails["next_refresh"] = transferDetailsData.NextRefresh
+		transferDetails["last_refresh_status"] = transferDetailsData.LastRefreshStatus
+		transferDetails["last_refresh_status_message"] = transferDetailsData.LastRefreshStatusMessage
+		list[0] = transferDetails
+	}
+
+	return list
 }

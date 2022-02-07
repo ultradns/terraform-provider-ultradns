@@ -29,22 +29,21 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			Optional: true,
 		},
 		"primary_create_info": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Optional: true,
 			MaxItems: 1,
 			Elem:     primaryZoneCreateInfoResource(),
 		},
 		"secondary_create_info": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Optional: true,
 			MaxItems: 1,
 			Elem:     secondaryZoneCreateInfoResource(),
 		},
 		"alias_create_info": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Optional: true,
 			MaxItems: 1,
-			Set:      helper.HashSingleSetResource,
 			Elem:     aliasZoneCreateInfoResource(),
 		},
 		"dnssec_status": {
@@ -68,13 +67,17 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			Computed: true,
 		},
 		"registrar_info": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
+			MaxItems: 1,
 			Computed: true,
+			Optional: true,
 			Elem:     registrarInfoResource(),
 		},
 		"transfer_status_details": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
+			MaxItems: 1,
 			Computed: true,
+			Optional: true,
 			Elem:     transferStatusResource(),
 		},
 	}
@@ -99,15 +102,16 @@ func primaryZoneCreateInfoResource() *schema.Resource {
 			"inherit": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 			"name_server": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
 				Elem:     nameServerResource(),
 			},
 			"tsig": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
 				Elem:     tsigResource(),
@@ -134,19 +138,19 @@ func secondaryZoneCreateInfoResource() *schema.Resource {
 				Optional: true,
 			},
 			"primary_name_server_1": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				MaxItems: 1,
 				Required: true,
 				Elem:     nameServerResource(),
 			},
 			"primary_name_server_2": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				MaxItems: 1,
 				Optional: true,
 				Elem:     nameServerResource(),
 			},
 			"primary_name_server_3": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				MaxItems: 1,
 				Optional: true,
 				Elem:     nameServerResource(),

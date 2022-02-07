@@ -27,15 +27,15 @@ func ResourceZone() *schema.Resource {
 
 func resourceZoneCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	services := meta.(*service.Service)
-	zone := newZone(rd)
+	zoneData := newZone(rd)
 
-	_, err := services.ZoneService.CreateZone(zone)
+	_, err := services.ZoneService.CreateZone(zoneData)
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	id := helper.GetZoneFQDN(zone.Properties.Name)
+	id := helper.GetZoneFQDN(zoneData.Properties.Name)
 	rd.SetId(id)
 
 	return resourceZoneRead(ctx, rd, meta)
@@ -53,18 +53,6 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 		rd.SetId("")
 
 		return nil
-	}
-
-	if zoneResponse.RegistrarInfo != nil {
-		if err := flattenRegistrarInfo(zoneResponse.RegistrarInfo, rd); err != nil {
-			return diag.FromErr(err)
-		}
-	}
-
-	if zoneResponse.TransferStatusDetails != nil {
-		if err := flattenTransferStatusDetails(zoneResponse.TransferStatusDetails, rd); err != nil {
-			return diag.FromErr(err)
-		}
 	}
 
 	if zoneResponse.Properties != nil {
@@ -95,9 +83,9 @@ func resourceZoneUpdate(ctx context.Context, rd *schema.ResourceData, meta inter
 	services := meta.(*service.Service)
 	zoneName := rd.Id()
 
-	zone := newZone(rd)
+	zoneData := newZone(rd)
 
-	_, err := services.ZoneService.UpdateZone(zoneName, zone)
+	_, err := services.ZoneService.UpdateZone(zoneName, zoneData)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -168,8 +156,8 @@ func getZoneProperties(rd *schema.ResourceData) *zone.Properties {
 func getPrimaryCreateInfo(rd *schema.ResourceData) *zone.PrimaryZone {
 	primaryCreateInfo := &zone.PrimaryZone{}
 
-	if val, ok := rd.GetOk("primary_create_info"); ok && val.(*schema.Set).Len() > 0 {
-		createInfoData := val.(*schema.Set).List()[0].(map[string]interface{})
+	if val, ok := rd.GetOk("primary_create_info"); ok && len(val.([]interface{})) > 0 {
+		createInfoData := val.([]interface{})[0].(map[string]interface{})
 
 		if val, ok := createInfoData["create_type"]; ok {
 			primaryCreateInfo.CreateType = val.(string)
@@ -187,22 +175,22 @@ func getPrimaryCreateInfo(rd *schema.ResourceData) *zone.PrimaryZone {
 			primaryCreateInfo.Inherit = val.(string)
 		}
 
-		if val, ok := createInfoData["name_server"]; ok && val.(*schema.Set).Len() > 0 {
-			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
+		if val, ok := createInfoData["name_server"]; ok && len(val.([]interface{})) > 0 {
+			nameServerData := val.([]interface{})[0].(map[string]interface{})
 			primaryCreateInfo.NameServer = getNameServer(nameServerData)
 		}
 
-		if val, ok := createInfoData["tsig"]; ok && val.(*schema.Set).Len() > 0 {
-			tsigData := val.(*schema.Set).List()[0].(map[string]interface{})
+		if val, ok := createInfoData["tsig"]; ok && len(val.([]interface{})) > 0 {
+			tsigData := val.([]interface{})[0].(map[string]interface{})
 			primaryCreateInfo.Tsig = getTsig(tsigData)
 		}
 
-		if val, ok := createInfoData["restrict_ip"]; ok && val.(*schema.Set).Len() > 0 {
+		if val, ok := createInfoData["restrict_ip"]; ok {
 			restrictIPDataList := val.(*schema.Set).List()
 			primaryCreateInfo.RestrictIPList = getRestrictIPList(restrictIPDataList)
 		}
 
-		if val, ok := createInfoData["notify_addresses"]; ok && val.(*schema.Set).Len() > 0 {
+		if val, ok := createInfoData["notify_addresses"]; ok {
 			notifyAddressDataList := val.(*schema.Set).List()
 			primaryCreateInfo.NotifyAddresses = getNotifyAddresses(notifyAddressDataList)
 		}
@@ -216,25 +204,25 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *zone.SecondaryZone {
 	primaryNameServers := &zone.PrimaryNameServers{NameServerIPList: nameServerIPList}
 	secondaryCreateInfo := &zone.SecondaryZone{PrimaryNameServers: primaryNameServers}
 
-	if val, ok := rd.GetOk("secondary_create_info"); ok && val.(*schema.Set).Len() > 0 {
-		createInfoData := val.(*schema.Set).List()[0].(map[string]interface{})
+	if val, ok := rd.GetOk("secondary_create_info"); ok && len(val.([]interface{})) > 0 {
+		createInfoData := val.([]interface{})[0].(map[string]interface{})
 
 		if val, ok := createInfoData["notification_email_address"]; ok {
 			secondaryCreateInfo.NotificationEmailAddress = val.(string)
 		}
 
-		if val, ok := createInfoData["primary_name_server_1"]; ok && val.(*schema.Set).Len() > 0 {
-			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
+		if val, ok := createInfoData["primary_name_server_1"]; ok && len(val.([]interface{})) > 0 {
+			nameServerData := val.([]interface{})[0].(map[string]interface{})
 			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP1 = getNameServer(nameServerData)
 		}
 
-		if val, ok := createInfoData["primary_name_server_2"]; ok && val.(*schema.Set).Len() > 0 {
-			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
+		if val, ok := createInfoData["primary_name_server_2"]; ok && len(val.([]interface{})) > 0 {
+			nameServerData := val.([]interface{})[0].(map[string]interface{})
 			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP2 = getNameServer(nameServerData)
 		}
 
-		if val, ok := createInfoData["primary_name_server_3"]; ok && val.(*schema.Set).Len() > 0 {
-			nameServerData := val.(*schema.Set).List()[0].(map[string]interface{})
+		if val, ok := createInfoData["primary_name_server_3"]; ok && len(val.([]interface{})) > 0 {
+			nameServerData := val.([]interface{})[0].(map[string]interface{})
 			secondaryCreateInfo.PrimaryNameServers.NameServerIPList.NameServerIP3 = getNameServer(nameServerData)
 		}
 	}
@@ -245,9 +233,9 @@ func getSecondaryCreateInfo(rd *schema.ResourceData) *zone.SecondaryZone {
 func getAliasCreateInfo(rd *schema.ResourceData) *zone.AliasZone {
 	aliasCreateInfo := &zone.AliasZone{}
 
-	if val, ok := rd.GetOk("alias_create_info"); ok && val.(*schema.Set).Len() > 0 {
-		data := val.(*schema.Set).List()[0].(map[string]interface{})
-		aliasCreateInfo.OriginalZoneName = data["original_zone_name"].(string)
+	if val, ok := rd.GetOk("alias_create_info"); ok && len(val.([]interface{})) > 0 {
+		createInfoData := val.([]interface{})[0].(map[string]interface{})
+		aliasCreateInfo.OriginalZoneName = createInfoData["original_zone_name"].(string)
 	}
 
 	return aliasCreateInfo
