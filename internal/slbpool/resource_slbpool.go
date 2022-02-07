@@ -174,7 +174,7 @@ func getRDataInfo(rdataInfoData map[string]interface{}) *slbpool.RDataInfo {
 		rdataInfo.ForcedState = val.(string)
 	}
 
-	if val, ok := rdataInfoData["availabe_to_serve"]; ok {
+	if val, ok := rdataInfoData["available_to_serve"]; ok {
 		rdataInfo.AvailableToServe = val.(bool)
 	}
 

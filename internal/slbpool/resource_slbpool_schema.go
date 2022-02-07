@@ -93,7 +93,7 @@ func rdataInfoResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"availabe_to_serve": {
+			"available_to_serve": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},

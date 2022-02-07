@@ -41,7 +41,7 @@ func TestAccResourceSFPool(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_sfpool.a", "monitor.0.search_string", "test"),
 					resource.TestCheckResourceAttr("ultradns_sfpool.a", "monitor.0.transmitted_data", "foo=bar"),
 					resource.TestCheckResourceAttr("ultradns_sfpool.a", "live_record_state", "FORCED_INACTIVE"),
-					resource.TestCheckResourceAttr("ultradns_sfpool.a", "live_record_description", "Maintainence Activity"),
+					resource.TestCheckResourceAttr("ultradns_sfpool.a", "live_record_description", "Maintenance Activity"),
 					resource.TestCheckResourceAttr("ultradns_sfpool.a", "pool_description", "SF Pool Resource of Type A"),
 					resource.TestCheckResourceAttr("ultradns_sfpool.a", "region_failure_sensitivity", "HIGH"),
 					resource.TestCheckResourceAttr("ultradns_sfpool.a", "status", "MANUAL"),
@@ -106,7 +106,7 @@ func TestAccResourceSFPool(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "monitor.0.search_string", "testing"),
 					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "monitor.0.transmitted_data", ""),
 					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "live_record_state", "NOT_FORCED"),
-					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "live_record_description", "Maintainence Activity"),
+					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "live_record_description", "Maintenance Activity"),
 					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "pool_description", "Update SF Pool Resource of Type AAAA"),
 					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "region_failure_sensitivity", "LOW"),
 					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "status", "OK"),
@@ -175,7 +175,7 @@ func testAccResourceSFPoolA(zoneName, ownerName string) string {
 		record_data = ["192.168.1.1"]
 		region_failure_sensitivity = "HIGH"
 		live_record_state = "FORCED_INACTIVE"
-		live_record_description = "Maintainence Activity"
+		live_record_description = "Maintenance Activity"
 		pool_description = "SF Pool Resource of Type A"
 		monitor{
 			url = "%s"
@@ -250,7 +250,7 @@ func testAccResourceUpdateSFPoolAAAA(zoneName, ownerName string) string {
 		record_data = ["aaaa:bbbb:cccc:dddd:eeee:ffff:1111:3333"]
 		region_failure_sensitivity = "LOW"
 		live_record_state = "NOT_FORCED"
-		live_record_description = "Maintainence Activity"
+		live_record_description = "Maintenance Activity"
 		pool_description = "Update SF Pool Resource of Type AAAA"
 		monitor{
 			url = "%s"

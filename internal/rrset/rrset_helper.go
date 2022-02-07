@@ -88,7 +88,6 @@ func GetRRSetKeyFromID(id string) *rrset.RRSetKey {
 }
 
 func FlattenRRSet(resList *rrset.ResponseList, rd *schema.ResourceData) error {
-
 	if err := rd.Set("zone_name", helper.GetZoneFQDN(resList.ZoneName)); err != nil {
 		return err
 	}
