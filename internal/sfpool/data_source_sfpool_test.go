@@ -40,7 +40,7 @@ func TestAccDataSourceSFPool(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "monitor.0.method", "POST"),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "monitor.0.search_string", "test"),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "monitor.0.transmitted_data", "foo=bar"),
-					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "live_record_description", "Maintainence Activity"),
+					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "live_record_description", "Maintenance Activity"),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "pool_description", "SF Pool Resource of Type A"),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "region_failure_sensitivity", "HIGH"),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "status", "MANUAL"),

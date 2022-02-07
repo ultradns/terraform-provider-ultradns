@@ -53,6 +53,7 @@ func NewRRSetWithRecordDataInfo(rd *schema.ResourceData) *rrset.RRSet {
 			rrSetData.RData[i] = rDataInfo["rdata"].(string)
 		}
 	}
+
 	return rrSetData
 }
 

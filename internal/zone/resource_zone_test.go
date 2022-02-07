@@ -48,6 +48,21 @@ func TestAccResourceZonePrimary(t *testing.T) {
 				),
 			},
 			{
+				Config: testAccResourceUpdateZonePrimary(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckZoneExists(resourceName),
+					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
+					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestUsername),
+					resource.TestCheckResourceAttr(resourceName, "type", zone.Primary),
+					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
+					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
+					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
+					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(resourceName, "primary_create_info.0.notify_addresses.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "primary_create_info.0.restrict_ip.#", "0"),
+				),
+			},
+			{
 				ResourceName:            resourceName,
 				ImportState:             true,
 				ImportStateVerify:       true,
@@ -188,18 +203,7 @@ func testAccResourceUpdateZonePrimary(zoneName string) string {
 		type        = "PRIMARY"
 		primary_create_info {
 			create_type = "NEW"
-			notify_addresses {
-				notify_address = "192.168.1.1"
-			}
-			notify_addresses {
-				notify_address = "192.168.1.2"
-			}
-			restrict_ip {
-				single_ip = "192.168.1.3"
-			}
-			restrict_ip {
-				single_ip = "192.168.1.4"
-			}
+		
 		}
 	}
 	`, zoneName, acctest.TestUsername)

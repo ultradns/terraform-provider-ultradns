@@ -82,7 +82,6 @@ func flattenSecondaryZone(zoneResponse *zone.Response, rd *schema.ResourceData) 
 	}
 
 	list[0] = secondaryCreateInfo
-
 	if err := rd.Set("secondary_create_info", list); err != nil {
 		return err
 	}
