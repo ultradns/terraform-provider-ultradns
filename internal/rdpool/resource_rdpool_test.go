@@ -47,7 +47,7 @@ func TestAccResourceRDPool(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "ttl", "150"),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "record_data.0", "192.168.1.2"),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "order", "RANDOM"),
-					resource.TestCheckResourceAttr("ultradns_rdpool.a", "description", "RD Pool Resource of Type A"),
+					resource.TestCheckResourceAttr("ultradns_rdpool.a", "description", ownerNameTypeA+"."+zoneName),
 				),
 			},
 			{

@@ -1,7 +1,6 @@
 package pool
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/ultradns-go-sdk/pkg/pool"
 )
 
@@ -27,7 +26,7 @@ func GetMonitor(monitorData map[string]interface{}) *pool.Monitor {
 	return monitor
 }
 
-func GetMonitorList(monitorData *pool.Monitor, rd *schema.ResourceData) []interface{} {
+func GetMonitorList(monitorData *pool.Monitor) []interface{} {
 	var list []interface{}
 
 	if monitorData != nil {

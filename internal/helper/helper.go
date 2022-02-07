@@ -34,8 +34,19 @@ func URIDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 	return old == new || old == strings.TrimSuffix(new, "/") || strings.TrimSuffix(old, "/") == new
 }
 
-func DescriptionDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
-	return new == ""
+func ComputedDescriptionDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
+	zoneName := ""
+	ownerName := ""
+
+	if val, ok := rd.GetOk("zone_name"); ok {
+		zoneName = val.(string)
+	}
+
+	if val, ok := rd.GetOk("owner_name"); ok {
+		ownerName = val.(string)
+	}
+
+	return old == helper.GetOwnerFQDN(ownerName, zoneName) && new == ""
 }
 
 func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
@@ -61,8 +72,4 @@ func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
 	}
 
 	return diags
-}
-
-func HashSingleSetResource(i interface{}) int {
-	return 0
 }

@@ -21,11 +21,11 @@ func flattenSFPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) erro
 		return errors.ResourceTypeMismatched(sfpool.Schema, profileSchema)
 	}
 
-	if err := rd.Set("monitor", pool.GetMonitorList(profile.Monitor, rd)); err != nil {
+	if err := rd.Set("monitor", pool.GetMonitorList(profile.Monitor)); err != nil {
 		return err
 	}
 
-	if err := rd.Set("backup_record", getBackupRecordList(profile.BackupRecord, rd)); err != nil {
+	if err := rd.Set("backup_record", getBackupRecordList(profile.BackupRecord)); err != nil {
 		return err
 	}
 
@@ -48,7 +48,7 @@ func flattenSFPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) erro
 	return nil
 }
 
-func getBackupRecordList(backupRecordData *sfpool.BackupRecord, rd *schema.ResourceData) []interface{} {
+func getBackupRecordList(backupRecordData *sfpool.BackupRecord) []interface{} {
 	var list []interface{}
 
 	if backupRecordData != nil {

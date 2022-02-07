@@ -16,7 +16,7 @@ func resourceRDPoolSchema() map[string]*schema.Schema {
 	rdPoolSchema["description"] = &schema.Schema{
 		Type:             schema.TypeString,
 		Optional:         true,
-		DiffSuppressFunc: helper.DescriptionDiffSuppress,
+		DiffSuppressFunc: helper.ComputedDescriptionDiffSuppress,
 	}
 
 	return rdPoolSchema

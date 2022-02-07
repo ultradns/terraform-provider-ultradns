@@ -21,15 +21,15 @@ func flattenSLBPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) err
 		return errors.ResourceTypeMismatched(slbpool.Schema, profileSchema)
 	}
 
-	if err := rd.Set("monitor", pool.GetMonitorList(profile.Monitor, rd)); err != nil {
+	if err := rd.Set("monitor", pool.GetMonitorList(profile.Monitor)); err != nil {
 		return err
 	}
 
-	if err := rd.Set("all_fail_record", getAllFailRecordList(profile.AllFailRecord, rd)); err != nil {
+	if err := rd.Set("all_fail_record", getAllFailRecordList(profile.AllFailRecord)); err != nil {
 		return err
 	}
 
-	if err := rd.Set("rdata_info", getRDataInfoSet(resList.RRSets[0], rd)); err != nil {
+	if err := rd.Set("rdata_info", getRDataInfoSet(resList.RRSets[0])); err != nil {
 		return err
 	}
 
@@ -56,7 +56,7 @@ func flattenSLBPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) err
 	return nil
 }
 
-func getAllFailRecordList(allFailRecordData *slbpool.AllFailRecord, rd *schema.ResourceData) []interface{} {
+func getAllFailRecordList(allFailRecordData *slbpool.AllFailRecord) []interface{} {
 	var list []interface{}
 
 	if allFailRecordData != nil {
@@ -71,7 +71,7 @@ func getAllFailRecordList(allFailRecordData *slbpool.AllFailRecord, rd *schema.R
 	return list
 }
 
-func getRDataInfoSet(rrSetData *sdkrrset.RRSet, rd *schema.ResourceData) *schema.Set {
+func getRDataInfoSet(rrSetData *sdkrrset.RRSet) *schema.Set {
 	set := &schema.Set{F: schema.HashResource(rdataInfoResource())}
 
 	rdataInfoListData := rrSetData.Profile.(*slbpool.Profile).RDataInfo
