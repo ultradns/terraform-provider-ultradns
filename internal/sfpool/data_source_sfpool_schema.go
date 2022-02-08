@@ -27,10 +27,6 @@ func dataSourceSFPoolSchema() map[string]*schema.Schema {
 		Type:     schema.TypeString,
 		Computed: true,
 	}
-	sfPoolSchema["live_record_state"] = &schema.Schema{
-		Type:     schema.TypeString,
-		Computed: true,
-	}
 	sfPoolSchema["pool_description"] = &schema.Schema{
 		Type:     schema.TypeString,
 		Computed: true,
