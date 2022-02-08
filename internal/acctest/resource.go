@@ -24,5 +24,5 @@ func TestAccResourceZonePrimary(resourceName, zoneName string) string {
 			}
 		}
 	}
-	`, resourceName, zoneName, TestUsername)
+	`, resourceName, zoneName, TestAccount)
 }
