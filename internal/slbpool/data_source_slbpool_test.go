@@ -77,7 +77,7 @@ func TestAccDataSourceSLBPool(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "all_fail_record.0.description", "All fail record"),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "rdata_info.#", "1"),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "rdata_info.0.rdata", "aaaa:bbbb:cccc:dddd:eeee:ffff:1111:2222"),
-					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "rdata_info.0.availabe_to_serve", "true"),
+					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "rdata_info.0.available_to_serve", "true"),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "rdata_info.0.forced_state", "FORCED_ACTIVE"),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "rdata_info.0.probing_enabled", "false"),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "rdata_info.0.description", "RData of type AAAA"),

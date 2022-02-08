@@ -26,7 +26,7 @@ const (
 var (
 	TestHost      = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
 	TestAccount   = os.Getenv("ULTRADNS_UNIT_TEST_ACCOUNT")
-	testUsername  = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME")
+	TestUsername  = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME")
 	testPassword  = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD")
 	testUserAgent = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
 )
@@ -46,7 +46,7 @@ func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.Resour
 	var diags diag.Diagnostics
 
 	cnf := client.Config{
-		Username:  testUsername,
+		Username:  TestUsername,
 		Password:  testPassword,
 		HostURL:   TestHost,
 		UserAgent: testUserAgent,
@@ -68,7 +68,7 @@ func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.Resour
 }
 
 func TestPreCheck(t *testing.T) {
-	if testUsername == "" {
+	if TestUsername == "" {
 		t.Fatal("username required for creating test client")
 	}
 
