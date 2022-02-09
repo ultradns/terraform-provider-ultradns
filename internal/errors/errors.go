@@ -20,5 +20,5 @@ func ResourceNotDestroyedError(key string) error {
 }
 
 func ResourceTypeMismatched(expected, found string) error {
-	return fmt.Errorf("resource type %w : expected - %s : found - %s", errMismatched, expected, found)
+	return fmt.Errorf("resource schema %w : expected - %s : found - %s", errMismatched, expected, found)
 }

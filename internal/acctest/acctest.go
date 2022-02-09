@@ -24,9 +24,10 @@ const (
 )
 
 var (
+	TestHost      = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
+	TestAccount   = os.Getenv("ULTRADNS_UNIT_TEST_ACCOUNT")
 	TestUsername  = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME")
 	testPassword  = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD")
-	testHost      = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
 	testUserAgent = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
 )
 
@@ -47,7 +48,7 @@ func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.Resour
 	cnf := client.Config{
 		Username:  TestUsername,
 		Password:  testPassword,
-		HostURL:   testHost,
+		HostURL:   TestHost,
 		UserAgent: testUserAgent,
 	}
 
@@ -75,8 +76,12 @@ func TestPreCheck(t *testing.T) {
 		t.Fatal("password required for creating test client")
 	}
 
-	if testHost == "" {
+	if TestHost == "" {
 		t.Fatal("host required for creating test client")
+	}
+
+	if TestAccount == "" {
+		t.Fatal("account required for creating test client")
 	}
 
 	if testUserAgent == "" {

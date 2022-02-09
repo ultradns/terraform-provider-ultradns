@@ -19,16 +19,20 @@ func TestAccDataSourceZonePrimary(t *testing.T) {
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourceZonePrimary(zoneName),
+				Config: testAccDataSourceZone(
+					"primary",
+					acctest.TestAccResourceZonePrimary("primary", zoneName),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(dataSourceName, "name", zoneName),
-					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestUsername),
+					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestAccount),
 					resource.TestCheckResourceAttr(dataSourceName, "type", zone.Primary),
 					resource.TestCheckResourceAttr(dataSourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "owner", acctest.TestUsername),
 					resource.TestCheckResourceAttr(dataSourceName, "resource_record_count", defaultCount),
-					resource.TestCheckResourceAttr(dataSourceName, "inherit", "TSIG"),
+					resource.TestCheckResourceAttr(dataSourceName, "notify_addresses.#", defaultCount),
+					resource.TestCheckResourceAttr(dataSourceName, "restrict_ip.#", defaultCount),
 				),
 			},
 		},
@@ -46,15 +50,21 @@ func TestAccDataSourceZoneSecondary(t *testing.T) {
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourceZoneSecondary(zoneName),
+				Config: testAccDataSourceZone(
+					"secondary",
+					testAccResourceZoneSecondary(zoneName),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(dataSourceName, "name", zoneName),
-					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestUsername),
+					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestAccount),
 					resource.TestCheckResourceAttr(dataSourceName, "type", zone.Secondary),
 					resource.TestCheckResourceAttr(dataSourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "owner", acctest.TestUsername),
 					resource.TestCheckResourceAttr(dataSourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(dataSourceName, "primary_name_server_1.0.ip", testNameServer),
+					resource.TestCheckResourceAttr(dataSourceName, "notification_email_address", "test@ultradns.com"),
+					resource.TestCheckResourceAttr(dataSourceName, "transfer_status_details.0.last_refresh_status", "SUCCESSFUL"),
 				),
 			},
 		},
@@ -64,6 +74,7 @@ func TestAccDataSourceZoneSecondary(t *testing.T) {
 
 func TestAccDataSourceZoneAlias(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
+	primaryZoneName := acctest.GetRandomZoneNameWithSpecialChar()
 	dataSourceName := "data.ultradns_zone.data_alias"
 
 	testCase := resource.TestCase{
@@ -72,15 +83,19 @@ func TestAccDataSourceZoneAlias(t *testing.T) {
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourceZoneAlias(zoneName),
+				Config: testAccDataSourceZone(
+					"alias",
+					testAccResourceZoneAlias(zoneName, primaryZoneName),
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(dataSourceName, "name", zoneName),
-					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestUsername),
+					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestAccount),
 					resource.TestCheckResourceAttr(dataSourceName, "type", zone.Alias),
 					resource.TestCheckResourceAttr(dataSourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(dataSourceName, "owner", acctest.TestUsername),
 					resource.TestCheckResourceAttr(dataSourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(dataSourceName, "original_zone_name", primaryZoneName),
 				),
 			},
 		},
@@ -88,32 +103,11 @@ func TestAccDataSourceZoneAlias(t *testing.T) {
 	resource.ParallelTest(t, testCase)
 }
 
-func testAccDataSourceZonePrimary(zoneName string) string {
+func testAccDataSourceZone(datasourceName, resource string) string {
 	return fmt.Sprintf(`
-	%s
-
-	data "ultradns_zone" "data_primary" {
-		name = "${resource.ultradns_zone.primary.id}"
+	%[1]s
+	data "ultradns_zone" "data_%[2]s" {
+		name = "${resource.ultradns_zone.%[2]s.id}"
 	}
-	`, testAccResourceZonePrimary(zoneName))
-}
-
-func testAccDataSourceZoneSecondary(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
-
-	data "ultradns_zone" "data_secondary" {
-		name = "${resource.ultradns_zone.secondary.id}"
-	}
-	`, testAccResourceZoneSecondary(zoneName))
-}
-
-func testAccDataSourceZoneAlias(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
-
-	data "ultradns_zone" "data_alias" {
-		name = "${resource.ultradns_zone.alias.id}"
-	}
-	`, testAccResourceZoneAlias(zoneName))
+	`, resource, datasourceName)
 }

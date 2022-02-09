@@ -9,7 +9,6 @@ func dataSourceZoneSchema() map[string]*schema.Schema {
 		"name": {
 			Type:     schema.TypeString,
 			Required: true,
-			ForceNew: true,
 		},
 		"account_name": {
 			Type:     schema.TypeString,
@@ -44,7 +43,7 @@ func dataSourceZoneSchema() map[string]*schema.Schema {
 			Computed: true,
 		},
 		"tsig": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Computed: true,
 			Elem:     tsigResource(),
 		},
@@ -59,7 +58,7 @@ func dataSourceZoneSchema() map[string]*schema.Schema {
 			Elem:     notifyAddressResource(),
 		},
 		"registrar_info": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Computed: true,
 			Elem:     registrarInfoResource(),
 		},
@@ -68,22 +67,22 @@ func dataSourceZoneSchema() map[string]*schema.Schema {
 			Computed: true,
 		},
 		"primary_name_server_1": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Computed: true,
 			Elem:     nameServerResource(),
 		},
 		"primary_name_server_2": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Computed: true,
 			Elem:     nameServerResource(),
 		},
 		"primary_name_server_3": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Computed: true,
 			Elem:     nameServerResource(),
 		},
 		"transfer_status_details": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Computed: true,
 			Elem:     transferStatusResource(),
 		},
@@ -106,7 +105,7 @@ func registrarInfoResource() *schema.Resource {
 				Computed: true,
 			},
 			"name_servers": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     registrarInfoNameServerResource(),
 			},

@@ -2,14 +2,16 @@ package zone
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 )
 
 func resourceZoneSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
-			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: true,
+			Type:             schema.TypeString,
+			Required:         true,
+			ForceNew:         true,
+			DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
 		},
 		"account_name": {
 			Type:        schema.TypeString,
@@ -27,19 +29,19 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			Optional: true,
 		},
 		"primary_create_info": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Optional: true,
 			MaxItems: 1,
 			Elem:     primaryZoneCreateInfoResource(),
 		},
 		"secondary_create_info": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Optional: true,
 			MaxItems: 1,
 			Elem:     secondaryZoneCreateInfoResource(),
 		},
 		"alias_create_info": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
 			Optional: true,
 			MaxItems: 1,
 			Elem:     aliasZoneCreateInfoResource(),
@@ -65,13 +67,17 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			Computed: true,
 		},
 		"registrar_info": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
+			MaxItems: 1,
 			Computed: true,
+			Optional: true,
 			Elem:     registrarInfoResource(),
 		},
 		"transfer_status_details": {
-			Type:     schema.TypeSet,
+			Type:     schema.TypeList,
+			MaxItems: 1,
 			Computed: true,
+			Optional: true,
 			Elem:     transferStatusResource(),
 		},
 	}
@@ -96,15 +102,16 @@ func primaryZoneCreateInfoResource() *schema.Resource {
 			"inherit": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 			"name_server": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
 				Elem:     nameServerResource(),
 			},
 			"tsig": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
 				Elem:     tsigResource(),
@@ -131,19 +138,19 @@ func secondaryZoneCreateInfoResource() *schema.Resource {
 				Optional: true,
 			},
 			"primary_name_server_1": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				MaxItems: 1,
-				Optional: true,
+				Required: true,
 				Elem:     nameServerResource(),
 			},
 			"primary_name_server_2": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				MaxItems: 1,
 				Optional: true,
 				Elem:     nameServerResource(),
 			},
 			"primary_name_server_3": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				MaxItems: 1,
 				Optional: true,
 				Elem:     nameServerResource(),
@@ -156,8 +163,9 @@ func aliasZoneCreateInfoResource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"original_zone_name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:             schema.TypeString,
+				Required:         true,
+				DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
 			},
 		},
 	}

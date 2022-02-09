@@ -27,7 +27,7 @@ func ResourceRecord() *schema.Resource {
 
 func resourceRecordCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	services := meta.(*service.Service)
-	rrSetData := rrset.NewRRSet(rd)
+	rrSetData := rrset.NewRRSetWithRecordData(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
 	_, err := services.RecordService.CreateRecord(rrSetKeyData, rrSetData)
@@ -55,7 +55,7 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	}
 
 	if len(resList.RRSets) > 0 {
-		if err = rrset.FlattenRRSet(resList, rd); err != nil {
+		if err = rrset.FlattenRRSetWithRecordData(resList, rd); err != nil {
 			return diag.FromErr(err)
 		}
 	}
@@ -65,7 +65,7 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 
 func resourceRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	services := meta.(*service.Service)
-	rrSetData := rrset.NewRRSet(rd)
+	rrSetData := rrset.NewRRSetWithRecordData(rd)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.RecordService.UpdateRecord(rrSetKeyData, rrSetData)

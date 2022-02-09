@@ -5,8 +5,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/ultradns-go-sdk/pkg/rdpool"
 )
 
 func DataSourceRDPool() *schema.Resource {
@@ -33,6 +35,12 @@ func dataSourceRDPoolRead(ctx context.Context, rd *schema.ResourceData, meta int
 	rd.SetId(rrSetKeyData.ID())
 
 	if len(resList.RRSets) > 0 {
+		profileSchema := resList.RRSets[0].Profile.GetContext()
+
+		if rdpool.Schema != profileSchema {
+			return diag.FromErr(errors.ResourceTypeMismatched(rdpool.Schema, profileSchema))
+		}
+
 		if err = flattenRDPool(resList, rd); err != nil {
 			return diag.FromErr(err)
 		}

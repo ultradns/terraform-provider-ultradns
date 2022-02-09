@@ -30,6 +30,8 @@ linters:
     - wrapcheck
     # default value needs to be provided as integer literal
     - gomnd
+    - predeclared
+    - dupl
 
     - gochecknoglobals
     - bodyclose
