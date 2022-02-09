@@ -3,7 +3,7 @@
 ## Primary Zone
 resource "ultradns_zone" "primary" {
     name        = "${var.ultradns_primary_zone_name}"
-    account_name = "${var.ultradns_username}"
+    account_name = "${var.ultradns_account}"
     type        = "PRIMARY"
     change_comment = "New Primary zone"
     primary_create_info {
@@ -27,7 +27,7 @@ resource "ultradns_zone" "primary" {
 ## Secondary Zone
 resource "ultradns_zone" "secondary" {
     name        = "${var.ultradns_secondary_zone_name}"
-    account_name = "${var.ultradns_username}"
+    account_name = "${var.ultradns_account}"
     type        = "SECONDARY"
     secondary_create_info {
         primary_name_server_1 {
@@ -40,7 +40,7 @@ resource "ultradns_zone" "secondary" {
 ## Alias Zone
 resource "ultradns_zone" "alias" {
     name        = "${var.ultradns_alias_zone_name}"
-    account_name = "${var.ultradns_username}"
+    account_name = "${var.ultradns_account}"
     type        = "ALIAS"
     change_comment = "New alias zone"
     alias_create_info {

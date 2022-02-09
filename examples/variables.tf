@@ -9,6 +9,11 @@ variable "ultradns_password" {
   description = "UltraDNS password"
 }
 
+variable "ultradns_account" {
+  type        = string
+  description = "UltraDNS account"
+}
+
 variable "ultradns_host_url" {
   type        = string
   description = "UltraDNS hosturl"
