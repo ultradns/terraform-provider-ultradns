@@ -166,7 +166,7 @@ func testAccCheckRecordExists(resourceName string) resource.TestCheckFunc {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, _, err := services.RecordService.ReadRecord(rrSetKey)
+		_, _, err := services.RecordService.Read(rrSetKey)
 
 		if err != nil {
 			return err
@@ -184,10 +184,10 @@ func testAccCheckRecordDestroy(s *terraform.State) error {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, recordResponse, err := services.RecordService.ReadRecord(rrSetKey)
+		_, recordResponse, err := services.RecordService.Read(rrSetKey)
 
 		if err == nil {
-			if len(recordResponse.RRSets) > 0 && recordResponse.RRSets[0].OwnerName == rrSetKey.Name {
+			if len(recordResponse.RRSets) > 0 && recordResponse.RRSets[0].OwnerName == rrSetKey.Owner {
 				return errors.ResourceNotDestroyedError(rs.Primary.ID)
 			}
 		}

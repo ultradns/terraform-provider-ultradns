@@ -8,8 +8,9 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/pool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	sdkpool "github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/slbpool"
 	sdkrrset "github.com/ultradns/ultradns-go-sdk/pkg/rrset"
-	"github.com/ultradns/ultradns-go-sdk/pkg/slbpool"
 )
 
 func ResourceSLBPool() *schema.Resource {
@@ -33,13 +34,13 @@ func resourceSLBPoolCreate(ctx context.Context, rd *schema.ResourceData, meta in
 	rrSetData := getNewSLBPoolRRSet(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
-	_, err := services.SLBPoolService.CreateSLBPool(rrSetKeyData, rrSetData)
+	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(rrSetKeyData.ID())
+	rd.SetId(rrSetKeyData.RecordID())
 
 	return resourceSLBPoolRead(ctx, rd, meta)
 }
@@ -49,7 +50,8 @@ func resourceSLBPoolRead(ctx context.Context, rd *schema.ResourceData, meta inte
 
 	services := meta.(*service.Service)
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
-	_, resList, err := services.SLBPoolService.ReadSLBPool(rrSetKey)
+	rrSetKey.PType = sdkpool.SLB
+	_, resList, err := services.RecordService.Read(rrSetKey)
 
 	if err != nil {
 		rd.SetId("")
@@ -71,7 +73,7 @@ func resourceSLBPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta in
 	rrSetData := getNewSLBPoolRRSet(rd)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
-	_, err := services.SLBPoolService.UpdateSLBPool(rrSetKeyData, rrSetData)
+	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -86,7 +88,7 @@ func resourceSLBPoolDelete(ctx context.Context, rd *schema.ResourceData, meta in
 	services := meta.(*service.Service)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
-	_, err := services.SLBPoolService.DeleteSLBPool(rrSetKeyData)
+	_, err := services.RecordService.Delete(rrSetKeyData)
 
 	if err != nil {
 		rd.SetId("")

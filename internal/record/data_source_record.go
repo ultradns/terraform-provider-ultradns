@@ -24,13 +24,13 @@ func dataSourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta int
 	services := meta.(*service.Service)
 
 	rrSetKeyData := rrset.NewRRSetKey(rd)
-	_, resList, err := services.RecordService.ReadRecord(rrSetKeyData)
+	_, resList, err := services.RecordService.Read(rrSetKeyData)
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(rrSetKeyData.ID())
+	rd.SetId(rrSetKeyData.RecordID())
 
 	if len(resList.RRSets) > 0 {
 		if err = rrset.FlattenRRSetWithRecordData(resList, rd); err != nil {

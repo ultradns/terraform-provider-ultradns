@@ -153,7 +153,7 @@ func testAccCheckSLBPoolExists(resourceName string) resource.TestCheckFunc {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, _, err := services.SLBPoolService.ReadSLBPool(rrSetKey)
+		_, _, err := services.RecordService.Read(rrSetKey)
 
 		if err != nil {
 			return err
@@ -171,10 +171,10 @@ func testAccCheckSLBPoolDestroy(s *terraform.State) error {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, slbPoolResponse, err := services.SLBPoolService.ReadSLBPool(rrSetKey)
+		_, slbPoolResponse, err := services.RecordService.Read(rrSetKey)
 
 		if err == nil {
-			if len(slbPoolResponse.RRSets) > 0 && slbPoolResponse.RRSets[0].OwnerName == rrSetKey.Name {
+			if len(slbPoolResponse.RRSets) > 0 && slbPoolResponse.RRSets[0].OwnerName == rrSetKey.Owner {
 				return errors.ResourceNotDestroyedError(rs.Primary.ID)
 			}
 		}

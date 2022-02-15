@@ -11,6 +11,7 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
 )
 
 const zoneResourceName = "primary_rdpool"
@@ -96,7 +97,8 @@ func testAccCheckRDPoolExists(resourceName string) resource.TestCheckFunc {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, _, err := services.RDPoolService.ReadRDPool(rrSetKey)
+		rrSetKey.PType = pool.RD
+		_, _, err := services.RecordService.Read(rrSetKey)
 
 		if err != nil {
 			return err
@@ -114,10 +116,11 @@ func testAccCheckRDPoolDestroy(s *terraform.State) error {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, rdPoolResponse, err := services.RDPoolService.ReadRDPool(rrSetKey)
+		rrSetKey.PType = pool.RD
+		_, rdPoolResponse, err := services.RecordService.Read(rrSetKey)
 
 		if err == nil {
-			if len(rdPoolResponse.RRSets) > 0 && rdPoolResponse.RRSets[0].OwnerName == rrSetKey.Name {
+			if len(rdPoolResponse.RRSets) > 0 && rdPoolResponse.RRSets[0].OwnerName == rrSetKey.Owner {
 				return errors.ResourceNotDestroyedError(rs.Primary.ID)
 			}
 		}

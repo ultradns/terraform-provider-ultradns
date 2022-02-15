@@ -8,6 +8,8 @@ require (
 	github.com/ultradns/ultradns-go-sdk v1.2.1-20220207203334-c2b3738
 )
 
+replace github.com/ultradns/ultradns-go-sdk v1.2.1-20220207203334-c2b3738 => ../ultradns-go-sdk
+
 require (
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/apparentlymart/go-cidr v1.0.1 // indirect

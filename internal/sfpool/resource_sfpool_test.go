@@ -134,7 +134,7 @@ func testAccCheckSFPoolExists(resourceName string) resource.TestCheckFunc {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, _, err := services.SFPoolService.ReadSFPool(rrSetKey)
+		_, _, err := services.RecordService.Read(rrSetKey)
 
 		if err != nil {
 			return err
@@ -152,10 +152,10 @@ func testAccCheckSFPoolDestroy(s *terraform.State) error {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, sfPoolResponse, err := services.SFPoolService.ReadSFPool(rrSetKey)
+		_, sfPoolResponse, err := services.RecordService.Read(rrSetKey)
 
 		if err == nil {
-			if len(sfPoolResponse.RRSets) > 0 && sfPoolResponse.RRSets[0].OwnerName == rrSetKey.Name {
+			if len(sfPoolResponse.RRSets) > 0 && sfPoolResponse.RRSets[0].OwnerName == rrSetKey.Owner {
 				return errors.ResourceNotDestroyedError(rs.Primary.ID)
 			}
 		}

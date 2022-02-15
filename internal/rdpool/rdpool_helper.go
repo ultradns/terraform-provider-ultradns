@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
-	"github.com/ultradns/ultradns-go-sdk/pkg/rdpool"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/rdpool"
 	sdkrrset "github.com/ultradns/ultradns-go-sdk/pkg/rrset"
 )
 

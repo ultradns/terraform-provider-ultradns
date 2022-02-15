@@ -1,7 +1,7 @@
 package pool
 
 import (
-	"github.com/ultradns/ultradns-go-sdk/pkg/pool"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
 )
 
 func GetMonitor(monitorData map[string]interface{}) *pool.Monitor {
@@ -40,4 +40,18 @@ func GetMonitorList(monitorData *pool.Monitor) []interface{} {
 	}
 
 	return list
+}
+
+func GetBackupRecord(backupRecordData map[string]interface{}) *pool.BackupRecord {
+	backupRecord := &pool.BackupRecord{}
+
+	if val, ok := backupRecordData["rdata"]; ok {
+		backupRecord.RData = val.(string)
+	}
+
+	if val, ok := backupRecordData["failover_delay"]; ok {
+		backupRecord.FailOverDelay = val.(int)
+	}
+
+	return backupRecord
 }

@@ -5,10 +5,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
-	"github.com/ultradns/ultradns-go-sdk/pkg/rdpool"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
 )
 
 func DataSourceRDPool() *schema.Resource {
@@ -26,21 +25,16 @@ func dataSourceRDPoolRead(ctx context.Context, rd *schema.ResourceData, meta int
 	services := meta.(*service.Service)
 
 	rrSetKeyData := rrset.NewRRSetKey(rd)
-	_, resList, err := services.RDPoolService.ReadRDPool(rrSetKeyData)
+	rrSetKeyData.PType = pool.RD
+	_, resList, err := services.RecordService.Read(rrSetKeyData)
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(rrSetKeyData.ID())
+	rd.SetId(rrSetKeyData.RecordID())
 
 	if len(resList.RRSets) > 0 {
-		profileSchema := resList.RRSets[0].Profile.GetContext()
-
-		if rdpool.Schema != profileSchema {
-			return diag.FromErr(errors.ResourceTypeMismatched(rdpool.Schema, profileSchema))
-		}
-
 		if err = flattenRDPool(resList, rd); err != nil {
 			return diag.FromErr(err)
 		}
