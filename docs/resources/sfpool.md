@@ -8,7 +8,7 @@ description: |-
 
 # Resource: ultradns_sfpool
 
-Use this resource to manage Simple Monitor/Failover (SF) pool records in UltraDNS
+Use this resource to manage Simple Monitor/Failover (SF) pool records in UltraDNS.
 
 ## Example Usage
 
@@ -23,7 +23,7 @@ resource "ultradns_sfpool" "a" {
     record_data = ["192.1.1.3"]
     region_failure_sensitivity = "HIGH"
     live_record_state = "NOT_FORCED"
-    live_record_description = "Maintainance"
+    live_record_description = "Maintenance"
     pool_description = "SF Pool Resource of Type A"
     monitor{
         url = "https://example.com"
@@ -63,8 +63,8 @@ The following arguments are supported:
 
 * `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
-* `record_type` - (Required) (String) Must be formatted as the well-known resource record type (A or AAAA) or the corresponding number for the type (1 or 28).<br/>
-Below are the supported resource record type with its corresponding number:<br/>
+* `record_type` - (Required) (String) Must be formatted as a well-known resource record type (A or AAAA), or the corresponding number for the type (1 or 28).<br/>
+Below are the supported resource record types with the corresponding number:<br/>
 `A (1)`
 `AAAA (28)`
 * `record_data` - (Required) (String List) The list of IPv4 or IPv6 addresses.
@@ -80,11 +80,10 @@ Below are the supported resource record type with its corresponding number:<br/>
 
 ### Nested `monitor` block has the following structure:
 
-* `url` - (Required) (String) Monitored URL. A full URL including: protocol, host, and URI. Required.
-Valid protocols are HTTP and HTTPS.
+* `url` - (Required) (String) Monitored URL. A full URL including the protocol, host, and URI. Valid protocols are HTTP and HTTPS.
 * `method` - (Required) (String) HTTP method used to connect to the monitored URL. Valid values are `GET`, `POST`.
-* `transmitted_data` - (Optional) (String) If a monitor is sending a POST, the data that is sent as the body of the request.
-* `search_string` - (Optional) (String) If supplied, a string that is checked against the returned data from the request. The monitor fails if the searchString is not present.
+* `transmitted_data` - (Optional) (String) If a monitor is sending a POST, this is the data sent as the body of the request.
+* `search_string` - (Optional) (String) A string that is checked against the returned data from the request. The monitor fails if the searchString is not present.
 
 ### Nested `backup_record` block has the following structure:
 
@@ -102,13 +101,13 @@ In addition to all arguments above, the following attributes are exported:
 
 ## Import
 
-Simple Monitor/Failover (SF) pool records can be imported by combining their `owner_name`, `zone_name`, `record_type` using colon.<br/>
+Simple Monitor/Failover (SF) pool records can be imported by combining their `owner_name`, `zone_name` and `record_type`, separated by a colon.<br/>
 Example : `www.example.com.:example.com.:A (1)`.
 
 
--> For import, the `owner_name` and `zone_name` must be a FQDN and `record_type` should have the type as well as the corresponding number as shown in the example above.
+-> For import, the `owner_name` and `zone_name` must be a FQDN, and `record_type` should have the type as well as the corresponding number as shown in the example below.
 
-e.g.,
-```
+Example:
+```terraform
 $ terraform import ultradns_sfpool.example "www.example.com.:example.com.:A (1)" 
 ```

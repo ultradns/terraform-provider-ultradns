@@ -181,12 +181,14 @@ Example: `03/18/21 10:20:34 AM GMT`.
 * `next_refresh` - (Computed) (String) Displays the date (`MM/dd/yy HH:mm:ss tt vvv`) when the next transfer attempt or refresh is.<br/>
 Example: `03/18/21 10:20:34 AM GMT`.
 * `last_refresh_status` - (Computed) (String) Displays the status of the last transfer that was attempted. Valid values are `IN_PROGRESS`, `FAILED`, `SUCCESSFUL`.
-* `last_refresh_status_message` - (Computed) (String) Displays the last transfer’s status message. This is currently shown as failure reason.
+* `last_refresh_status_message` - (Computed) (String) Displays the last transfer’s status message.
+
 
 ## Import
 
-Zones can be imported using their name (must be a FQDN), e.g.,
+Zones can be imported using their name (must be a FQDN).
 
-```
+Example:
+```terraform
 $ terraform import ultradns_zone.example "example.com." 
 ```
