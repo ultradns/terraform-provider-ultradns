@@ -7,9 +7,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rdpool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/record"
+	"github.com/ultradns/terraform-provider-ultradns/internal/sbpool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/terraform-provider-ultradns/internal/sfpool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/slbpool"
+	"github.com/ultradns/terraform-provider-ultradns/internal/tcpool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/version"
 	"github.com/ultradns/terraform-provider-ultradns/internal/zone"
 	"github.com/ultradns/ultradns-go-sdk/pkg/client"
@@ -28,6 +30,8 @@ func Provider() *schema.Provider {
 			"ultradns_rdpool":  rdpool.ResourceRDPool(),
 			"ultradns_sfpool":  sfpool.ResourceSFPool(),
 			"ultradns_slbpool": slbpool.ResourceSLBPool(),
+			"ultradns_sbpool":  sbpool.ResourceSBPool(),
+			"ultradns_tcpool":  tcpool.ResourceTCPool(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"ultradns_zone":    zone.DataSourceZone(),
@@ -35,6 +39,8 @@ func Provider() *schema.Provider {
 			"ultradns_rdpool":  rdpool.DataSourceRDPool(),
 			"ultradns_sfpool":  sfpool.DataSourceSFPool(),
 			"ultradns_slbpool": slbpool.DataSourceSLBPool(),
+			"ultradns_sbpool":  sbpool.DataSourceSBPool(),
+			"ultradns_tcpool":  tcpool.DataSourceTCPool(),
 		},
 	}
 }
