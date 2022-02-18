@@ -32,7 +32,7 @@ resource "ultradns_record" "cname" {
     owner_name = "cname"
     record_type = "CNAME"
     ttl = 120
-    record_data = ["sample.com."]
+    record_data = ["host.sample.com."]
 }
 ```
 
@@ -40,11 +40,11 @@ resource "ultradns_record" "cname" {
 
 ```terraform
 resource "ultradns_record" "ptr" {
-    zone_name = "example.com."
-    owner_name = "192.168.1.1"
+    zone_name = "70.154.156.in-addr.arpa."
+    owner_name = "1"
     record_type = "12"
     ttl = 120
-    record_data = ["sample.com."]
+    record_data = ["ns1.example.com."]
 }
 ```
 
@@ -56,7 +56,7 @@ resource "ultradns_record" "mx" {
     owner_name = "mx"
     record_type = "15"
     ttl = 120
-    record_data = ["2 sample.com."]
+    record_data = ["2 example.com."]
 }
 ```
 
@@ -68,7 +68,7 @@ resource "ultradns_record" "txt" {
     owner_name = "txt"
     record_type = "TXT"
     ttl = 120
-    record_data = ["example.com."]
+    record_data = ["text data"]
 }
 ```
 
@@ -92,7 +92,7 @@ resource "ultradns_record" "srv" {
     owner_name = "srv"
     record_type = "33"
     ttl = 120
-    record_data = ["5 6 7 sample.com."]
+    record_data = ["5 6 7 example.com."]
 }
 ```
 
@@ -151,6 +151,6 @@ Example : `www.example.com.:example.com.:A (1)`.
 -> For import, the `owner_name` and `zone_name` must be a FQDN, and `record_type` should have the type as well as the corresponding number as shown in the example below.
 
 Example:
-```terraform
+```
 $ terraform import ultradns_record.example "www.example.com.:example.com.:A (1)" 
 ```
