@@ -87,9 +87,10 @@ Nested block describing the info of secondary zone. The structure of this block 
 * `alias_create_info` - (Optional) (Block Set, Max: 1)
 Nested block describing the info of alias zone. The structure of this block is described below.
 
-#### When `type` is "PRIMARY" <a href="#nested-primary_create_info-block-has-the-following-structure">`primary_create_info`</a> needs to be provided.
-#### When `type` is "SECONDARY" <a href="#nested-secondary_create_info-block-has-the-following-structure">`secondary_create_info`</a> needs to be provided.
-#### When `type` is "ALIAS" <a href="#nested-alias_create_info-block-has-the-following-structure">`alias_create_info`</a> needs to be provided.
+-> When `type` is "PRIMARY" <a href="#nested-primary_create_info-block-has-the-following-structure">`primary_create_info`</a> is required.<br> 
+When `type` is "SECONDARY" <a href="#nested-secondary_create_info-block-has-the-following-structure">`secondary_create_info`</a> is required<br>
+When `type` is "ALIAS" <a href="#nested-alias_create_info-block-has-the-following-structure">`alias_create_info`</a> is required.
+
 
 ### Nested `primary_create_info` block has the following structure:
 
@@ -183,10 +184,12 @@ Example: `03/18/21 10:20:34 AM GMT`.
 * `last_refresh_status` - (Computed) (String) Displays the status of the last transfer that was attempted. Valid values are `IN_PROGRESS`, `FAILED`, `SUCCESSFUL`.
 * `last_refresh_status_message` - (Computed) (String) Displays the last transfer’s status message. This is currently shown as failure reason.
 
+
 ## Import
 
-Zones can be imported using their name (must be a FQDN), e.g.,
+Zones can be imported using their name (must be a FQDN).
 
+Example:
 ```
 $ terraform import ultradns_zone.example "example.com." 
 ```

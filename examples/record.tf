@@ -21,10 +21,10 @@ resource "ultradns_record" "cname" {
 ## Record Resource of Type PTR (12)
 resource "ultradns_record" "ptr" {
     zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "192.168.1.1"
+    owner_name = "1"
     record_type = "12"
     ttl = 120
-    record_data = ["example.com."]
+    record_data = ["ns1.example.com."]
 }
 
 ## Record Resource of Type MX (15)

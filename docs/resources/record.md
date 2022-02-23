@@ -32,7 +32,7 @@ resource "ultradns_record" "cname" {
     owner_name = "cname"
     record_type = "CNAME"
     ttl = 120
-    record_data = ["sample.com."]
+    record_data = ["host.sample.com."]
 }
 ```
 
@@ -40,11 +40,11 @@ resource "ultradns_record" "cname" {
 
 ```terraform
 resource "ultradns_record" "ptr" {
-    zone_name = "example.com."
-    owner_name = "192.168.1.1"
+    zone_name = "70.154.156.in-addr.arpa."
+    owner_name = "1"
     record_type = "12"
     ttl = 120
-    record_data = ["sample.com."]
+    record_data = ["ns1.example.com."]
 }
 ```
 
@@ -56,7 +56,7 @@ resource "ultradns_record" "mx" {
     owner_name = "mx"
     record_type = "15"
     ttl = 120
-    record_data = ["2 sample.com."]
+    record_data = ["2 example.com."]
 }
 ```
 
@@ -68,7 +68,7 @@ resource "ultradns_record" "txt" {
     owner_name = "txt"
     record_type = "TXT"
     ttl = 120
-    record_data = ["example.com."]
+    record_data = ["text data"]
 }
 ```
 
@@ -92,7 +92,7 @@ resource "ultradns_record" "srv" {
     owner_name = "srv"
     record_type = "33"
     ttl = 120
-    record_data = ["5 6 7 sample.com."]
+    record_data = ["5 6 7 example.com."]
 }
 ```
 
@@ -127,7 +127,7 @@ The following arguments are supported:
 * `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
 * `record_type` - (Required) (String) Must be formatted as the well-known resource record type (A, AAAA, TXT, etc.) or the corresponding number for the type; between 1 and 65535.<br/>
-Below are the supported resource record type with its corresponding number:<br/>
+Below are the supported resource record types with the corresponding number:<br/>
 `A (1)`
 `CNAME (5)`
 `PTR (12)`
@@ -144,13 +144,13 @@ Additionally for MX, CNAME, and PTR record types, the data value must be a FQDN,
 
 ## Import
 
-Records can be imported by combining their `owner_name`, `zone_name`, `record_type` using colon.<br/>
+Records can be imported by combining their `owner_name`, `zone_name`, and `record_type`, separated by a colon.<br/>
 Example : `www.example.com.:example.com.:A (1)`.
 
 
--> For import, the `owner_name` and `zone_name` must be a FQDN and `record_type` should have the type as well as the corresponding number as shown in the example above.
+-> For import, the `owner_name` and `zone_name` must be a FQDN, and `record_type` should have the type as well as the corresponding number as shown in the example below.
 
-e.g.,
+Example:
 ```
 $ terraform import ultradns_record.example "www.example.com.:example.com.:A (1)" 
 ```
