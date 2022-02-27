@@ -2,6 +2,7 @@ package tcpool
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 )
 
@@ -22,8 +23,9 @@ func resourceTCPoolSchema() map[string]*schema.Schema {
 		Elem:     backupRecordResource(),
 	}
 	tcPoolSchema["pool_description"] = &schema.Schema{
-		Type:     schema.TypeString,
-		Optional: true,
+		Type:             schema.TypeString,
+		Optional:         true,
+		DiffSuppressFunc: helper.ComputedDescriptionDiffSuppress,
 	}
 	tcPoolSchema["run_probes"] = &schema.Schema{
 		Type:     schema.TypeBool,
@@ -85,10 +87,6 @@ func rdataInfoResource() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
-			},
-			"status": {
-				Type:     schema.TypeString,
-				Computed: true,
 			},
 			"available_to_serve": {
 				Type:     schema.TypeBool,

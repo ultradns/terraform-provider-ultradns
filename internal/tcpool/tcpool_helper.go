@@ -57,7 +57,6 @@ func getRDataInfoSet(rrSetData *sdkrrset.RRSet) *schema.Set {
 	for i, rdataInfoData := range rdataInfoListData {
 		rdataInfo := make(map[string]interface{})
 		rdataInfo["state"] = rdataInfoData.State
-		rdataInfo["status"] = rdataInfoData.Status
 		rdataInfo["available_to_serve"] = rdataInfoData.AvailableToServe
 		rdataInfo["run_probes"] = rdataInfoData.RunProbes
 		rdataInfo["priority"] = rdataInfoData.Priority

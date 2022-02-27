@@ -177,7 +177,7 @@ func getRDataInfo(rdataInfoData map[string]interface{}) *sdkpool.RDataInfo {
 	}
 
 	if val, ok := rdataInfoData["weight"]; ok {
-		rdataInfo.Priority = val.(int)
+		rdataInfo.Weight = val.(int)
 	}
 
 	if val, ok := rdataInfoData["threshold"]; ok {
