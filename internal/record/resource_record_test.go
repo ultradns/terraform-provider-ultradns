@@ -7,11 +7,7 @@ import (
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
-	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
-	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
-	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 )
 
 const zoneResourceName = "primary_record"
@@ -20,14 +16,14 @@ func TestAccResourceRecord(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
 	ownerNameTypeA := tfacctest.RandString(3)
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckRecordDestroy,
+		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_record", ""),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceRecordA(zoneName, ownerNameTypeA),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.a"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.a", ""),
 					resource.TestCheckResourceAttr("ultradns_record.a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.a", "owner_name", ownerNameTypeA+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.a", "record_type", "A"),
@@ -38,7 +34,7 @@ func TestAccResourceRecord(t *testing.T) {
 			{
 				Config: testAccResourceUpdateRecordA(zoneName, ownerNameTypeA),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.a"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.a", ""),
 					resource.TestCheckResourceAttr("ultradns_record.a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.a", "owner_name", ownerNameTypeA+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.a", "record_type", "A"),
@@ -54,7 +50,7 @@ func TestAccResourceRecord(t *testing.T) {
 			{
 				Config: testAccResourceRecordCNAME(zoneName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.cname"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.cname", ""),
 					resource.TestCheckResourceAttr("ultradns_record.cname", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.cname", "record_type", "CNAME"),
 					resource.TestCheckResourceAttr("ultradns_record.cname", "ttl", "120"),
@@ -64,7 +60,7 @@ func TestAccResourceRecord(t *testing.T) {
 			{
 				Config: testAccResourceRecordPTR(zoneName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.ptr"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.ptr", ""),
 					resource.TestCheckResourceAttr("ultradns_record.ptr", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.ptr", "record_type", "PTR"),
 					resource.TestCheckResourceAttr("ultradns_record.ptr", "ttl", "120"),
@@ -79,7 +75,7 @@ func TestAccResourceRecord(t *testing.T) {
 			{
 				Config: testAccResourceRecordMX(zoneName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.mx"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.mx", ""),
 					resource.TestCheckResourceAttr("ultradns_record.mx", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.mx", "record_type", "MX"),
 					resource.TestCheckResourceAttr("ultradns_record.mx", "ttl", "120"),
@@ -94,7 +90,7 @@ func TestAccResourceRecord(t *testing.T) {
 			{
 				Config: testAccResourceRecordTXT(zoneName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.txt"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.txt", ""),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "record_type", "TXT"),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "ttl", "120"),
@@ -104,7 +100,7 @@ func TestAccResourceRecord(t *testing.T) {
 			{
 				Config: testAccResourceRecordAAAA(zoneName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.aaaa"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.aaaa", ""),
 					resource.TestCheckResourceAttr("ultradns_record.aaaa", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.aaaa", "record_type", "AAAA"),
 					resource.TestCheckResourceAttr("ultradns_record.aaaa", "ttl", "120"),
@@ -114,7 +110,7 @@ func TestAccResourceRecord(t *testing.T) {
 			{
 				Config: testAccResourceRecordSRV(zoneName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.srv"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.srv", ""),
 					resource.TestCheckResourceAttr("ultradns_record.srv", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.srv", "record_type", "SRV"),
 					resource.TestCheckResourceAttr("ultradns_record.srv", "ttl", "120"),
@@ -129,7 +125,7 @@ func TestAccResourceRecord(t *testing.T) {
 			{
 				Config: testAccResourceRecordSSHFP(zoneName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.sshfp"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.sshfp", ""),
 					resource.TestCheckResourceAttr("ultradns_record.sshfp", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.sshfp", "record_type", "SSHFP"),
 					resource.TestCheckResourceAttr("ultradns_record.sshfp", "ttl", "120"),
@@ -144,7 +140,7 @@ func TestAccResourceRecord(t *testing.T) {
 			{
 				Config: testAccResourceRecordAPEXALIAS(zoneName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRecordExists("ultradns_record.apex"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.apex", ""),
 					resource.TestCheckResourceAttr("ultradns_record.apex", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.apex", "record_type", "APEXALIAS"),
 					resource.TestCheckResourceAttr("ultradns_record.apex", "ttl", "120"),
@@ -154,46 +150,6 @@ func TestAccResourceRecord(t *testing.T) {
 		},
 	}
 	resource.ParallelTest(t, testCase)
-}
-
-func testAccCheckRecordExists(resourceName string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[resourceName]
-
-		if !ok {
-			return errors.ResourceNotFoundError(resourceName)
-		}
-
-		services := acctest.TestAccProvider.Meta().(*service.Service)
-		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, _, err := services.RecordService.Read(rrSetKey)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
-func testAccCheckRecordDestroy(s *terraform.State) error {
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "ultradns_record" {
-			continue
-		}
-
-		services := acctest.TestAccProvider.Meta().(*service.Service)
-		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		_, recordResponse, err := services.RecordService.Read(rrSetKey)
-
-		if err == nil {
-			if len(recordResponse.RRSets) > 0 && recordResponse.RRSets[0].OwnerName == rrSetKey.Owner {
-				return errors.ResourceNotDestroyedError(rs.Primary.ID)
-			}
-		}
-	}
-
-	return nil
 }
 
 func testAccResourceRecordA(zoneName, ownerName string) string {

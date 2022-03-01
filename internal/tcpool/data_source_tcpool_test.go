@@ -6,15 +6,16 @@ import (
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
 )
 
 func TestAccDataSourceTCPool(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
 	ownerName := tfacctest.RandString(3)
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckTCPoolDestroy,
+		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_tcpool", pool.TC),
 		Steps: []resource.TestStep{
 			{
 				Config: acctest.TestAccDataSourceRRSet(
@@ -26,7 +27,7 @@ func TestAccDataSourceTCPool(t *testing.T) {
 					testAccResourceTCPoolA(zoneName, ownerName),
 				),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckTCPoolExists("data.ultradns_tcpool.data_a"),
+					acctest.TestAccCheckRecordResourceExists("data.ultradns_tcpool.data_a", pool.TC),
 					resource.TestCheckResourceAttr("data.ultradns_tcpool.data_a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_tcpool.data_a", "owner_name", ownerName+"."+zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_tcpool.data_a", "record_type", "A"),

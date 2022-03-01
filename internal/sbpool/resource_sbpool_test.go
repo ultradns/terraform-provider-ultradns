@@ -6,11 +6,7 @@ import (
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
-	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
-	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
-	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
 )
 
@@ -20,14 +16,14 @@ func TestAccResourceSBPool(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
 	ownerName := tfacctest.RandString(3)
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckSBPoolDestroy,
+		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_sbpool", pool.SB),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceSBPoolA(zoneName, ownerName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSBPoolExists("ultradns_sbpool.a"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_sbpool.a", pool.SB),
 					resource.TestCheckResourceAttr("ultradns_sbpool.a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_sbpool.a", "owner_name", ownerName+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_sbpool.a", "record_type", "A"),
@@ -49,7 +45,7 @@ func TestAccResourceSBPool(t *testing.T) {
 			{
 				Config: testAccResourceUpdateSBPoolA(zoneName, ownerName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSBPoolExists("ultradns_sbpool.a"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_sbpool.a", pool.SB),
 					resource.TestCheckResourceAttr("ultradns_sbpool.a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_sbpool.a", "owner_name", ownerName+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_sbpool.a", "record_type", "A"),
@@ -80,48 +76,6 @@ func TestAccResourceSBPool(t *testing.T) {
 	}
 
 	resource.ParallelTest(t, testCase)
-}
-
-func testAccCheckSBPoolExists(resourceName string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[resourceName]
-
-		if !ok {
-			return errors.ResourceNotFoundError(resourceName)
-		}
-
-		services := acctest.TestAccProvider.Meta().(*service.Service)
-		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		rrSetKey.PType = pool.SB
-		_, _, err := services.RecordService.Read(rrSetKey)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
-func testAccCheckSBPoolDestroy(s *terraform.State) error {
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "ultradns_sbpool" {
-			continue
-		}
-
-		services := acctest.TestAccProvider.Meta().(*service.Service)
-		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		rrSetKey.PType = pool.SB
-		_, sbPoolResponse, err := services.RecordService.Read(rrSetKey)
-
-		if err == nil {
-			if len(sbPoolResponse.RRSets) > 0 && sbPoolResponse.RRSets[0].OwnerName == rrSetKey.Owner {
-				return errors.ResourceNotDestroyedError(rs.Primary.ID)
-			}
-		}
-	}
-
-	return nil
 }
 
 func testAccResourceSBPoolA(zoneName, ownerName string) string {

@@ -6,11 +6,7 @@ import (
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
-	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
-	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
-	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
 )
 
@@ -21,14 +17,14 @@ func TestAccResourceRDPool(t *testing.T) {
 	ownerNameTypeA := tfacctest.RandString(3)
 	ownerNameTypeAAAA := tfacctest.RandString(3)
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckRDPoolDestroy,
+		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_rdpool", pool.RD),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceRDPoolA(zoneName, ownerNameTypeA),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRDPoolExists("ultradns_rdpool.a"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_rdpool.a", pool.RD),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "owner_name", ownerNameTypeA+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "record_type", "A"),
@@ -41,7 +37,7 @@ func TestAccResourceRDPool(t *testing.T) {
 			{
 				Config: testAccResourceUpdateRDPoolA(zoneName, ownerNameTypeA),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRDPoolExists("ultradns_rdpool.a"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_rdpool.a", pool.RD),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "owner_name", ownerNameTypeA+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "record_type", "A"),
@@ -59,7 +55,7 @@ func TestAccResourceRDPool(t *testing.T) {
 			{
 				Config: testAccResourceRDPoolAAAA(zoneName, ownerNameTypeAAAA),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRDPoolExists("ultradns_rdpool.aaaa"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_rdpool.aaaa", pool.RD),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "owner_name", ownerNameTypeAAAA+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "record_type", "AAAA"),
@@ -72,7 +68,7 @@ func TestAccResourceRDPool(t *testing.T) {
 			{
 				Config: testAccResourceUpdateRDPoolAAAA(zoneName, ownerNameTypeAAAA),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckRDPoolExists("ultradns_rdpool.aaaa"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_rdpool.aaaa", pool.RD),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "owner_name", ownerNameTypeAAAA+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "record_type", "AAAA"),
@@ -85,48 +81,6 @@ func TestAccResourceRDPool(t *testing.T) {
 		},
 	}
 	resource.ParallelTest(t, testCase)
-}
-
-func testAccCheckRDPoolExists(resourceName string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[resourceName]
-
-		if !ok {
-			return errors.ResourceNotFoundError(resourceName)
-		}
-
-		services := acctest.TestAccProvider.Meta().(*service.Service)
-		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		rrSetKey.PType = pool.RD
-		_, _, err := services.RecordService.Read(rrSetKey)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
-func testAccCheckRDPoolDestroy(s *terraform.State) error {
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "ultradns_rdpool" {
-			continue
-		}
-
-		services := acctest.TestAccProvider.Meta().(*service.Service)
-		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		rrSetKey.PType = pool.RD
-		_, rdPoolResponse, err := services.RecordService.Read(rrSetKey)
-
-		if err == nil {
-			if len(rdPoolResponse.RRSets) > 0 && rdPoolResponse.RRSets[0].OwnerName == rrSetKey.Owner {
-				return errors.ResourceNotDestroyedError(rs.Primary.ID)
-			}
-		}
-	}
-
-	return nil
 }
 
 func testAccResourceRDPoolA(zoneName, ownerName string) string {

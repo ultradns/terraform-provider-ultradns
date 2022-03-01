@@ -9,8 +9,12 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/provider"
+	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/client"
 )
@@ -67,25 +71,71 @@ func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.Resour
 	return service, diags
 }
 
-func TestPreCheck(t *testing.T) {
-	if TestUsername == "" {
-		t.Fatal("username required for creating test client")
-	}
+func TestPreCheck(t *testing.T) func() {
+	return func() {
+		if TestUsername == "" {
+			t.Fatal("username required for creating test client")
+		}
 
-	if testPassword == "" {
-		t.Fatal("password required for creating test client")
-	}
+		if testPassword == "" {
+			t.Fatal("password required for creating test client")
+		}
 
-	if TestHost == "" {
-		t.Fatal("host required for creating test client")
-	}
+		if TestHost == "" {
+			t.Fatal("host required for creating test client")
+		}
 
-	if TestAccount == "" {
-		t.Fatal("account required for creating test client")
-	}
+		if TestAccount == "" {
+			t.Fatal("account required for creating test client")
+		}
 
-	if testUserAgent == "" {
-		t.Fatal("user agent required for creating test client")
+		if testUserAgent == "" {
+			t.Fatal("user agent required for creating test client")
+		}
+	}
+}
+
+func TestAccCheckRecordResourceExists(resourceName, pType string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[resourceName]
+
+		if !ok {
+			return errors.ResourceNotFoundError(resourceName)
+		}
+
+		services := TestAccProvider.Meta().(*service.Service)
+		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
+		rrSetKey.PType = pType
+		_, _, err := services.RecordService.Read(rrSetKey)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
+func TestAccCheckRecordResourceDestroy(resourceName, pType string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		for _, rs := range s.RootModule().Resources {
+			if rs.Type != resourceName {
+				continue
+			}
+
+			services := TestAccProvider.Meta().(*service.Service)
+			rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
+			rrSetKey.PType = pType
+			_, response, err := services.RecordService.Read(rrSetKey)
+
+			if err == nil {
+				if len(response.RRSets) > 0 && response.RRSets[0].OwnerName == rrSetKey.Owner {
+					return errors.ResourceNotDestroyedError(rs.Primary.ID)
+				}
+			}
+		}
+
+		return nil
 	}
 }
 

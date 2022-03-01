@@ -28,7 +28,7 @@ func TestAccResourceZonePrimary(t *testing.T) {
 	resourceName := "ultradns_zone.primary"
 
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
@@ -78,7 +78,7 @@ func TestAccResourceZoneSecondary(t *testing.T) {
 	resourceName := "ultradns_zone.secondary"
 
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
@@ -130,7 +130,7 @@ func TestAccResourceZoneAlias(t *testing.T) {
 	resourceName := "ultradns_zone.alias"
 
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{

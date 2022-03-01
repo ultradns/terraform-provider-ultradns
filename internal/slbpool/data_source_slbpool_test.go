@@ -7,6 +7,7 @@ import (
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
 )
 
 func TestAccDataSourceSLBPool(t *testing.T) {
@@ -14,9 +15,9 @@ func TestAccDataSourceSLBPool(t *testing.T) {
 	ownerNameTypeA := tfacctest.RandString(3)
 	ownerNameTypeAAAA := tfacctest.RandString(3)
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckSLBPoolDestroy,
+		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_slbpool", pool.SLB),
 		Steps: []resource.TestStep{
 			{
 				Config: acctest.TestAccDataSourceRRSet(
@@ -28,7 +29,7 @@ func TestAccDataSourceSLBPool(t *testing.T) {
 					testAccResourceSLBPoolA(zoneName, ownerNameTypeA),
 				),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSLBPoolExists("data.ultradns_slbpool.data_a"),
+					acctest.TestAccCheckRecordResourceExists("data.ultradns_slbpool.data_a", pool.SLB),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_a", "owner_name", ownerNameTypeA+"."+zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_a", "record_type", "A"),
@@ -58,7 +59,7 @@ func TestAccDataSourceSLBPool(t *testing.T) {
 					testAccResourceSLBPoolAAAA(zoneName, ownerNameTypeAAAA),
 				),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSLBPoolExists("data.ultradns_slbpool.data_aaaa"),
+					acctest.TestAccCheckRecordResourceExists("data.ultradns_slbpool.data_aaaa", pool.SLB),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "owner_name", ownerNameTypeAAAA+"."+zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_slbpool.data_aaaa", "record_type", "AAAA"),

@@ -6,11 +6,7 @@ import (
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
-	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
-	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
-	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
 )
 
@@ -20,14 +16,14 @@ func TestAccResourceTCPool(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
 	ownerName := tfacctest.RandString(3)
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckTCPoolDestroy,
+		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_tcpool", pool.TC),
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceTCPoolA(zoneName, ownerName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckTCPoolExists("ultradns_tcpool.a"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_tcpool.a", pool.TC),
 					resource.TestCheckResourceAttr("ultradns_tcpool.a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_tcpool.a", "owner_name", ownerName+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_tcpool.a", "record_type", "A"),
@@ -47,7 +43,7 @@ func TestAccResourceTCPool(t *testing.T) {
 			{
 				Config: testAccResourceUpdateTCPoolA(zoneName, ownerName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckTCPoolExists("ultradns_tcpool.a"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_tcpool.a", pool.TC),
 					resource.TestCheckResourceAttr("ultradns_tcpool.a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_tcpool.a", "owner_name", ownerName+"."+zoneName),
 					resource.TestCheckResourceAttr("ultradns_tcpool.a", "record_type", "A"),
@@ -78,48 +74,6 @@ func TestAccResourceTCPool(t *testing.T) {
 	}
 
 	resource.ParallelTest(t, testCase)
-}
-
-func testAccCheckTCPoolExists(resourceName string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[resourceName]
-
-		if !ok {
-			return errors.ResourceNotFoundError(resourceName)
-		}
-
-		services := acctest.TestAccProvider.Meta().(*service.Service)
-		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		rrSetKey.PType = pool.TC
-		_, _, err := services.RecordService.Read(rrSetKey)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
-func testAccCheckTCPoolDestroy(s *terraform.State) error {
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "ultradns_tcpool" {
-			continue
-		}
-
-		services := acctest.TestAccProvider.Meta().(*service.Service)
-		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
-		rrSetKey.PType = pool.TC
-		_, tcPoolResponse, err := services.RecordService.Read(rrSetKey)
-
-		if err == nil {
-			if len(tcPoolResponse.RRSets) > 0 && tcPoolResponse.RRSets[0].OwnerName == rrSetKey.Owner {
-				return errors.ResourceNotDestroyedError(rs.Primary.ID)
-			}
-		}
-	}
-
-	return nil
 }
 
 func testAccResourceTCPoolA(zoneName, ownerName string) string {
