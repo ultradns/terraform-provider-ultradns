@@ -6,7 +6,7 @@ resource "ultradns_sbpool" "sbpoola" {
     owner_name = "sbpoola"
     record_type = "A"
     ttl = 120
-    pool_description = "Description"
+    pool_description = "SB Pool Resource of Type A"
     run_probes = true
     act_on_probes = true
     order = "ROUND_ROBIN"
@@ -31,6 +31,10 @@ resource "ultradns_sbpool" "sbpoola" {
     }
     backup_record{
         rdata = "192.168.1.3"
+        failover_delay = 1
+    }
+    backup_record{
+        rdata = "192.168.1.4"
         failover_delay = 1
     }
 }

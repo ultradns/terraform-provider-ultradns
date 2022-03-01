@@ -32,8 +32,4 @@ resource "ultradns_tcpool" "tcpoola" {
         rdata = "192.168.1.3"
         failover_delay = 1
     }
-    backup_record{
-        rdata = "192.168.1.4"
-        failover_delay = 1
-    }
 }

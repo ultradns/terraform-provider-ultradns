@@ -16,7 +16,7 @@ Use this resource to manage Simple Load Balancing (SLB) pool records in UltraDNS
 
 ```terraform
 resource "ultradns_slbpool" "a" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
+    zone_name = "example.com."
     owner_name = "a"
     record_type = "A"
     ttl = 120
@@ -47,7 +47,7 @@ resource "ultradns_slbpool" "a" {
 
 ```terraform
 resource "ultradns_slbpool" "aaaa" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
+    zone_name = "example.com."
     owner_name = "aaaa"
     record_type = "28"
     ttl = 120
