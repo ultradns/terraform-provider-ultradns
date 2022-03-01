@@ -139,17 +139,6 @@ func getNewTCPoolRRSet(rd *schema.ResourceData) *sdkrrset.RRSet {
 	return rrSetData
 }
 
-func getBackupRecordList(backupRecordDataList []interface{}) []*sdkpool.BackupRecord {
-	backupRecordList := make([]*sdkpool.BackupRecord, len(backupRecordDataList))
-
-	for i, d := range backupRecordDataList {
-		backupRecordData := d.(map[string]interface{})
-		backupRecordList[i] = pool.GetBackupRecord(backupRecordData)
-	}
-
-	return backupRecordList
-}
-
 func getRDataInfoList(rdataInfoDataList []interface{}) []*sdkpool.RDataInfo {
 	rdataInfoList := make([]*sdkpool.RDataInfo, len(rdataInfoDataList))
 

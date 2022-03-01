@@ -76,7 +76,8 @@ func rdataInfoResource() *schema.Resource {
 			},
 			"threshold": {
 				Type:     schema.TypeInt,
-				Required: true,
+				Optional: true,
+				Default:  1,
 			},
 			"failover_delay": {
 				Type:     schema.TypeInt,
