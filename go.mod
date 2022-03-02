@@ -5,10 +5,8 @@ go 1.17
 require (
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.10.1
-	github.com/ultradns/ultradns-go-sdk v1.2.1-20220207203334-c2b3738
+	github.com/ultradns/ultradns-go-sdk v1.3.0-20220301194248-80454b0
 )
-
-replace github.com/ultradns/ultradns-go-sdk v1.2.1-20220207203334-c2b3738 => ../ultradns-go-sdk
 
 require (
 	github.com/agext/levenshtein v1.2.2 // indirect

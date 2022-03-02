@@ -34,10 +34,7 @@ linters:
     - dupl
 
     - gochecknoglobals
-    - bodyclose
     - lll # should reduce line length or configure max length of line
-    - noctx
     - gochecknoinits
-    - gomoddirectives
 
   fast: false
