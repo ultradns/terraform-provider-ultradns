@@ -6,7 +6,7 @@ resource "ultradns_rdpool" "rdpoola" {
     owner_name = "rdpoola"
     record_type = "1"
     order = "ROUND_ROBIN"
-    ttl = 120
+    ttl = 800
     record_data = ["192.1.1.1","192.168.1.2"]
 }
 
@@ -17,7 +17,7 @@ resource "ultradns_rdpool" "rdpoolaaaa" {
     record_type = "AAAA"
     order = "RANDOM"
     description = "Record AAAA RD pool"
-    ttl = 120
+    ttl = 800
     record_data = ["2001:db8:85a3:0:0:8a2e:370:7334"]
 }
 

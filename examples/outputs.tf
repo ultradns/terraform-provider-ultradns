@@ -17,3 +17,11 @@ output "sfpool" {
 output "slbpool" {
   value = data.ultradns_slbpool.slbpool
 }
+
+output "sbpool" {
+  value = data.ultradns_sbpool.sbpool
+}
+
+output "tcpool" {
+  value = data.ultradns_tcpool.tcpool
+}

@@ -2,7 +2,7 @@
 
 ## SB Pool Resource of Type A (1)
 resource "ultradns_sbpool" "sbpoola" {
-    zone_name = "${var.ultradns_primary_zone_name}"
+    zone_name = "${resource.ultradns_zone.primary.id}"
     owner_name = "sbpoola"
     record_type = "A"
     ttl = 120
@@ -37,4 +37,11 @@ resource "ultradns_sbpool" "sbpoola" {
         rdata = "192.168.1.4"
         failover_delay = 1
     }
+}
+
+## SB Pool Datasource
+data "ultradns_sbpool" "sbpool" {
+    zone_name = "${resource.ultradns_zone.primary.id}"
+    owner_name = "${resource.ultradns_sbpool.sbpoola.owner_name}"
+    record_type = "${resource.ultradns_sbpool.sbpoola.record_type}"
 }

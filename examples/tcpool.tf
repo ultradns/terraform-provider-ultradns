@@ -2,7 +2,7 @@
 
 ## TC Pool Resource of Type A (1)
 resource "ultradns_tcpool" "tcpoola" {
-    zone_name = "${var.ultradns_primary_zone_name}"
+    zone_name = "${resource.ultradns_zone.primary.id}"
     owner_name = "tcpoola"
     record_type = "A"
     ttl = 120
@@ -32,4 +32,11 @@ resource "ultradns_tcpool" "tcpoola" {
         rdata = "192.168.1.3"
         failover_delay = 1
     }
+}
+
+## TC Pool Datasource
+data "ultradns_tcpool" "tcpool" {
+    zone_name = "${resource.ultradns_zone.primary.id}"
+    owner_name = "${resource.ultradns_tcpool.tcpoola.owner_name}"
+    record_type = "${resource.ultradns_tcpool.tcpoola.record_type}"
 }
