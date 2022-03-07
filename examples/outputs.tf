@@ -25,3 +25,7 @@ output "sbpool" {
 output "tcpool" {
   value = data.ultradns_tcpool.tcpool
 }
+
+output "probehttp" {
+  value = data.ultradns_probe_http.probehttp
+}

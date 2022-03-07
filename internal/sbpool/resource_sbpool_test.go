@@ -21,7 +21,7 @@ func TestAccResourceSBPool(t *testing.T) {
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_sbpool", pool.SB),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceSBPoolA(zoneName, ownerName),
+				Config: acctest.TestAccResourceSBPool(zoneName, ownerName),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_sbpool.a", pool.SB),
 					resource.TestCheckResourceAttr("ultradns_sbpool.a", "zone_name", zoneName),
@@ -43,7 +43,7 @@ func TestAccResourceSBPool(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateSBPoolA(zoneName, ownerName),
+				Config: testAccResourceUpdateSBPool(zoneName, ownerName),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_sbpool.a", pool.SB),
 					resource.TestCheckResourceAttr("ultradns_sbpool.a", "zone_name", zoneName),
@@ -78,46 +78,7 @@ func TestAccResourceSBPool(t *testing.T) {
 	resource.ParallelTest(t, testCase)
 }
 
-func testAccResourceSBPoolA(zoneName, ownerName string) string {
-	return fmt.Sprintf(`
-	%s
-	resource "ultradns_sbpool" "a" {
-		zone_name = "${resource.ultradns_zone.primary_sbpool.id}"
-		owner_name = "%s.${resource.ultradns_zone.primary_sbpool.id}"
-		record_type = "A"
-		ttl = 120
-		pool_description = "SB Pool Resource of Type A"
-    	run_probes = true
-    	act_on_probes = true
-    	order = "ROUND_ROBIN"
-    	failure_threshold = 2
-    	max_active = 1
-    	max_served = 1
-    	rdata_info{
-			priority = 2
-			threshold = 1
-			rdata = "192.168.1.1"
-			failover_delay = 1
-			run_probes = true
-			state = "ACTIVE"
-		}
-		rdata_info{
-			priority = 1
-			threshold = 1
-			rdata = "192.168.1.2"
-			failover_delay = 1
-			run_probes = false
-			state = "NORMAL"
-		}
-		backup_record{
-			rdata = "192.168.1.3"
-			failover_delay = 1
-		}
-	}
-	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName)
-}
-
-func testAccResourceUpdateSBPoolA(zoneName, ownerName string) string {
+func testAccResourceUpdateSBPool(zoneName, ownerName string) string {
 	return fmt.Sprintf(`
 	%s
 	resource "ultradns_sbpool" "a" {

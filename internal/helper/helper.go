@@ -73,3 +73,17 @@ func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
 
 	return diags
 }
+
+func GetProbeIDFromURI(uri string) string {
+	return splitURI(uri, "probes/")
+}
+
+func splitURI(uri, split string) string {
+	splitStringData := strings.Split(uri, split)
+
+	if len(splitStringData) == 2 {
+		return splitStringData[1]
+	}
+
+	return ""
+}

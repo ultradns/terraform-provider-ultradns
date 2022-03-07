@@ -24,7 +24,7 @@ func TestAccDataSourceTCPool(t *testing.T) {
 					zoneName,
 					ownerName+"."+zoneName,
 					"1",
-					testAccResourceTCPoolA(zoneName, ownerName),
+					acctest.TestAccResourceTCPool(zoneName, ownerName),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_tcpool.data_a", pool.TC),

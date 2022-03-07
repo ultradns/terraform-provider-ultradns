@@ -24,7 +24,7 @@ func TestAccDataSourceSBPool(t *testing.T) {
 					zoneName,
 					ownerName+"."+zoneName,
 					"1",
-					testAccResourceSBPoolA(zoneName, ownerName),
+					acctest.TestAccResourceSBPool(zoneName, ownerName),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_sbpool.data_a", pool.SB),

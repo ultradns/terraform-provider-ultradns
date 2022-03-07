@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
+	"github.com/ultradns/terraform-provider-ultradns/internal/probe"
 	"github.com/ultradns/terraform-provider-ultradns/internal/provider"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
@@ -116,6 +117,27 @@ func TestAccCheckRecordResourceExists(resourceName, pType string) resource.TestC
 	}
 }
 
+func TestAccCheckProbeResourceExists(resourceName, pType string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[resourceName]
+
+		if !ok {
+			return errors.ResourceNotFoundError(resourceName)
+		}
+
+		services := TestAccProvider.Meta().(*service.Service)
+		rrSetKey := probe.GetRRSetKeyFromID(rs.Primary.ID)
+		rrSetKey.PType = pType
+		_, _, err := services.ProbeService.Read(rrSetKey)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
 func TestAccCheckRecordResourceDestroy(resourceName, pType string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		for _, rs := range s.RootModule().Resources {
@@ -130,6 +152,29 @@ func TestAccCheckRecordResourceDestroy(resourceName, pType string) resource.Test
 
 			if err == nil {
 				if len(response.RRSets) > 0 && response.RRSets[0].OwnerName == rrSetKey.Owner {
+					return errors.ResourceNotDestroyedError(rs.Primary.ID)
+				}
+			}
+		}
+
+		return nil
+	}
+}
+
+func TestAccCheckProbeResourceDestroy(resourceName, pType string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		for _, rs := range s.RootModule().Resources {
+			if rs.Type != resourceName {
+				continue
+			}
+
+			services := TestAccProvider.Meta().(*service.Service)
+			rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
+			rrSetKey.PType = pType
+			_, response, err := services.ProbeService.Read(rrSetKey)
+
+			if err == nil {
+				if response.Type == pType {
 					return errors.ResourceNotDestroyedError(rs.Primary.ID)
 				}
 			}
