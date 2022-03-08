@@ -1,33 +1,14 @@
 # HTTP Probe Resources
 
-## HTTP Probe Resource of TC Pool
-resource "ultradns_probe_http" "http_tc" {
-	zone_name = "${resource.ultradns_tcpool.rdpoola.zone_name}"
-	owner_name = "${resource.ultradns_tcpool.rdpoola.owner_name}"
+## HTTP Probe Resource of SB Pool
+resource "ultradns_probe_http" "http_sb" {
+	zone_name = "${resource.ultradns_sbpool.sbpoola.zone_name}"
+	owner_name = "sbpoola"
 	interval = "HALF_MINUTE"
 	agents = ["EUROPE_WEST", "SOUTH_AMERICA", "PALO_ALTO", "NEW_YORK"]
 	threshold = 4
 	total_limit{
-		warning = "5"
-		critical = "8"
-		fail = "10"
-	}
-	transaction{
-		method = "GET"
-		protocol_version = "HTTP/1.0"
-		url = "https://www.ultradns.com/"
-		follow_redirects = false
-		expected_response = "3XX"
-		connect_limit{
-			warning = "5"
-			critical = "8"
-			fail = "10"
-		}
-		run_limit{
-			warning = "5"
-			critical = "8"
-			fail = "10"
-		}
+		fail = 20
 	}
 	transaction{
 		method = "POST"
@@ -39,12 +20,26 @@ resource "ultradns_probe_http" "http_tc" {
 		search_string {
 			fail = "Failure"
 		}
-		connect_limit{
-			fail = 11
+		connect_limit{ 
+			fail = 10
 		}
 		run_limit{
-			fail = 12
+			fail = 10
 		}
+	}
+}
+
+## HTTP Probe Resource of TC Pool
+resource "ultradns_probe_http" "http_tc" {
+	zone_name = "${resource.ultradns_tcpool.tcpoola.zone_name}"
+	owner_name = "tcpoola"
+	interval = "HALF_MINUTE"
+	agents = ["EUROPE_WEST", "SOUTH_AMERICA", "PALO_ALTO", "NEW_YORK"]
+	threshold = 4
+	total_limit{
+		warning = 10 
+		critical = 15 
+		fail = 20
 	}
 	transaction{
 		method = "POST"
@@ -54,13 +49,29 @@ resource "ultradns_probe_http" "http_tc" {
 		follow_redirects = true
 		expected_response = "3XX"
 		search_string {
+			warning = "Warning"
+			critical = "Critical"
 			fail = "Failure"
 		}
 		connect_limit{
-			fail = 11
+			warning = 5 
+			critical = 8 
+			fail = 10
+		}
+		avg_connect_limit{
+			warning = 5 
+			critical = 8 
+			fail = 10
 		}
 		run_limit{
-			fail = 12
+			warning = 5 
+			critical = 8 
+			fail = 10
+		}
+		avg_run_limit{
+			warning = 5 
+			critical = 8 
+			fail = 10
 		}
 	}
 }
