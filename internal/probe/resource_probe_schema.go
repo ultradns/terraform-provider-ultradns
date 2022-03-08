@@ -23,7 +23,8 @@ func ResourceProbeSchema() map[string]*schema.Schema {
 		},
 		"interval": {
 			Type:     schema.TypeString,
-			Required: true,
+			Optional: true,
+			Default:  "FIVE_MINUTES",
 		},
 		"agents": {
 			Type:     schema.TypeSet,

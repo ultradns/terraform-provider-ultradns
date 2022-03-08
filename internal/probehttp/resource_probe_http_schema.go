@@ -47,6 +47,7 @@ func httpTransactionResource() *schema.Resource {
 			"follow_redirects": {
 				Type:     schema.TypeBool,
 				Optional: true,
+				Default:  false,
 			},
 			"expected_response": {
 				Type:     schema.TypeString,
