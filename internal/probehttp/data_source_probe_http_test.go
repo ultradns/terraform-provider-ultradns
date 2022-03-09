@@ -6,7 +6,6 @@ import (
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
-	"github.com/ultradns/ultradns-go-sdk/pkg/probe"
 	sdkprobe "github.com/ultradns/ultradns-go-sdk/pkg/probe"
 )
 
@@ -17,7 +16,7 @@ func TestAccDataSourceProbeHTTP(t *testing.T) {
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: acctest.TestAccCheckProbeResourceDestroy("ultradns_probe_http", probe.HTTP),
+		CheckDestroy: acctest.TestAccCheckProbeResourceDestroy("ultradns_probe_http", sdkprobe.HTTP),
 		Steps: []resource.TestStep{
 			{
 				Config: acctest.TestAccDataSourceProbe(

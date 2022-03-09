@@ -3,7 +3,6 @@ package probehttp
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -32,6 +31,7 @@ func dataSourceprobeHTTPRead(ctx context.Context, rd *schema.ResourceData, meta 
 
 	if val, ok := rd.GetOk("guid"); ok {
 		rrSetKey.ID = val.(string)
+
 		return readProbeHTTP(rrSetKey, rd, meta)
 	}
 
@@ -58,6 +58,7 @@ func listProbeHTTP(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta in
 	if val, ok := rd.GetOk("pool_record"); ok {
 		query.PoolRecord = val.(string)
 	}
+
 	_, probeDataList, err := services.ProbeService.List(rrSetKey, query)
 
 	if err != nil {
@@ -67,6 +68,7 @@ func listProbeHTTP(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta in
 	if len(probeDataList.Probes) == 1 && probeDataList.Probes[0].Type == sdkprobe.HTTP {
 		probeData := probeDataList.Probes[0]
 		rrSetKey.ID = probeData.ID
+
 		return setProbeHTTPDetails(rrSetKey, probeData, rd)
 	}
 
@@ -92,7 +94,9 @@ func flattenDataSourceProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe
 func setMatchedProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
 	threshold := 0
 	interval := ""
+
 	var probeData *sdkprobe.Probe
+
 	var agents *schema.Set
 
 	if val, ok := rd.GetOk("threshold"); ok {
@@ -131,6 +135,7 @@ func setMatchedProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.
 
 	if probeData != nil {
 		rrSetKey.ID = probeData.ID
+
 		return setProbeHTTPDetails(rrSetKey, probeData, rd)
 	}
 
@@ -152,17 +157,4 @@ func setProbeHTTPDetails(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe,
 	probeData.Details = details
 
 	return flattenDataSourceProbeHTTP(rrSetKey, probeData, rd)
-}
-
-func getProbeHTTPDetails(m map[string]interface{}) *http.Details {
-	details := &http.Details{}
-	jsonStr, err := json.Marshal(m)
-	if err != nil {
-		fmt.Println(err)
-	}
-	if err := json.Unmarshal(jsonStr, details); err != nil {
-		fmt.Println(err)
-	}
-
-	return details
 }
