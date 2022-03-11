@@ -29,3 +29,11 @@ output "tcpool" {
 output "probehttp" {
   value = data.ultradns_probe_http.probehttp
 }
+
+output "probeping" {
+  value = data.ultradns_probe_ping.probeping
+}
+
+output "probedns" {
+  value = data.ultradns_probe_dns.probedns
+}
