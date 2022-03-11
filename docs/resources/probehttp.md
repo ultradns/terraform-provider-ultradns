@@ -136,7 +136,7 @@ Any combination of HTTP codes between 100-599 separated by "|" </br>For example:
 * `critical` - (Optional) (Integer) Indicates how long the HTTP Transactional Probe should wait before a critical warning is generated.
 * `fail` - (Optional) (Integer) Indicates how long the HTTP Transactional Probe should wait before it make the probe to fail.
 
--> `warning` and `critical` are only used for Traffic Controller Pools
+-> `warning` and `critical` are only used for Traffic Controller pools
 
 ### Nested `search_string` block has the following structure:
 
