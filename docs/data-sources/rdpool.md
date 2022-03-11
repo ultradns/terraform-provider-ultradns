@@ -39,5 +39,5 @@ In addition to all of the arguments above, the following attributes are exported
 
 * `ttl` - (Computed) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
 * `record_data` - (Computed) (String List) The list of IPv4 or IPv6 addresses.
-* `order` - (Computed) (String) The order of the records will be returned in. Valid values are `FIXED`, `RANDOM`, `ROUND_ROBIN`.
+* `order` - (Computed) (String) The order of the records will be returned in.
 * `description` - (Computed) (String) An optional description of the RD pool.

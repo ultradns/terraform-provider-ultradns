@@ -95,7 +95,7 @@ When `type` is "ALIAS" <a href="#nested-alias_create_info-block-has-the-followin
 ### Nested `primary_create_info` block has the following structure:
 
 * `create_type` - (Required) (String) Indicates the method for creating the primary zone. Valid values are `NEW`, `COPY`, `TRANSFER`.
-* `force_import` - (Optional) (Boolean) Indicates whether or not to move existing records from zones into this new zone. Default set to false.
+* `force_import` - (Optional) (Boolean) Indicates whether or not to move existing records from zones into this new zone. Default value set to false.
 * `original_zone_name` - (Optional) (String) The name of the zone being copied. The existing zone must be owned by the same account as the new zone. It needs to be provided if <a href="#create_type">`create_type`</a> is `COPY`.
 * `inherit` - (Optional) (String) Defines whether this zone should inherit the zone transfer values from the Account, and also specifies which values to inherit. Valid values are `ALL`, `NONE`, any combination of `IP_RANGE`, `NOTIFY_IP`, `TSIG`. Separate multiple values with a comma.<br/>
 Example: `IP_RANGE, NOTIFY_IP`

@@ -5,8 +5,8 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/pool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/slbpool"
 	sdkrrset "github.com/ultradns/ultradns-go-sdk/pkg/rrset"
-	"github.com/ultradns/ultradns-go-sdk/pkg/slbpool"
 )
 
 func flattenSLBPool(resList *sdkrrset.ResponseList, rd *schema.ResourceData) error {

@@ -7,6 +7,7 @@ import (
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
 )
 
 func TestAccDataSourceSFPool(t *testing.T) {
@@ -14,9 +15,9 @@ func TestAccDataSourceSFPool(t *testing.T) {
 	ownerNameTypeA := tfacctest.RandString(3)
 	ownerNameTypeAAAA := tfacctest.RandString(3)
 	testCase := resource.TestCase{
-		PreCheck:     func() { acctest.TestPreCheck(t) },
+		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckSFPoolDestroy,
+		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_sfpool", pool.SF),
 		Steps: []resource.TestStep{
 			{
 				Config: acctest.TestAccDataSourceRRSet(
@@ -28,7 +29,7 @@ func TestAccDataSourceSFPool(t *testing.T) {
 					testAccResourceSFPoolA(zoneName, ownerNameTypeA),
 				),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSFPoolExists("data.ultradns_sfpool.data_a"),
+					acctest.TestAccCheckRecordResourceExists("data.ultradns_sfpool.data_a", pool.SF),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "owner_name", ownerNameTypeA+"."+zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_a", "record_type", "A"),
@@ -56,7 +57,7 @@ func TestAccDataSourceSFPool(t *testing.T) {
 					testAccResourceSFPoolAAAA(zoneName, ownerNameTypeAAAA),
 				),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckSFPoolExists("data.ultradns_sfpool.data_aaaa"),
+					acctest.TestAccCheckRecordResourceExists("data.ultradns_sfpool.data_aaaa", pool.SF),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_aaaa", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_aaaa", "owner_name", ownerNameTypeAAAA+"."+zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_sfpool.data_aaaa", "record_type", "AAAA"),

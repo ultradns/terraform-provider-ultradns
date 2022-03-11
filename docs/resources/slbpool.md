@@ -16,7 +16,7 @@ Use this resource to manage Simple Load Balancing (SLB) pool records in UltraDNS
 
 ```terraform
 resource "ultradns_slbpool" "a" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
+    zone_name = "example.com."
     owner_name = "a"
     record_type = "A"
     ttl = 120
@@ -47,7 +47,7 @@ resource "ultradns_slbpool" "a" {
 
 ```terraform
 resource "ultradns_slbpool" "aaaa" {
-    zone_name = "${resource.ultradns_zone.primary.id}"
+    zone_name = "example.com."
     owner_name = "aaaa"
     record_type = "28"
     ttl = 120
@@ -123,8 +123,8 @@ Below are the supported resource record types with the corresponding number:<br/
 
 * `rdata` - (Required) (String) An IPv4 address or IPv6 address.
 * `description` - (Optional) (String) An optional description of the record in the live pool.
-* `forced_state` - (Optional) (String) The Forced State of the record that indicates whether the record needs to be: force served, forced to be inactive, or the force status not being considered (monitoring result decides the record state). Valid values are `FORCED_ACTIVE`, `FORCED_INACTIVE`, or `NOT_FORCED`. Default set to `NOT_FORCED`.
-* `probing_enabled` - (Optional) (Boolean) Can be set at the record level to indicate whether probing is required (true) or not (false) for the given record. Default set to true.
+* `forced_state` - (Optional) (String) The Forced State of the record that indicates whether the record needs to be: force served, forced to be inactive, or the force status not being considered (monitoring result decides the record state). Valid values are `FORCED_ACTIVE`, `FORCED_INACTIVE`, or `NOT_FORCED`. Default value set to `NOT_FORCED`.
+* `probing_enabled` - (Optional) (Boolean) Can be set at the record level to indicate whether probing is required (true) or not (false) for the given record. Default value set to true.
 * `available_to_serve` - (Computed) (Boolean) Indicates whether the record is available to be served (true) or not (false), based upon the probe results or the forced state of the record.
 
 ## Attributes Reference

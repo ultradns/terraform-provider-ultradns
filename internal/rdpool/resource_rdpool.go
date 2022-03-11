@@ -7,7 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
-	"github.com/ultradns/ultradns-go-sdk/pkg/rdpool"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/rdpool"
 	sdkrrset "github.com/ultradns/ultradns-go-sdk/pkg/rrset"
 )
 
@@ -32,13 +33,13 @@ func resourceRDPoolCreate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetData := getNewRDPool(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
-	_, err := services.RDPoolService.CreateRDPool(rrSetKeyData, rrSetData)
+	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(rrSetKeyData.ID())
+	rd.SetId(rrSetKeyData.RecordID())
 
 	return resourceRDPoolRead(ctx, rd, meta)
 }
@@ -48,7 +49,9 @@ func resourceRDPoolRead(ctx context.Context, rd *schema.ResourceData, meta inter
 
 	services := meta.(*service.Service)
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
-	_, resList, err := services.RDPoolService.ReadRDPool(rrSetKey)
+	rrSetKey.PType = pool.RD
+
+	_, resList, err := services.RecordService.Read(rrSetKey)
 
 	if err != nil {
 		rd.SetId("")
@@ -70,7 +73,7 @@ func resourceRDPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetData := getNewRDPool(rd)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
-	_, err := services.RDPoolService.UpdateRDPool(rrSetKeyData, rrSetData)
+	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -85,7 +88,7 @@ func resourceRDPoolDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	services := meta.(*service.Service)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
-	_, err := services.RDPoolService.DeleteRDPool(rrSetKeyData)
+	_, err := services.RecordService.Delete(rrSetKeyData)
 
 	if err != nil {
 		rd.SetId("")

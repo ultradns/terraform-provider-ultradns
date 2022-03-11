@@ -8,8 +8,9 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/pool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	sdkpool "github.com/ultradns/ultradns-go-sdk/pkg/record/pool"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record/sfpool"
 	sdkrrset "github.com/ultradns/ultradns-go-sdk/pkg/rrset"
-	"github.com/ultradns/ultradns-go-sdk/pkg/sfpool"
 )
 
 func ResourceSFPool() *schema.Resource {
@@ -33,13 +34,13 @@ func resourceSFPoolCreate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetData := getNewSFPoolRRSet(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
-	_, err := services.SFPoolService.CreateSFPool(rrSetKeyData, rrSetData)
+	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(rrSetKeyData.ID())
+	rd.SetId(rrSetKeyData.RecordID())
 
 	return resourceSFPoolRead(ctx, rd, meta)
 }
@@ -49,7 +50,8 @@ func resourceSFPoolRead(ctx context.Context, rd *schema.ResourceData, meta inter
 
 	services := meta.(*service.Service)
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
-	_, resList, err := services.SFPoolService.ReadSFPool(rrSetKey)
+	rrSetKey.PType = sdkpool.SF
+	_, resList, err := services.RecordService.Read(rrSetKey)
 
 	if err != nil {
 		rd.SetId("")
@@ -71,7 +73,7 @@ func resourceSFPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetData := getNewSFPoolRRSet(rd)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
-	_, err := services.SFPoolService.UpdateSFPool(rrSetKeyData, rrSetData)
+	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -86,7 +88,7 @@ func resourceSFPoolDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	services := meta.(*service.Service)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
-	_, err := services.SFPoolService.DeleteSFPool(rrSetKeyData)
+	_, err := services.RecordService.Delete(rrSetKeyData)
 
 	if err != nil {
 		rd.SetId("")

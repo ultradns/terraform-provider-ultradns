@@ -65,11 +65,11 @@ func NewRRSetKey(rd *schema.ResourceData) *rrset.RRSetKey {
 	}
 
 	if val, ok := rd.GetOk("owner_name"); ok {
-		rrSetKeyData.Name = val.(string)
+		rrSetKeyData.Owner = val.(string)
 	}
 
 	if val, ok := rd.GetOk("record_type"); ok {
-		rrSetKeyData.Type = val.(string)
+		rrSetKeyData.RecordType = val.(string)
 	}
 
 	return rrSetKeyData
@@ -80,9 +80,9 @@ func GetRRSetKeyFromID(id string) *rrset.RRSetKey {
 	splitStringData := strings.Split(id, ":")
 
 	if len(splitStringData) == 3 {
-		rrSetKeyData.Name = splitStringData[0]
+		rrSetKeyData.Owner = splitStringData[0]
 		rrSetKeyData.Zone = splitStringData[1]
-		rrSetKeyData.Type = helper.GetRecordTypeString(splitStringData[2])
+		rrSetKeyData.RecordType = helper.GetRecordTypeString(splitStringData[2])
 	}
 
 	return rrSetKeyData

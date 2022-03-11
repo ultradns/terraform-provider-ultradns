@@ -30,13 +30,13 @@ func resourceRecordCreate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetData := rrset.NewRRSetWithRecordData(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
-	_, err := services.RecordService.CreateRecord(rrSetKeyData, rrSetData)
+	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	rd.SetId(rrSetKeyData.ID())
+	rd.SetId(rrSetKeyData.RecordID())
 
 	return resourceRecordRead(ctx, rd, meta)
 }
@@ -46,7 +46,7 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 
 	services := meta.(*service.Service)
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
-	_, resList, err := services.RecordService.ReadRecord(rrSetKey)
+	_, resList, err := services.RecordService.Read(rrSetKey)
 
 	if err != nil {
 		rd.SetId("")
@@ -68,7 +68,7 @@ func resourceRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetData := rrset.NewRRSetWithRecordData(rd)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
-	_, err := services.RecordService.UpdateRecord(rrSetKeyData, rrSetData)
+	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -83,7 +83,7 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	services := meta.(*service.Service)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
-	_, err := services.RecordService.DeleteRecord(rrSetKeyData)
+	_, err := services.RecordService.Delete(rrSetKeyData)
 
 	if err != nil {
 		rd.SetId("")
