@@ -100,7 +100,7 @@ The following arguments are supported:
 
 * `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
-* `interval` - (Optional) (String) Length of time between probes in minutes. Valid values are `HALF_MINUTE`, `ONE_MINUTE`, `TWO_MINUTES`, `FIVE_MINUTES`, `TEN_MINUTES`, and `FIFTEEN_MINUTES`.</br>Default set to `FIVE_MINUTES`.
+* `interval` - (Optional) (String) Length of time between probes in minutes. Valid values are `HALF_MINUTE`, `ONE_MINUTE`, `TWO_MINUTES`, `FIVE_MINUTES`, `TEN_MINUTES`, and `FIFTEEN_MINUTES`.</br>Default value set to `FIVE_MINUTES`.
 * `agents` - (Required) (String List) Locations that will be used for probing. One or more values must be specified.
 Valid values are `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
 * `threshold` - (Required) (Integer) Number of agents that must agree for a probe state to be changed.
@@ -115,34 +115,34 @@ Valid values are `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
 
 -> HTTP probes will only correctly work if the indicated server supports the configured HTTP protocol version, otherwise the probe will fail.
 
-* `url` - (Required) (String) URL to probe.
-* `transmitted_data` - (Optional) (String) Data to send to URL.
-* `follow_redirects` - (Optional) (Boolean) Indicates whether or not to follow redirects. Default set to false.
+* `url` - (Required) (String) The URL that will be probed..
+* `transmitted_data` - (Optional) (String) The data to send to the URL.
+* `follow_redirects` - (Optional) (Boolean) Indicates whether or not to follow redirects. Default value set to false.
 * `expected_response` - (Optional) (String) The Expected Response code for probes to be returned as Successful. Valid values are</br>
 `2XX`: Probe will pass for any code between 200-299.</br>
 `3XX`: Probe will pass for any code between 300-399.</br>
 `2XX|3XX`: Probe will pass for any code between 200-399.</br>
 Any combination of HTTP codes between 100-599 separated by "|" </br>For example:</br>
 `201|302`
-* `search_string` - (Optional) (Block Set, Max:1) Nested block describing the strings need to be search on probes successful response. It does not search the status line and headers. The structure of this block is described below.
+* `search_string` - (Optional) (Block Set, Max:1) Nested block describing the strings required to be searched for a probe’s successful response. This does not search the status line or headers. The structure of this block is described below.
 * `connect_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe stays connected to the resource. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
-* `avg_connect_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean connect time over the five most recent probes run on each agent. Only used for Traffic Controller Pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `avg_connect_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) time to connect for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 * `run_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
-* `avg_run_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean run time over the five most recent probes run on each agent. Only used for Traffic Controller Pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `avg_run_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) run-time for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 
 ### Nested `limit` block has the following structure:
 
-* `warning` - (Optional) (Integer) Time for the HTTP transactional probe for a warning to be generated.
-* `critical` - (Optional) (Integer)  Time for the HTTP transactional probe for a critical warning to be generated.
-* `fail` - (Optional) (Integer)  Time for the HTTP transactional probe for the probe to fail.
+* `warning` - (Optional) (Integer) Indicates how long the HTTP Transactional Probe should wait before a warning is generated.
+* `critical` - (Optional) (Integer) Indicates how long the HTTP Transactional Probe should wait before a critical warning is generated.
+* `fail` - (Optional) (Integer) Indicates how long the HTTP Transactional Probe should wait before it make the probe to fail.
 
--> `warning` and `critical` are only used for Traffic Controller Pools.
+-> `warning` and `critical` are only used for Traffic Controller Pools
 
 ### Nested `search_string` block has the following structure:
 
-* `warning` - (Optional) (String) If the probe does not find the string within the response, or does not match it as a regular expression, a warning will be generated. 
-* `critical` - (Optional) (String) If the probe does not find the string within the response, or does not match it as a regular expression, a critical warning will be generated.
-* `fail` - (Optional) (String) If the probe does not find the string within the response, or does not match it as a regular expression, the probe will fail.
+* `warning` - (Optional) (String) If the probe does not find the serach string within the response, or does not match it as a regular expression, a warning will be generated. 
+* `critical` - (Optional) (String) If the probe does not find the serach string within the response, or does not match it as a regular expression, a critical warning will be generated.
+* `fail` - (Optional) (String) If the probe does not find the serach string within the response, or does not match it as a regular expression, the probe will fail.
 
 ## Attributes Reference
 

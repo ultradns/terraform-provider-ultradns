@@ -73,6 +73,6 @@ In addition to all of the arguments above, the following attributes are exported
 
 * `rdata` - (Computed) (String) An IPv4 or IPv6 address.
 * `description` - (Computed) (String) An optional description of the record in the live pool.
-* `forced_state` - (Computed) (String) The Forced State of the record that indicates whether the record needs to be: force served, forced to be inactive, or the force status not being considered (monitoring result decides the record state). Valid values are `FORCED_ACTIVE`, `FORCED_INACTIVE`, or `NOT_FORCED`. Default set to `NOT_FORCED`.
+* `forced_state` - (Computed) (String) The Forced State of the record that indicates whether the record needs to be: force served, forced to be inactive, or the force status not being considered (monitoring result decides the record state). Valid values are `FORCED_ACTIVE`, `FORCED_INACTIVE`, or `NOT_FORCED`.
 * `probing_enabled` - (Computed) (Boolean) Can be set at the record level to indicate whether probing is required (true) or not (false) for the given record.
 * `available_to_serve` - (Computed) (Boolean) Indicates whether the record is available to be served (true) or not (false), based upon the probe results or the forced state of the record.

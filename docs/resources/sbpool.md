@@ -65,32 +65,32 @@ Below are the supported resource record types with the corresponding number:<br/
 `A (1)`
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
 * `pool_description` - (Optional) (String) An optional description of the SiteBacker (SB) field.
-* `run_probes` - (Optional) (Boolean) Indicates whether or not the probes are run for this pool. Default set to true.
-* `act_on_probes` - (Optional) (Boolean) Indicates whether or not pool records will be enabled (true) or disabled (false) when probes are run. Default set to true.
-* `order` - (Optional) (String) Indicates the order of the records returned by the resolver for the SiteBacker pool. Valid values are `FIXED`, `RANDOM`, and `ROUND_ROBIN`. Default set to `ROUND_ROBIN`.
+* `run_probes` - (Optional) (Boolean) Indicates whether or not the probes are run for this pool. Default value set to true.
+* `act_on_probes` - (Optional) (Boolean) Indicates whether or not pool records will be enabled (true) or disabled (false) when probes are run. Default value set to true.
+* `order` - (Optional) (String) Indicates the order of the records returned by the resolver for the SiteBacker pool. Valid values are `FIXED`, `RANDOM`, and `ROUND_ROBIN`. Default value set to `ROUND_ROBIN`.
 * `failure_threshold` - (Optional) (Integer) The minimum number of records that must fail for a pool to be labeled 'FAILED'. If the number of failed records in the pool is greater than or equal to the 'Failure Threshold' value, the pool will be labeled FAILED.<br/>
 For example, a pool with six priority records, one all-fail record, and the Failure Threshold value is set to four (4). If four or more priority records are not available to serve, the pool will be labeled FAILED, and the all-fail record will be served.<br/>
 Valid value between 0 and the number of priority records in the pool.
 * `max_active` - (Optional) (Integer) Specifies the maximum number of active servers in a pool and determines when SiteBacker takes backup servers offline.<br/>
-For example, consider a pool with six servers. Setting Max Active to 4 means SiteBacker takes two servers offline and sends the four active records in the answer. Default set to 1.
-* `max_served` - (Optional) (Integer) Determines the number of record answers for each query. This is typically All Active records or a sub set of Max Active. Default set to the value of `max_active`.
+For example, consider a pool with six servers. Setting Max Active to 4 means SiteBacker takes two servers offline and sends the four active records in the answer. Default value set to 1.
+* `max_served` - (Optional) (Integer) Determines the number of record answers for each query. This is typically All Active records, or a subset of Max Active. Default value set to the value of `max_active`.
 * `backup_record` - (Required) (Block Set) List of nested blocks describing the information of backup records for the SiteBacker pool. Specifies the records to be served if all other records fail. There can be one or more A records used as backup records, or a single CNAME record. The structure of this block is described below.
 * `rdata_info` - (Required) (Block Set) List of nested blocks describing the pool records. The structure of this block is described below.
 
 ### Nested `backup_record` block has the following structure:
 
 * `rdata` - (Required) (String) The IPv4 address or CNAME for the backup record.
-* `failover_delay` - (Optional) (Integer) Specifies the time, from 0–30 minutes, that SiteBacker waits after detecting that the pool record has failed before activating primary records. Default set to 0.
-* `available_to_serve` - (Computed) (Boolean) Indicates whether the pool backup record is active and available to serve records.
+* `failover_delay` - (Optional) (Integer) Specifies the time, between 0 – 30 minutes, that SiteBacker waits after detecting that the pool record has failed, prior to activating the primary records. Default value set to 0.
+* `available_to_serve` - (Computed) (Boolean) Indicates whether the pool's backup record is active and available to serve records.
 
 ### Nested `rdata_info` block has the following structure:
 
 * `rdata` - (Required) (String) The IPv4 address or CNAME.
 * `priority` - (Required) (Integer) Indicates the serving preference for this pool record.
-* `threshold` - (Optional) (Integer) Specifies how many probes must agree before the record state is changed. Default set to 1.
-* `failover_delay` - (Optional) (Integer) Specifies the time, from 0–30 minutes, that SiteBacker waits after detecting that the pool record has failed before activating secondary records. Default set to 0.
-* `state` - (Optional) (String) The current state of the pool record. Valid values are `NORMAL`, `ACTIVE`, and `INACTIVE`. Default set to `NORMAL`.
-* `run_probes` - (Optional) (Boolean) Indicates whether or not probes are run for this pool record. Default set to true.
+* `threshold` - (Optional) (Integer) Specifies how many probes must agree before the record state is changed. Default value set to 1.
+* `failover_delay` - (Optional) (Integer) Specifies the time, between 0 – 30 minutes, that SiteBacker waits after detecting that the pool record has failed, prior to activating the secondary records. Default value set to 0.
+* `state` - (Optional) (String) The current state of the pool record. Valid values are `NORMAL`, `ACTIVE`, and `INACTIVE`. Default value set to `NORMAL`.
+* `run_probes` - (Optional) (Boolean) Indicates whether or not probes are run for this pool record. Default value set to true.
 * `available_to_serve` - (Computed) (Boolean) Indicates whether the pool record is active and available to serve records.
 
 ## Attributes Reference
@@ -101,7 +101,7 @@ In addition to all arguments above, the following attributes are exported:
 `OK`- If the number of records serving is equal to the Max Active value, and all the active records are top priority records.</br>
 For example, if a pool has a Max Active of 1 and the Priority 1 record is serving.</br>
 `WARNING` – If the number of records serving is equal to the Max Active value, and the active records are not top priority records.</br>
-For example, if a pool has a Max Active of 1 and the Priority 1 records is not serving and the Priority 2 record is serving.</br>
+For example, if a pool has a Max Active of 1, and the Priority 1 record is not serving and the Priority 2 record is serving.</br>
 `CRITICAL` – If the number of records serving is less than the Max Active value, or the All Fail record is being served.</br>
 For example, if a pool has a Max Active of 2, and only one record is serving.</br>
 `FAILED` - If the FailureThreshold value is 0 or null, and no records are serving, and there is no All Fail record configured.</br>OR</br>If the number of priority records not available to serve equals or exceeds the FailureThreshold’s value.</br>
