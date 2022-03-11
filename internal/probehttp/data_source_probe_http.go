@@ -65,13 +65,6 @@ func listProbeHTTP(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta in
 		return diag.FromErr(err)
 	}
 
-	if len(probeDataList.Probes) == 1 && probeDataList.Probes[0].Type == sdkprobe.HTTP {
-		probeData := probeDataList.Probes[0]
-		rrSetKey.ID = probeData.ID
-
-		return setProbeHTTPDetails(rrSetKey, probeData, rd)
-	}
-
 	return setMatchedProbeHTTP(rrSetKey, probeDataList.Probes, rd)
 }
 
@@ -92,41 +85,10 @@ func flattenDataSourceProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe
 }
 
 func setMatchedProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
-	threshold := 0
-	interval := ""
-
 	var probeData *sdkprobe.Probe
 
-	var agents *schema.Set
-
-	if val, ok := rd.GetOk("threshold"); ok {
-		threshold = val.(int)
-	}
-
-	if val, ok := rd.GetOk("interval"); ok {
-		interval = val.(string)
-	}
-
-	if val, ok := rd.GetOk("agents"); ok {
-		agents = val.(*schema.Set)
-	}
-
 	for _, probeResData := range probeDataList {
-		if probeResData.Type != sdkprobe.HTTP {
-			continue
-		}
-
-		if threshold != 0 && probeResData.Threshold != threshold {
-			continue
-		}
-
-		if interval != "" && probeResData.Interval != interval {
-			continue
-		}
-
-		agentSet := probe.GetAgentSet(probeResData.Agents)
-
-		if agents != nil && agentSet.Equal(agents) {
+		if ok := validateProbeFilterOptions(probeResData, rd); !ok {
 			continue
 		}
 
@@ -140,6 +102,45 @@ func setMatchedProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.
 	}
 
 	return diag.FromErr(errors.ProbeResourceNotFound(sdkprobe.HTTP))
+}
+
+func validateProbeFilterOptions(probeData *sdkprobe.Probe, rd *schema.ResourceData) bool {
+	var agents *schema.Set
+
+	threshold := 0
+	interval := ""
+
+	if val, ok := rd.GetOk("threshold"); ok {
+		threshold = val.(int)
+	}
+
+	if val, ok := rd.GetOk("interval"); ok {
+		interval = val.(string)
+	}
+
+	if val, ok := rd.GetOk("agents"); ok {
+		agents = val.(*schema.Set)
+	}
+
+	if probeData.Type != sdkprobe.HTTP {
+		return false
+	}
+
+	if threshold != 0 && probeData.Threshold != threshold {
+		return false
+	}
+
+	if interval != "" && probeData.Interval != interval {
+		return false
+	}
+
+	agentSet := probe.GetAgentSet(probeData.Agents)
+
+	if agents != nil && !agentSet.Equal(agents) {
+		return false
+	}
+
+	return true
 }
 
 func setProbeHTTPDetails(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
