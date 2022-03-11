@@ -43,7 +43,7 @@ In addition to all of the arguments above, the following attributes are exported
 `OK` – Live record is being served.</br>
 `CRITICAL` – The backup record is being served due to the monitor detecting a failure.</br>
 `MANUAL` – The backup record is being served due to the user forcing the live record to be inactive.
-* `region_failure_sensitivity` - (Computed) (String) Specifies the sensitivity to the number of regions that need to fail for the backup record to be made active. Valid values are `LOW`, `HIGH`.
+* `region_failure_sensitivity` - (Computed) (String) Specifies the sensitivity to the number of regions that need to fail for the backup record to be made active.
 * `live_record_description` - (Computed) (String) An optional description of the live record.
 * `pool_description` - (Computed) (String) An optional description of the Simple Failover field.
 * `monitor` - (Computed) (Block Set) Nested block describing the information for the monitor. The structure of this block is described below.
@@ -53,7 +53,7 @@ In addition to all of the arguments above, the following attributes are exported
 
 * `url` - (Computed) (String) Monitored URL. A full URL including the protocol, host, and URI.
 Valid protocols are HTTP and HTTPS.
-* `method` - (Computed) (String) HTTP method used to connect to the monitored URL. Valid values are `GET`, and `POST`.
+* `method` - (Computed) (String) HTTP method used to connect to the monitored URL.
 * `transmitted_data` - (Computed) (String) If a monitor is sending a POST, this is the data that is sent as the body of the request.
 * `search_string` - (Computed) (String) A string that is checked against the returned data from the request. 
 

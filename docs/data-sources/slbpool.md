@@ -38,7 +38,7 @@ Below are the supported resource record types with the corresponding number:<br/
 In addition to all of the arguments above, the following attributes are exported:
 
 * `ttl` - (Computed) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
-* `region_failure_sensitivity` - (Computed) (String) Specifies the sensitivity to the number of regions that need to fail for the backup record to be made active. Valid values are `LOW`, and `HIGH`.
+* `region_failure_sensitivity` - (Computed) (String) Specifies the sensitivity to the number of regions that need to fail for the backup record to be made active.
 * `response_method` - (Required) (String) The method used to select which record is returned from the primary record pool. valid values are:</br>
 `PRIORITY_HUNT` – The sequence of the records listed in the primary record pool determines the priority. The first record listed is the highest priority record. Once a record starts being served, it will always be served until the probe detects a failure on this record, or, the record is set to FORCED_INACTIVE.</br>
 `RANDOM` – A random record is returned from the following set of primary records.</br>
@@ -59,7 +59,7 @@ In addition to all of the arguments above, the following attributes are exported
 ### Nested `monitor` block has the following structure:
 
 * `url` - (Computed) (String) Monitored URL. A full URL including the protocol, host, and URI. Valid protocols are HTTP and HTTPS.
-* `method` - (Computed) (String) HTTP method used to connect to the monitored URL. Valid values are `GET`, and `POST`.
+* `method` - (Computed) (String) HTTP method used to connect to the monitored URL.
 * `transmitted_data` - (Computed) (String) If a monitor is sending a POST, the data that is sent as the body of the request.
 * `search_string` - (Computed) (String) A string that is checked against the returned data from the request. 
 
@@ -73,6 +73,6 @@ In addition to all of the arguments above, the following attributes are exported
 
 * `rdata` - (Computed) (String) An IPv4 or IPv6 address.
 * `description` - (Computed) (String) An optional description of the record in the live pool.
-* `forced_state` - (Computed) (String) The Forced State of the record that indicates whether the record needs to be: force served, forced to be inactive, or the force status not being considered (monitoring result decides the record state). Valid values are `FORCED_ACTIVE`, `FORCED_INACTIVE`, or `NOT_FORCED`.
+* `forced_state` - (Computed) (String) The Forced State of the record that indicates whether the record needs to be: force served, forced to be inactive, or the force status not being considered (monitoring result decides the record state).
 * `probing_enabled` - (Computed) (Boolean) Can be set at the record level to indicate whether probing is required (true) or not (false) for the given record.
 * `available_to_serve` - (Computed) (Boolean) Indicates whether the record is available to be served (true) or not (false), based upon the probe results or the forced state of the record.

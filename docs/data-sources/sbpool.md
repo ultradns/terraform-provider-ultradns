@@ -40,10 +40,9 @@ In addition to all of the arguments above, the following attributes are exported
 * `pool_description` - (Computed) (String) An optional description of the SiteBacker (SB) field.
 * `run_probes` - (Computed) (Boolean) Indicates whether or not the probes are run for this pool.
 * `act_on_probes` - (Computed) (Boolean) Indicates whether or not pool records will be enabled (true) or disabled (false) when probes are run.
-* `order` - (Computed) (String) Indicates the order of the records returned by the resolver for the SiteBacker pool. Valid values are `FIXED`, `RANDOM`, and `ROUND_ROBIN`.
+* `order` - (Computed) (String) Indicates the order of the records returned by the resolver for the SiteBacker pool.
 * `failure_threshold` - (Computed) (Integer) The minimum number of records that must fail for a pool to be labeled 'FAILED'. If the number of failed records in the pool is greater than or equal to the 'Failure Threshold' value, the pool will be labeled FAILED.<br/>
 For example, a pool with six priority records, one all-fail record, and the Failure Threshold value is set to four (4). If four or more priority records are not available to serve, the pool will be labeled FAILED, and the all-fail record will be served.<br/>
-Valid value between 0 and the number of priority records in the pool.
 * `max_active` - (Computed) (Integer) Specifies the maximum number of active servers in a pool and determines when SiteBacker takes backup servers offline.<br/>
 For example, consider a pool with six servers. Setting Max Active to 4 means SiteBacker takes two servers offline and sends the four active records in the answer.
 * `max_served` - (Computed) (Integer) Determines the number of record answers for each query. This is typically All Active records, or a subset of Max Active.
@@ -71,6 +70,6 @@ For example, if the Failure Threshold value is 3, and there are 3 or more Priori
 * `priority` - (Computed) (Integer) Indicates the serving preference for this pool record.
 * `threshold` - (Computed) (Integer) Specifies how many probes must agree before the record state is changed.
 * `failover_delay` - (Computed) (Integer) Specifies the time, between 0 – 30 minutes, that SiteBacker waits after detecting that the pool record has failed, prior to activating the secondary records. Default value set to 0.
-* `state` - (Computed) (String) The current state of the pool record. Valid values are `NORMAL`, `ACTIVE`, and `INACTIVE`.
+* `state` - (Computed) (String) The current state of the pool record.
 * `run_probes` - (Computed) (Boolean) Indicates whether or not probes are run for this pool record. 
 * `available_to_serve` - (Computed) (Boolean) Indicates whether the pool record is active and available to serve records.

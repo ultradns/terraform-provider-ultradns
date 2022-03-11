@@ -102,7 +102,7 @@ The following arguments are supported:
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
 * `interval` - (Optional) (String) Length of time between probes in minutes. Valid values are `HALF_MINUTE`, `ONE_MINUTE`, `TWO_MINUTES`, `FIVE_MINUTES`, `TEN_MINUTES`, and `FIFTEEN_MINUTES`.</br>Default value set to `FIVE_MINUTES`.
 * `agents` - (Required) (String List) Locations that will be used for probing. One or more values must be specified.
-Valid values are `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
+Valid values are `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_CENTRAL`, `NORTH_AMERICA_EAST`, `NORTH_AMERICA_WEST`, `SOUTH_AMERICA`, `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
 * `threshold` - (Required) (Integer) Number of agents that must agree for a probe state to be changed.
 * `pool_record` - (Optional) (String) The pool record associated with this probe. Specified when creating a record-level probe.
 * `transaction` - (Required) (Block Set, Min:1) List of nested blocks describing the http requests sent for a single probe. The structure of this block is described below.

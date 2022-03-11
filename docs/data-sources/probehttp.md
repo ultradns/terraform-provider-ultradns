@@ -52,7 +52,7 @@ The following arguments are supported:
 The following arguments are used to filter the probes:
 
 * `guid` - (Optional) (String) The internal id for this probe.
-* `interval` - (Optional) (String) Length of time between probes in minutes. Valid values are `HALF_MINUTE`, `ONE_MINUTE`, `TWO_MINUTES`, `FIVE_MINUTES`, `TEN_MINUTES`, and `FIFTEEN_MINUTES`.
+* `interval` - (Optional) (String) Length of time between probes in minutes.
 * `agents` - (Required) (String List) Locations that will be used for probing. The exact list must be provided if probes need to be filtered using agents.
 * `threshold` - (Optional) (Integer) The probe threshold value.
 * `pool_record` - (Optional) (String) The pool record associated with this probe.
@@ -71,8 +71,8 @@ In addition to all of the arguments above, the following attributes are exported
 
 ### Nested `transaction` block has the following structure:
 
-* `method` - (Computed) (String) HTTP method. Valid values are `GET` or `POST`.
-* `protocol_version` - (Computed) (String) HTTP protocol version. Valid values are `HTTP/1.0`, `HTTP/1.1`, `HTTP/2`.
+* `method` - (Computed) (String) HTTP method.
+* `protocol_version` - (Computed) (String) HTTP protocol version.
 * `url` - (Computed) (String) The URL that will be probed.
 * `transmitted_data` - (Computed) (String) The data to send to the URL.
 * `follow_redirects` - (Computed) (Boolean) Indicates whether or not to follow redirects.

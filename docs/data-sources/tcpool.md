@@ -41,8 +41,7 @@ In addition to all of the arguments above, the following attributes are exported
 * `run_probes` - (Computed) (Boolean) Indicates whether or not the probes are run for this pool.
 * `act_on_probes` - (Computed) (Boolean) Indicates whether or not pool records will be enabled (true) or disabled (false) when probes are run.
 * `failure_threshold` - (Computed) (Integer) The minimum number of records that must fail for a pool to be labeled 'FAILED'. If the number of failed records in the pool is greater than or equal to the 'Failure Threshold' value, the pool will be labeled FAILED.<br/>
-For example, a pool with six priority records, one all-fail record, and the Failure Threshold value is set to four (4). If four or more priority records are not available to serve, the pool will be labeled FAILED, and the all-fail record will be served.<br/>
-Valid value between 0 and the number of priority records in the pool.
+For example, a pool with six priority records, one all-fail record, and the Failure Threshold value is set to four (4). If four or more priority records are not available to serve, the pool will be labeled FAILED, and the all-fail record will be served.
 * `max_to_lb` - (Computed) (Integer) Specifies the maximum number of active servers in a pool. The maximum value is the number of pool records.
 * `backup_record` - (Computed) (Block Set, Max: 1) Nested block describing the information of the backup record for the Traffic Controller pool. The backup record is served if all other records fail. There can be one or more A records used as backup records, or a single CNAME record. The structure of this block is described below.
 * `rdata_info` - (Computed) (Block Set) List of nested blocks describing the pool records. The structure of this block is described below.
@@ -69,6 +68,6 @@ For example, if the Failure Threshold value is 3, and there are 3 or more Priori
 * `threshold` - (Computed) (Integer) Specifies how many probes must agree before the record state is changed.
 * `weight` - (Optional) (Integer) Determines the traffic load to send to each server in the Traffic Controller pool. Even integers from 2 to 100.
 * `failover_delay` - (Computed) (Integer) Specifies the time, between 0 – 30 minutes, that the Traffic Controller waits after detecting that the pool record has failed, prior to activating the secondary records. Default value set to 0.
-* `state` - (Computed) (String) The current state of the pool record. Valid values are `NORMAL`, `ACTIVE`, and `INACTIVE`.
+* `state` - (Computed) (String) The current state of the pool record.
 * `run_probes` - (Computed) (Boolean) Indicates whether or not probes are run for this pool record.
 * `available_to_serve` - (Computed) (Boolean) Indicates whether the pool record is active and available to serve records.
