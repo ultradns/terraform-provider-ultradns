@@ -53,7 +53,7 @@ The following arguments are used to filter the probes:
 
 * `guid` - (Optional) (String) The internal id for this probe.
 * `interval` - (Optional) (String) Length of time between probes in minutes.
-* `agents` - (Required) (String List) Locations that will be used for probing. The exact list must be provided if probes need to be filtered using agents.
+* `agents` - (Optional) (String List) Locations that will be used for probing. The exact list must be provided if probes need to be filtered using agents.
 * `threshold` - (Optional) (Integer) The probe threshold value.
 * `pool_record` - (Optional) (String) The pool record associated with this probe.
 
@@ -89,11 +89,11 @@ In addition to all of the arguments above, the following attributes are exported
 * `critical` - (Computed) (Integer) Indicates how long the HTTP Transactional Probe should wait before a critical warning is generated.
 * `fail` - (Computed) (Integer) Indicates how long the HTTP Transactional Probe should wait before it make the probe to fail.
 
--> `warning` and `critical` are only used for Traffic Controller pools.
-
 ### Nested `search_string` block has the following structure:
 
 * `warning` - (Computed) (String) If the probe does not find the search string within the response, or does not match it as a regular expression, a warning will be generated. 
 * `critical` - (Computed) (String) If the probe does not find the search string within the response, or does not match it as a regular expression, a critical warning will be generated.
 * `fail` - (Computed) (String) If the probe does not find the search string within the response, or does not match it as a regular expression, the probe will fail.
+
+-> `warning` and `critical` are only used for Traffic Controller pools
 
