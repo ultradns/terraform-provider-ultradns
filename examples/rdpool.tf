@@ -1,6 +1,6 @@
-# # RD Pool Resources
+# RD Pool Resources
 
-# RD Pool Resource of Type A (1)
+## RD Pool Resource of Type A (1)
 resource "ultradns_rdpool" "rdpoola" {
     zone_name = "${resource.ultradns_zone.primary.id}"
     owner_name = "rdpoola"
