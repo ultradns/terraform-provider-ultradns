@@ -1,6 +1,8 @@
 package dirpool
 
 import (
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/ultradns-go-sdk/pkg/record/dirpool"
@@ -83,10 +85,10 @@ func getSourceIPInfoSet(sourceIPDataList []*dirpool.IPAddress) *schema.Set {
 
 	for _, sourceIPData := range sourceIPDataList {
 		sourceIP := make(map[string]interface{})
-		sourceIP["start"] = sourceIPData.Start
-		sourceIP["end"] = sourceIPData.End
-		sourceIP["cidr"] = sourceIPData.Cidr
-		sourceIP["address"] = sourceIPData.Address
+		sourceIP["start"] = strings.ToLower(sourceIPData.Start)
+		sourceIP["end"] = strings.ToLower(sourceIPData.End)
+		sourceIP["cidr"] = strings.ToLower(sourceIPData.Cidr)
+		sourceIP["address"] = strings.ToLower(sourceIPData.Address)
 		set.Add(sourceIP)
 	}
 

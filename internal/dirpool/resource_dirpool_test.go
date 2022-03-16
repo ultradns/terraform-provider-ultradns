@@ -98,12 +98,12 @@ func TestAccResourceDirPool(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "rdata_info.0.geo_group_name", "geo_group"),
 					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "rdata_info.0.geo_codes.0", "EUR"),
 					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "rdata_info.0.ip_group_name", "ip_group"),
-					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "rdata_info.0.ip.0.start", "AAAA:BBBB:CCCC:DDDD:EEEE:FFFF:1111:4444"),
-					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "rdata_info.0.ip.0.end", "AAAA:BBBB:CCCC:DDDD:EEEE:FFFF:1111:6666"),
+					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "rdata_info.0.ip.0.start", "aaaa:bbbb:cccc:dddd:eeee:ffff:1111:4444"),
+					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "rdata_info.0.ip.0.end", "aaaa:bbbb:cccc:dddd:eeee:ffff:1111:6666"),
 					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "no_response.0.geo_group_name", "geo_response_group"),
 					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "no_response.0.ip_group_name", "ip_response_group"),
 					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "no_response.0.geo_codes.0", "AI"),
-					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "no_response.0.ip.0.address", "AAAA:BBBB:CCCC:DDDD:EEEE:FFFF:3333:5555"),
+					resource.TestCheckResourceAttr("ultradns_dirpool.aaaa", "no_response.0.ip.0.address", "aaaa:bbbb:cccc:dddd:eeee:ffff:3333:5555"),
 				),
 			},
 			{
@@ -272,8 +272,8 @@ func testAccResourceDIRPoolAAAA(zoneName, ownerName string) string {
 			geo_codes = ["EUR"]
 			ip_group_name = "ip_group"
 			ip{
-				start = "AAAA:BBBB:CCCC:DDDD:EEEE:FFFF:1111:4444"
-				end = "AAAA:BBBB:CCCC:DDDD:EEEE:FFFF:1111:6666"
+				start = "aaaa:bbbb:cccc:dddd:eeee:ffff:1111:4444"
+				end = "aaaa:bbbb:cccc:dddd:eeee:ffff:1111:6666"
 			}
 		}
 		no_response{
@@ -281,7 +281,7 @@ func testAccResourceDIRPoolAAAA(zoneName, ownerName string) string {
 			geo_codes = ["AI"]
 			ip_group_name = "ip_response_group"
 			ip{
-				address = "AAAA:BBBB:CCCC:DDDD:EEEE:FFFF:3333:5555"
+				address = "aaaa:bbbb:cccc:dddd:eeee:ffff:3333:5555"
 			}
 		}
 	}
