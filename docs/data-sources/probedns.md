@@ -73,7 +73,7 @@ In addition to all of the arguments above, the following attributes are exported
 * `type` - (Computed) (String) Select the record type that the probe will check for. Valid values are `NULL`, `AXFR`, or any Resource Record Type.
 * `query_name` - (Computed) (String) The name that should be queried.
 * `tcp_only` - (Computed) (Boolean) Indicates whether or not the probe should use TCP only, or first UDP then TCP.
-* `response` - (Computed) (Block Set, Max:1) Nested block describing the strings to match the response that will generate a warning or failure. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `response` - (Computed) (Block Set, Max:1) Nested block describing the strings to match the response that will generate a warning or failure. The structure of this block is described below.
 * `run_limit` - (Computed) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 * `avg_run_limit` - (Computed) (Block Set, Max:1) Nested block describing the mean (average) run-time for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 
