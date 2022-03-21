@@ -34,7 +34,24 @@ func TestAccDataSourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_record.data_a", "record_data.0", "192.168.1.1"),
 				),
 			},
-
+			{
+				Config: acctest.TestAccDataSourceRRSet(
+					"ultradns_record",
+					"ns",
+					zoneName,
+					zoneName,
+					"2",
+					testAccResourceRecordNS(zoneName),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_ns", ""),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_ns", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_ns", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_ns", "record_type", "NS"),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_ns", "ttl", "800"),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_ns", "record_data.#", "3"),
+				),
+			},
 			{
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_record",

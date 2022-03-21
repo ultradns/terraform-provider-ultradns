@@ -2,6 +2,7 @@ package rrset
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 )
 
 func DataSourceRRSetSchema() map[string]*schema.Schema {
@@ -15,8 +16,9 @@ func DataSourceRRSetSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 		"record_type": {
-			Type:     schema.TypeString,
-			Required: true,
+			Type:             schema.TypeString,
+			Required:         true,
+			ValidateDiagFunc: helper.RecordTypeValidation,
 		},
 		"ttl": {
 			Type:     schema.TypeInt,

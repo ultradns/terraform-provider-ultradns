@@ -54,6 +54,7 @@ func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
 
 	var supportedRRType = map[string]bool{
 		"A": true, "1": true,
+		"NS": true, "2": true,
 		"CNAME": true, "5": true,
 		"PTR": true, "12": true,
 		"MX": true, "15": true,
@@ -72,6 +73,16 @@ func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
 	}
 
 	return diags
+}
+
+func GetSchemaSetFromList(dataList []string) *schema.Set {
+	set := &schema.Set{F: schema.HashString}
+
+	for _, data := range dataList {
+		set.Add(data)
+	}
+
+	return set
 }
 
 func GetProbeIDFromURI(uri string) string {
