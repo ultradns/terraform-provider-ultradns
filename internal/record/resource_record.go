@@ -51,7 +51,7 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 
 	if rrSetKey.RecordType == recordTypeStringNS {
-		return resourceNSRecordRead(ctx, rd, meta)
+		return resourceNSRecordRead(rd, meta)
 	}
 
 	_, resList, err := services.RecordService.Read(rrSetKey)
@@ -77,7 +77,7 @@ func resourceRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	if rrSetKeyData.RecordType == recordTypeStringNS {
-		return resourceNSRecordUpdate(ctx, rd, meta)
+		return resourceNSRecordUpdate(rd, meta)
 	}
 
 	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
@@ -96,7 +96,7 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	if rrSetKeyData.RecordType == recordTypeStringNS {
-		return resourceNSRecordDelete(ctx, rd, meta)
+		return resourceNSRecordDelete(rd, meta)
 	}
 
 	_, err := services.RecordService.Delete(rrSetKeyData)
@@ -112,7 +112,7 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	return diags
 }
 
-func resourceNSRecordRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceNSRecordRead(rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
@@ -150,7 +150,7 @@ func resourceNSRecordRead(ctx context.Context, rd *schema.ResourceData, meta int
 	return diags
 }
 
-func resourceNSRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceNSRecordUpdate(rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	services := meta.(*service.Service)
 	rrSetData := rrset.NewRRSetWithRecordData(rd)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
@@ -177,10 +177,10 @@ func resourceNSRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta i
 		return diag.FromErr(er)
 	}
 
-	return resourceNSRecordRead(ctx, rd, meta)
+	return resourceNSRecordRead(rd, meta)
 }
 
-func resourceNSRecordDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceNSRecordDelete(rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
