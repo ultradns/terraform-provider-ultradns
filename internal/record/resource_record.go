@@ -145,7 +145,6 @@ func resourceNSRecordRead(ctx context.Context, rd *schema.ResourceData, meta int
 		if err := rd.Set("record_data", helper.GetSchemaSetFromList(recordData)); err != nil {
 			return diag.FromErr(err)
 		}
-
 	}
 
 	return diags
@@ -298,8 +297,7 @@ func rmRecordData(data, target []string) []string {
 }
 
 func addRecordData(data, target []string) []string {
-	for _, val := range data {
-		target = append(target, val)
-	}
+	target = append(target, data...)
+
 	return target
 }
