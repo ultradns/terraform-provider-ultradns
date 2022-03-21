@@ -4,9 +4,10 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
+	sdkhelper "github.com/ultradns/ultradns-go-sdk/pkg/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/probe"
-	probehelper "github.com/ultradns/ultradns-go-sdk/pkg/probe/helper"
+	sdkprobehelper "github.com/ultradns/ultradns-go-sdk/pkg/probe/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/rrset"
 )
 
@@ -56,29 +57,19 @@ func FlattenProbe(probeData *probe.Probe, rd *schema.ResourceData) error {
 		return err
 	}
 
-	if err := rd.Set("agents", GetAgentSet(probeData.Agents)); err != nil {
+	if err := rd.Set("agents", helper.GetSchemaSetFromList(probeData.Agents)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func GetAgentSet(agentsData []string) *schema.Set {
-	set := &schema.Set{F: schema.HashString}
-
-	for _, data := range agentsData {
-		set.Add(data)
-	}
-
-	return set
-}
-
 func FlattenRRSetKey(rrSetKeyData *rrset.RRSetKey, rd *schema.ResourceData) error {
-	if err := rd.Set("zone_name", helper.GetZoneFQDN(rrSetKeyData.Zone)); err != nil {
+	if err := rd.Set("zone_name", sdkhelper.GetZoneFQDN(rrSetKeyData.Zone)); err != nil {
 		return err
 	}
 
-	if err := rd.Set("owner_name", helper.GetOwnerFQDN(rrSetKeyData.Owner, rrSetKeyData.Zone)); err != nil {
+	if err := rd.Set("owner_name", sdkhelper.GetOwnerFQDN(rrSetKeyData.Owner, rrSetKeyData.Zone)); err != nil {
 		return err
 	}
 
@@ -92,15 +83,15 @@ func GetRRSetKeyFromID(id string) *rrset.RRSetKey {
 	if len(splitStringData) == 4 {
 		rrSetKeyData.Owner = splitStringData[0]
 		rrSetKeyData.Zone = splitStringData[1]
-		rrSetKeyData.RecordType = helper.GetRecordTypeString(splitStringData[2])
+		rrSetKeyData.RecordType = sdkhelper.GetRecordTypeString(splitStringData[2])
 		rrSetKeyData.ID = splitStringData[3]
 	}
 
 	return rrSetKeyData
 }
 
-func GetLimit(limitData map[string]interface{}) *probehelper.Limit {
-	limit := &probehelper.Limit{}
+func GetLimit(limitData map[string]interface{}) *sdkprobehelper.Limit {
+	limit := &sdkprobehelper.Limit{}
 
 	if val, ok := limitData["warning"]; ok {
 		limit.Warning = val.(int)
@@ -117,8 +108,8 @@ func GetLimit(limitData map[string]interface{}) *probehelper.Limit {
 	return limit
 }
 
-func GetSearchString(searchStringData map[string]interface{}) *probehelper.SearchString {
-	searchString := &probehelper.SearchString{}
+func GetSearchString(searchStringData map[string]interface{}) *sdkprobehelper.SearchString {
+	searchString := &sdkprobehelper.SearchString{}
 
 	if val, ok := searchStringData["warning"]; ok {
 		searchString.Warning = val.(string)
@@ -135,7 +126,7 @@ func GetSearchString(searchStringData map[string]interface{}) *probehelper.Searc
 	return searchString
 }
 
-func GetLimitList(limitData *probehelper.Limit) []interface{} {
+func GetLimitList(limitData *sdkprobehelper.Limit) []interface{} {
 	var list []interface{}
 
 	if limitData != nil {
@@ -150,7 +141,7 @@ func GetLimitList(limitData *probehelper.Limit) []interface{} {
 	return list
 }
 
-func GetSearchStringList(searchStringData *probehelper.SearchString) []interface{} {
+func GetSearchStringList(searchStringData *sdkprobehelper.SearchString) []interface{} {
 	var list []interface{}
 
 	if searchStringData != nil {
@@ -163,4 +154,43 @@ func GetSearchStringList(searchStringData *probehelper.SearchString) []interface
 	}
 
 	return list
+}
+
+func ValidateProbeFilterOptions(probeType string, probeData *probe.Probe, rd *schema.ResourceData) bool {
+	var agents *schema.Set
+
+	threshold := 0
+	interval := ""
+
+	if val, ok := rd.GetOk("threshold"); ok {
+		threshold = val.(int)
+	}
+
+	if val, ok := rd.GetOk("interval"); ok {
+		interval = val.(string)
+	}
+
+	if val, ok := rd.GetOk("agents"); ok {
+		agents = val.(*schema.Set)
+	}
+
+	if probeData.Type != probeType {
+		return false
+	}
+
+	if threshold != 0 && probeData.Threshold != threshold {
+		return false
+	}
+
+	if interval != "" && probeData.Interval != interval {
+		return false
+	}
+
+	agentSet := helper.GetSchemaSetFromList(probeData.Agents)
+
+	if agents != nil && !agentSet.Equal(agents) {
+		return false
+	}
+
+	return true
 }
