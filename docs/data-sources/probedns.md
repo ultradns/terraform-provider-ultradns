@@ -52,38 +52,41 @@ The following arguments are supported:
 The following arguments are used to filter the probes:
 
 * `guid` - (Optional) (String) The internal id for this probe.
+
+-> `guid` can be fetched using UltraDNS REST API.
+
 * `interval` - (Optional) (String) Length of time between probes in minutes.
-* `agents` - (Optional) (String List) Locations that will be used for probing. The exact list must be provided if probes need to be filtered using agents.
+* `agents` - (Optional) (String List) Locations that will be used for probing. The exact list must be provided if probes need to be filtered using agents. Valid values are: `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_CENTRAL`, `NORTH_AMERICA_EAST`, `NORTH_AMERICA_WEST`, `SOUTH_AMERICA`, `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
 * `threshold` - (Optional) (Integer) The probe threshold value.
 * `pool_record` - (Optional) (String) The pool record associated with this probe.
 
 ->
 1) If `guid` is provided, the probe with that guid is returned, and other filter options are not considered.</br>
-2) If there is a conflict between probes due to filter options other than `guid`,the last created probe is returned.</br>
+2) If there is a conflict between probes due to filter options other than `guid`, the last created probe is returned.</br>
 3) If no probe is found for the filter options, an error is returned.  
 
 ## Attributes Reference
 
 In addition to all of the arguments above, the following attributes are exported:
 
-* `port` - (Optional) (String) The Port that should be used for DNS lookup.
-* `type` - (Optional) (String) Select which kind of record should be checked for. Valid values are `NULL`, `AXFR`, or any Resource Record Type.
-* `query_name` - (Optional) (String) The name that should be queried.
-* `tcp_only` - (Optional) (Boolean) Indicates whether or not the probe should use TCP only, or first UDP then TCP.
-* `response` - (Optional) (Block Set, Max:1) Nested block describing the strings to match the response that will generates a warning or failure. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
-* `run_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
-* `avg_run_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) run-time for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `port` - (Computed) (String) The Port that should be used for DNS lookup.
+* `type` - (Computed) (String) Select the record type that the probe will check for. Valid values are `NULL`, `AXFR`, or any Resource Record Type.
+* `query_name` - (Computed) (String) The name that should be queried.
+* `tcp_only` - (Computed) (Boolean) Indicates whether or not the probe should use TCP only, or first UDP then TCP.
+* `response` - (Computed) (Block Set, Max:1) Nested block describing the strings to match the response that will generate a warning or failure. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `run_limit` - (Computed) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `avg_run_limit` - (Computed) (Block Set, Max:1) Nested block describing the mean (average) run-time for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 
 ### Nested `limit` block has the following structure:
 
-* `warning` - (Optional) (Integer) Indicates how long the DNS Probe should wait before a warning is generated.
-* `critical` - (Optional) (Integer) Indicates how long the DNS  Probe should wait before a critical warning is generated.
-* `fail` - (Optional) (Integer) Indicates how long the DNS Probe should wait before it make the probe to fail.
+* `warning` - (Computed) (Integer) Indicates how long (in seconds) the DNS Probe should wait, before a warning is generated.
+* `critical` - (Computed) (Integer) Indicates how long (in seconds) the DNS  Probe should wait, before a critical warning is generated.
+* `fail` - (Computed) (Integer) Indicates how long (in seconds) the DNS Probe should wait, before causing the probe to fail.
 
 ### Nested `response` block has the following structure:
 
-* `warning` - (Optional) (String) Match exactly for records with single field responses (that is: A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and match partially for types with multiple field responses, and join all fields separated by spaces and match to trigger a warning.
-* `critical` - (Optional) (String) Match exactly for records with single field responses (that is: A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and match partially for types with multiple field responses, and join all fields separated by spaces and match to trigger a critical warning.
-* `fail` - (Optional) (String) Match exactly for records with single field responses (that is: A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and match partially for types with multiple field responses, and join all fields separated by spaces and match to trigger a failure.
+* `warning` - (Computed) (String) Will match exactly for records containing a single field response (i.e., A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and partial matches for record types with multiple field response. Fields separated by spaces will be combined with the matches to trigger a warning.
+* `critical` - (Computed) (String) Will match exactly for records containing a single field response (i.e., A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and partial matches for record types with multiple field response. Fields separated by spaces will be combined with the matches to trigger a critical warning.
+* `fail` - (Computed) (String) Will match exactly for records containing a single field response (i.e., A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and partial matches for record types with multiple field response. Fields separated by spaces will be combined with the matches to trigger a failure.
 
--> `warning` and `critical` are only used for Traffic Controller pools
+-> `warning` and `critical` are only used for Traffic Controller pools.

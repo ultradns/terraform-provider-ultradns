@@ -81,13 +81,12 @@ The following arguments are supported:
 * `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
 * `interval` - (Optional) (String) Length of time between probes in minutes. Valid values are `HALF_MINUTE`, `ONE_MINUTE`, `TWO_MINUTES`, `FIVE_MINUTES`, `TEN_MINUTES`, and `FIFTEEN_MINUTES`.</br>Default value set to `FIVE_MINUTES`.
-* `agents` - (Required) (String List) Locations that will be used for probing. One or more values must be specified.
-Valid values are `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_CENTRAL`, `NORTH_AMERICA_EAST`, `NORTH_AMERICA_WEST`, `SOUTH_AMERICA`, `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
+* `agents` - (Required) (String List) Locations that will be used for probing. Multiple values can be comma separated. Valid values are:  `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_CENTRAL`, `NORTH_AMERICA_EAST`, `NORTH_AMERICA_WEST`, `SOUTH_AMERICA`, `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
 * `threshold` - (Required) (Integer) Number of agents that must agree for a probe state to be changed.
 * `pool_record` - (Optional) (String) The pool record associated with this probe. Specified when creating a record-level probe.
 * `packets` - (Optional) (String) Number of ICMP packets to send. Default value set to 3.
 * `packet_size` - (Optional) (String) Size of packets in bytes. Default value set to 56.
-* `loss_percent_limit` - (Optional) (Block Set, Max:1) Nested block describing the percentage of packets lost will be acceptable and beyond that it will generates warning or failure. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `loss_percent_limit` - (Optional) (Block Set, Max:1) Nested block describing the acceptable percentage of packets lost, which will in turn, generate either a warning or a failure. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 * `total_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe should run in total for all pings. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 * `average_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) time to connect for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 * `run_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
@@ -95,11 +94,11 @@ Valid values are `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_C
 
 ### Nested `limit` block has the following structure:
 
-* `warning` - (Optional) (Integer) Indicates how long/percent the PING Probe should wait before a warning is generated.
-* `critical` - (Optional) (Integer) Indicates how long/percent the PING  Probe should wait before a critical warning is generated.
-* `fail` - (Optional) (Integer) Indicates how long/percent the PING Probe should wait before it make the probe to fail.
+* `warning` - (Optional) (Integer) Indicates how long (in seconds, or by percentage value) the PING Probe should wait, before a warning is generated.
+* `critical` - (Optional) (Integer) Indicates how long (in seconds, or by percentage value) the PING  Probe should wait, before a critical warning is generated.
+* `fail` - (Optional) (Integer) Indicates how long (in seconds, or by percentage value) the PING Probe should wait, before causing the probe to fail.
 
--> `warning` and `critical` are only used for Traffic Controller pools
+-> `warning` and `critical` are only used for Traffic Controller pools.
 
 
 ## Attributes Reference
