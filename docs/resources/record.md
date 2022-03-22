@@ -24,6 +24,18 @@ resource "ultradns_record" "a" {
 }
 ```
 
+### Create DNS record of type NS (2)
+
+```terraform
+resource "ultradns_record" "ns" {
+    zone_name = "example.com."
+    owner_name = "example.com."
+    record_type = "NS"
+    ttl = 120
+    record_data = ["ns11.sample.com.","ns12.sample.com."]
+}
+```
+
 ### Create DNS record of type CNAME (5)
 
 ```terraform

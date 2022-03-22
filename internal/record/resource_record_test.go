@@ -88,10 +88,9 @@ func TestAccResourceRecord(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:            "ultradns_record.ns_owner",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"record_data"},
+				ResourceName:      "ultradns_record.ns_owner",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			{
 				Config: testAccResourceRecordCNAME(zoneName),
