@@ -72,31 +72,30 @@ The following arguments are supported:
 * `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
 * `interval` - (Optional) (String) Length of time between probes in minutes. Valid values are `HALF_MINUTE`, `ONE_MINUTE`, `TWO_MINUTES`, `FIVE_MINUTES`, `TEN_MINUTES`, and `FIFTEEN_MINUTES`.</br>Default value set to `FIVE_MINUTES`.
-* `agents` - (Required) (String List) Locations that will be used for probing. One or more values must be specified.
-Valid values are `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_CENTRAL`, `NORTH_AMERICA_EAST`, `NORTH_AMERICA_WEST`, `SOUTH_AMERICA`, `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
+* `agents` - (Required) (String List) Locations that will be used for probing. Multiple values can be comma separated. Valid values are: `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_CENTRAL`, `NORTH_AMERICA_EAST`, `NORTH_AMERICA_WEST`, `SOUTH_AMERICA`, `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
 * `threshold` - (Required) (Integer) Number of agents that must agree for a probe state to be changed.
 * `pool_record` - (Optional) (String) The pool record associated with this probe. Specified when creating a record-level probe.
 * `port` - (Optional) (String) The Port that should be used for DNS lookup. Default value set to 53.
-* `type` - (Optional) (String) Select which kind of record should be checked for. Valid values are `NULL`, `AXFR`, or any Resource Record Type. Default value set to `NULL`.
+* `type` - (Optional) (String) Select the record type that the probe will check for. Valid values are `NULL`, `AXFR`, or any Resource Record Type. Default value set to `NULL`.
 * `query_name` - (Optional) (String) The name that should be queried.
 * `tcp_only` - (Optional) (Boolean) Indicates whether or not the probe should use TCP only, or first UDP then TCP. Default value set to false.
-* `response` - (Optional) (Block Set, Max:1) Nested block describing the strings to match the response that will generates a warning or failure. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `response` - (Optional) (Block Set, Max:1) Nested block describing the strings to match the response that will generate a warning or failure. The structure of this block is described below.
 * `run_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 * `avg_run_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) run-time for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
 
 ### Nested `limit` block has the following structure:
 
-* `warning` - (Optional) (Integer) Indicates how long the DNS Probe should wait before a warning is generated.
-* `critical` - (Optional) (Integer) Indicates how long the DNS  Probe should wait before a critical warning is generated.
-* `fail` - (Optional) (Integer) Indicates how long the DNS Probe should wait before it make the probe to fail.
+* `warning` - (Optional) (Integer) Indicates how long (in seconds) the DNS Probe should wait, before a warning is generated.
+* `critical` - (Optional) (Integer) Indicates how long (in seconds) the DNS  Probe should wait, before a critical warning is generated.
+* `fail` - (Optional) (Integer) Indicates how long (in seconds) the DNS Probe should wait, before causing the probe to fail.
 
 ### Nested `response` block has the following structure:
 
-* `warning` - (Optional) (String) Match exactly for records with single field responses (that is: A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and match partially for types with multiple field responses, and join all fields separated by spaces and match to trigger a warning.
-* `critical` - (Optional) (String) Match exactly for records with single field responses (that is: A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and match partially for types with multiple field responses, and join all fields separated by spaces and match to trigger a critical warning.
-* `fail` - (Optional) (String) Match exactly for records with single field responses (that is: A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and match partially for types with multiple field responses, and join all fields separated by spaces and match to trigger a failure.
+* `warning` - (Optional) (String) Will match exactly for records containing a single field response (i.e., A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and partial matches for record types with multiple field response. Fields separated by spaces will be combined with the matches to trigger a warning.
+* `critical` - (Optional) (String) Will match exactly for records containing a single field response (i.e., A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and partial matches for record types with multiple field response. Fields separated by spaces will be combined with the matches to trigger a critical warning.
+* `fail` - (Optional) (String) Will match exactly for records containing a single field response (i.e., A, CNAME, DNAME, NS, MB, MD, MF, MG, MR, PTR), and partial matches for record types with multiple field response. Fields separated by spaces will be combined with the matches to trigger a failure.
 
--> `warning` and `critical` are only used for Traffic Controller pools
+-> `warning` and `critical` are only used for Traffic Controller pools.
 
 ## Attributes Reference
 

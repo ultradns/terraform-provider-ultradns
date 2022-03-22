@@ -15,6 +15,7 @@ const zoneResourceName = "primary_record"
 func TestAccResourceRecord(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
 	ownerNameTypeA := tfacctest.RandString(3)
+	ownerNameTypeNS := tfacctest.RandString(3)
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
 		Providers:    acctest.TestAccProviders,
@@ -32,7 +33,7 @@ func TestAccResourceRecord(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateRecordA(zoneName, ownerNameTypeA),
+				Config: testAccUpdateResourceRecordA(zoneName, ownerNameTypeA),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.a", ""),
 					resource.TestCheckResourceAttr("ultradns_record.a", "zone_name", zoneName),
@@ -44,6 +45,50 @@ func TestAccResourceRecord(t *testing.T) {
 			},
 			{
 				ResourceName:      "ultradns_record.a",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: testAccResourceRecordNS(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.ns", ""),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "record_type", "NS"),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "ttl", "800"),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "record_data.0", "ns11.example.com."),
+				),
+			},
+			{
+				Config: testAccUpdateResourceRecordNS(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.ns", ""),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "record_type", "NS"),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "ttl", "900"),
+					resource.TestCheckResourceAttr("ultradns_record.ns", "record_data.#", "2"),
+				),
+			},
+			{
+				ResourceName:            "ultradns_record.ns",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"record_data"},
+			},
+			{
+				Config: testAccResourceRecordNSwithOwner(zoneName, ownerNameTypeNS),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.ns_owner", ""),
+					resource.TestCheckResourceAttr("ultradns_record.ns_owner", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.ns_owner", "owner_name", ownerNameTypeNS+"."+zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.ns_owner", "record_type", "NS"),
+					resource.TestCheckResourceAttr("ultradns_record.ns_owner", "ttl", "800"),
+					resource.TestCheckResourceAttr("ultradns_record.ns_owner", "record_data.#", "2"),
+				),
+			},
+			{
+				ResourceName:      "ultradns_record.ns_owner",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -166,7 +211,7 @@ func testAccResourceRecordA(zoneName, ownerName string) string {
 	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName)
 }
 
-func testAccResourceUpdateRecordA(zoneName, ownerName string) string {
+func testAccUpdateResourceRecordA(zoneName, ownerName string) string {
 	return fmt.Sprintf(`
 	%s
 
@@ -176,6 +221,48 @@ func testAccResourceUpdateRecordA(zoneName, ownerName string) string {
 		record_type = "1"
 		ttl = 850
 		record_data = ["192.168.1.2"]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName)
+}
+
+func testAccResourceRecordNS(zoneName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "ns" {
+		zone_name = "${resource.ultradns_zone.primary_record.id}"
+		owner_name = "${resource.ultradns_zone.primary_record.id}"
+		record_type = "NS"
+		ttl = 800
+		record_data = ["ns11.example.com."]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName))
+}
+
+func testAccUpdateResourceRecordNS(zoneName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "ns" {
+		zone_name = "${resource.ultradns_zone.primary_record.id}"
+		owner_name = "${resource.ultradns_zone.primary_record.id}"
+		record_type = "NS"
+		ttl = 900
+		record_data = ["ns12.example.com.","ns13.example.com."]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName))
+}
+
+func testAccResourceRecordNSwithOwner(zoneName, ownerName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "ns_owner" {
+		zone_name = "${resource.ultradns_zone.primary_record.id}"
+		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
+		record_type = "2"
+		ttl = 800
+		record_data = ["ns12.example.com.","ns13.example.com."]
 	}
 	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), ownerName)
 }

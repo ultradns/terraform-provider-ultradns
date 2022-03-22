@@ -88,7 +88,7 @@ func setMatchedProbeDNS(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.P
 	var probeData *sdkprobe.Probe
 
 	for _, probeResData := range probeDataList {
-		if ok := validateProbeFilterOptions(probeResData, rd); !ok {
+		if ok := probe.ValidateProbeFilterOptions(sdkprobe.DNS, probeResData, rd); !ok {
 			continue
 		}
 
@@ -102,45 +102,6 @@ func setMatchedProbeDNS(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.P
 	}
 
 	return diag.FromErr(errors.ProbeResourceNotFound(sdkprobe.DNS))
-}
-
-func validateProbeFilterOptions(probeData *sdkprobe.Probe, rd *schema.ResourceData) bool {
-	var agents *schema.Set
-
-	threshold := 0
-	interval := ""
-
-	if val, ok := rd.GetOk("threshold"); ok {
-		threshold = val.(int)
-	}
-
-	if val, ok := rd.GetOk("interval"); ok {
-		interval = val.(string)
-	}
-
-	if val, ok := rd.GetOk("agents"); ok {
-		agents = val.(*schema.Set)
-	}
-
-	if probeData.Type != sdkprobe.DNS {
-		return false
-	}
-
-	if threshold != 0 && probeData.Threshold != threshold {
-		return false
-	}
-
-	if interval != "" && probeData.Interval != interval {
-		return false
-	}
-
-	agentSet := probe.GetAgentSet(probeData.Agents)
-
-	if agents != nil && !agentSet.Equal(agents) {
-		return false
-	}
-
-	return true
 }
 
 func setProbeDNSDetails(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {

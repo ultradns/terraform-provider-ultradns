@@ -9,6 +9,15 @@ resource "ultradns_record" "a" {
     record_data = ["192.168.1.1"]
 }
 
+## Record Resource of Type NS (2)
+resource "ultradns_record" "ns" {
+		zone_name = "${resource.ultradns_zone.primary.id}"
+		owner_name = "${resource.ultradns_zone.primary.id}"
+		record_type = "NS"
+		ttl = 800
+		record_data = ["ns11.example.com.","ns12.example.com."]
+}
+
 ## Record Resource of Type CNAME (5)
 resource "ultradns_record" "cname" {
     zone_name = "${resource.ultradns_zone.primary.id}"

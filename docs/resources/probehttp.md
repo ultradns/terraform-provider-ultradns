@@ -132,11 +132,11 @@ Any combination of HTTP codes between 100-599 separated by "|" </br>For example:
 
 ### Nested `limit` block has the following structure:
 
-* `warning` - (Optional) (Integer) Indicates how long the HTTP Transactional Probe should wait before a warning is generated.
-* `critical` - (Optional) (Integer) Indicates how long the HTTP Transactional Probe should wait before a critical warning is generated.
-* `fail` - (Optional) (Integer) Indicates how long the HTTP Transactional Probe should wait before it make the probe to fail.
+* `warning` - (Optional) (Integer) Indicates how long (in seconds) the HTTP Transactional Probe should wait, before a warning is generated.
+* `critical` - (Optional) (Integer) Indicates how long (in seconds) the HTTP Transactional Probe should wait, before a critical warning is generated.
+* `fail` - (Optional) (Integer) Indicates how long the (in seconds) HTTP Transactional Probe should wait, before causing the probe to fail.
 
--> `warning` and `critical` are only used for Traffic Controller pools
+-> `warning` and `critical` are only used for Traffic Controller pools.
 
 ### Nested `search_string` block has the following structure:
 
