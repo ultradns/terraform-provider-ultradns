@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/ultradns-go-sdk/pkg/record/dirpool"
 	sdkrrset "github.com/ultradns/ultradns-go-sdk/pkg/rrset"
@@ -56,7 +57,7 @@ func getRDataInfoSet(rrSetData *sdkrrset.RRSet) *schema.Set {
 
 		if rdataInfoData.GeoInfo != nil {
 			rdataInfo["geo_group_name"] = rdataInfoData.GeoInfo.Name
-			rdataInfo["geo_codes"] = getGEOCodesSet(rdataInfoData.GeoInfo.Codes)
+			rdataInfo["geo_codes"] = helper.GetSchemaSetFromList(rdataInfoData.GeoInfo.Codes)
 		}
 
 		if rdataInfoData.IPInfo != nil {
@@ -65,16 +66,6 @@ func getRDataInfoSet(rrSetData *sdkrrset.RRSet) *schema.Set {
 		}
 
 		set.Add(rdataInfo)
-	}
-
-	return set
-}
-
-func getGEOCodesSet(geoCodes []string) *schema.Set {
-	set := &schema.Set{F: schema.HashString}
-
-	for _, data := range geoCodes {
-		set.Add(data)
 	}
 
 	return set
@@ -105,7 +96,7 @@ func getNoResponseList(noResponseData *dirpool.RDataInfo) []interface{} {
 
 		if noResponseData.GeoInfo != nil {
 			noRespone["geo_group_name"] = noResponseData.GeoInfo.Name
-			noRespone["geo_codes"] = getGEOCodesSet(noResponseData.GeoInfo.Codes)
+			noRespone["geo_codes"] = helper.GetSchemaSetFromList(noResponseData.GeoInfo.Codes)
 		}
 
 		if noResponseData.IPInfo != nil {
