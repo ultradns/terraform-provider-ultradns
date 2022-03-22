@@ -128,7 +128,7 @@ resource "ultradns_dirpool" "srv" {
 
 
 # Record Datasource
-data "ultradns_dirpool" "record" {
+data "ultradns_dirpool" "dirpool" {
     zone_name = "${resource.ultradns_zone.primary.id}"
     owner_name = "${resource.ultradns_dirpool.a.owner_name}"
     record_type = "${resource.ultradns_dirpool.a.record_type}"
