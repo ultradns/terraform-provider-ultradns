@@ -24,5 +24,5 @@ func ResourceTypeMismatched(expected, found string) error {
 }
 
 func ProbeResourceNotFound(key string) error {
-	return fmt.Errorf("probe resource of type %s %w : try with other criteria fields", key, errNotFound)
+	return fmt.Errorf("probe resource of type %s %w : modify filter options and try again", key, errNotFound)
 }

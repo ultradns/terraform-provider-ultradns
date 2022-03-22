@@ -1,4 +1,4 @@
-package probehttp
+package probeping
 
 import (
 	"context"
@@ -11,34 +11,34 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	sdkprobe "github.com/ultradns/ultradns-go-sdk/pkg/probe"
-	"github.com/ultradns/ultradns-go-sdk/pkg/probe/http"
+	"github.com/ultradns/ultradns-go-sdk/pkg/probe/ping"
 	sdkrrset "github.com/ultradns/ultradns-go-sdk/pkg/rrset"
 )
 
-func DataSourceprobeHTTP() *schema.Resource {
+func DataSourceprobePING() *schema.Resource {
 	return &schema.Resource{
 
-		ReadContext: dataSourceprobeHTTPRead,
+		ReadContext: dataSourceprobePINGRead,
 
-		Schema: dataSourceprobeHTTPSchema(),
+		Schema: dataSourceprobePINGSchema(),
 	}
 }
 
-func dataSourceprobeHTTPRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func dataSourceprobePINGRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	rrSetKey := rrset.NewRRSetKey(rd)
-	rrSetKey.PType = sdkprobe.HTTP
+	rrSetKey.PType = sdkprobe.PING
 	rrSetKey.RecordType = probe.RecordTypeA
 
 	if val, ok := rd.GetOk("guid"); ok {
 		rrSetKey.ID = val.(string)
 
-		return readProbeHTTP(rrSetKey, rd, meta)
+		return readProbePING(rrSetKey, rd, meta)
 	}
 
-	return listProbeHTTP(rrSetKey, rd, meta)
+	return listProbePING(rrSetKey, rd, meta)
 }
 
-func readProbeHTTP(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func readProbePING(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	services := meta.(*service.Service)
 
 	_, probeData, err := services.ProbeService.Read(rrSetKey)
@@ -47,10 +47,10 @@ func readProbeHTTP(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta in
 		return diag.FromErr(err)
 	}
 
-	return flattenDataSourceProbeHTTP(rrSetKey, probeData, rd)
+	return flattenDataSourceProbePING(rrSetKey, probeData, rd)
 }
 
-func listProbeHTTP(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func listProbePING(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	services := meta.(*service.Service)
 
 	query := &sdkprobe.Query{}
@@ -65,10 +65,10 @@ func listProbeHTTP(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta in
 		return diag.FromErr(err)
 	}
 
-	return setMatchedProbeHTTP(rrSetKey, probeDataList.Probes, rd)
+	return setMatchedProbePING(rrSetKey, probeDataList.Probes, rd)
 }
 
-func flattenDataSourceProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
+func flattenDataSourceProbePING(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	rd.SetId(rrSetKey.PID())
@@ -77,18 +77,18 @@ func flattenDataSourceProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe
 		return diag.FromErr(err)
 	}
 
-	if err := flattenProbeHTTP(probeData, rd); err != nil {
+	if err := flattenProbePING(probeData, rd); err != nil {
 		return diag.FromErr(err)
 	}
 
 	return diags
 }
 
-func setMatchedProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
+func setMatchedProbePING(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
 	var probeData *sdkprobe.Probe
 
 	for _, probeResData := range probeDataList {
-		if ok := probe.ValidateProbeFilterOptions(sdkprobe.HTTP, probeResData, rd); !ok {
+		if ok := probe.ValidateProbeFilterOptions(sdkprobe.PING, probeResData, rd); !ok {
 			continue
 		}
 
@@ -98,14 +98,14 @@ func setMatchedProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.
 	if probeData != nil {
 		rrSetKey.ID = probeData.ID
 
-		return setProbeHTTPDetails(rrSetKey, probeData, rd)
+		return setProbePINGDetails(rrSetKey, probeData, rd)
 	}
 
-	return diag.FromErr(errors.ProbeResourceNotFound(sdkprobe.HTTP))
+	return diag.FromErr(errors.ProbeResourceNotFound(sdkprobe.PING))
 }
 
-func setProbeHTTPDetails(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
-	details := &http.Details{}
+func setProbePINGDetails(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
+	details := &ping.Details{}
 	jsonStr, err := json.Marshal(probeData.Details.(map[string]interface{}))
 
 	if err != nil {
@@ -118,5 +118,5 @@ func setProbeHTTPDetails(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe,
 
 	probeData.Details = details
 
-	return flattenDataSourceProbeHTTP(rrSetKey, probeData, rd)
+	return flattenDataSourceProbePING(rrSetKey, probeData, rd)
 }

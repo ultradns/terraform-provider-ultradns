@@ -52,14 +52,17 @@ The following arguments are supported:
 The following arguments are used to filter the probes:
 
 * `guid` - (Optional) (String) The internal id for this probe.
+
+-> `guid` can be fetched using UltraDNS REST API.
+
 * `interval` - (Optional) (String) Length of time between probes in minutes.
-* `agents` - (Required) (String List) Locations that will be used for probing. The exact list must be provided if probes need to be filtered using agents.
+* `agents` - (Optional) (String List) Locations that will be used for probing. The exact list must be provided if probes need to be filtered using agents. Valid values are: `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_CENTRAL`, `NORTH_AMERICA_EAST`, `NORTH_AMERICA_WEST`, `SOUTH_AMERICA`, `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
 * `threshold` - (Optional) (Integer) The probe threshold value.
 * `pool_record` - (Optional) (String) The pool record associated with this probe.
 
 ->
 1) If `guid` is provided, the probe with that guid is returned, and other filter options are not considered.</br>
-2) If there is a conflict between probes due to filter options other than `guid`,the last created probe is returned.</br>
+2) If there is a conflict between probes due to filter options other than `guid`, the last created probe is returned.</br>
 3) If no probe is found for the filter options, an error is returned.  
 
 ## Attributes Reference
@@ -85,15 +88,15 @@ In addition to all of the arguments above, the following attributes are exported
 
 ### Nested `limit` block has the following structure:
 
-* `warning` - (Computed) (Integer) Indicates how long the HTTP Transactional Probe should wait before a warning is generated.
-* `critical` - (Computed) (Integer) Indicates how long the HTTP Transactional Probe should wait before a critical warning is generated.
-* `fail` - (Computed) (Integer) Indicates how long the HTTP Transactional Probe should wait before it make the probe to fail.
-
--> `warning` and `critical` are only used for Traffic Controller pools.
+* `warning` - (Computed) (Integer) Indicates how long (in seconds) the HTTP Transactional Probe should wait, before a warning is generated.
+* `critical` - (Computed) (Integer) Indicates how long (in seconds) the HTTP Transactional Probe should wait, before a critical warning is generated.
+* `fail` - (Computed) (Integer) Indicates how long the (in seconds) HTTP Transactional Probe should wait, before causing the probe to fail.
 
 ### Nested `search_string` block has the following structure:
 
 * `warning` - (Computed) (String) If the probe does not find the search string within the response, or does not match it as a regular expression, a warning will be generated. 
 * `critical` - (Computed) (String) If the probe does not find the search string within the response, or does not match it as a regular expression, a critical warning will be generated.
 * `fail` - (Computed) (String) If the probe does not find the search string within the response, or does not match it as a regular expression, the probe will fail.
+
+-> `warning` and `critical` are only used for Traffic Controller pools.
 
