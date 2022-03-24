@@ -87,19 +87,19 @@ Nested block describing the info of secondary zone. The structure of this block 
 * `alias_create_info` - (Optional) (Block Set, Max: 1)
 Nested block describing the info of alias zone. The structure of this block is described below.
 
--> When `type` is "PRIMARY" <a href="#nested-primary_create_info-block-has-the-following-structure">`primary_create_info`</a> is required.<br> 
-When `type` is "SECONDARY" <a href="#nested-secondary_create_info-block-has-the-following-structure">`secondary_create_info`</a> is required<br>
-When `type` is "ALIAS" <a href="#nested-alias_create_info-block-has-the-following-structure">`alias_create_info`</a> is required.
+-> When `type` is "PRIMARY" [`primary_create_info`](#nested-primary_create_info-block-has-the-following-structure) is required.<br> 
+When `type` is "SECONDARY" [`secondary_create_info`](#nested-secondary_create_info-block-has-the-following-structure) is required<br>
+When `type` is "ALIAS" [`alias_create_info`](##nested-alias_create_info-block-has-the-following-structure) is required.
 
 
 ### Nested `primary_create_info` block has the following structure:
 
 * `create_type` - (Required) (String) Indicates the method for creating the primary zone. Valid values are `NEW`, `COPY`, `TRANSFER`.
 * `force_import` - (Optional) (Boolean) Indicates whether or not to move existing records from zones into this new zone. Default value set to false.
-* `original_zone_name` - (Optional) (String) The name of the zone being copied. The existing zone must be owned by the same account as the new zone. It needs to be provided if <a href="#create_type">`create_type`</a> is `COPY`.
+* `original_zone_name` - (Optional) (String) The name of the zone being copied. The existing zone must be owned by the same account as the new zone. It needs to be provided if [`create_type`](#create_type) is `COPY`.
 * `inherit` - (Optional) (String) Defines whether this zone should inherit the zone transfer values from the Account, and also specifies which values to inherit. Valid values are `ALL`, `NONE`, any combination of `IP_RANGE`, `NOTIFY_IP`, `TSIG`. Separate multiple values with a comma.<br/>
 Example: `IP_RANGE, NOTIFY_IP`
-* `name_server` - (Optional) (Block Set, Max: 1) Nested block describing the Primary zone's name server. It needs to be provided if <a href="#create_type">`create_type`</a> is `TRANSFER`.
+* `name_server` - (Optional) (Block Set, Max: 1) Nested block describing the Primary zone's name server. It needs to be provided if [`create_type`](#create_type) is `TRANSFER`.
 * `tsig` - (Optional) (Block Set, Max: 1) Nested block describing the TSIG information for the primary zone. The structure of this block is described below.
 * `restrict_ip` - (Optional) (Block Set) Nested block describing the list of IPv4 or IPv6 ranges that are allowed to transfer primary zones out using zone transfer protocol (AXFR/IXFR). The structure of this block is described below.
 * `notify_addresses` - (Optional) (Block Set) Nested block describing the addresses that are notified when updates are made to the primary zone. The structure of this block is described below.
@@ -135,9 +135,9 @@ The following tsig values are required if TSIG is enabled for the zone.
 
 ### Nested `secondary_create_info` block has the following structure:
 
-* `primary_name_server_1` - (Required) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described above. It is the info of primary name server.
-* `primary_name_server_2` - (Optional) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described above. It is the info of first backup primary name server.
-* `primary_name_server_3` - (Optional) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described above. It is the info of second backup primary name server.
+* `primary_name_server_1` - (Required) (Block Set) The structure of this block follows the same structure as the [`name_server`](#nested-name_server-block-has-the-following-structure) block described above. It is the info of primary name server.
+* `primary_name_server_2` - (Optional) (Block Set) The structure of this block follows the same structure as the [`name_server`](#nested-name_server-block-has-the-following-structure) block described above. It is the info of first backup primary name server.
+* `primary_name_server_3` - (Optional) (Block Set) The structure of this block follows the same structure as the [`name_server`](#nested-name_server-block-has-the-following-structure) block described above. It is the info of second backup primary name server.
 * `notification_email_address` - (Optional) (String) The Notification Email for a secondary zone.
 
 ### Nested `alias_create_info` block has the following structure:
@@ -158,8 +158,8 @@ Example: `2021-12-07T11:25Z`.
 * `registrar_info` - (Computed) (Block Set) Nested block describing information about the name server configuration for this zone. The structure of this block is described below.
 * `transfer_status_details` - (Computed) (Block Set) Nested block describing the zone transfer details. The structure of this block is described below.
 
-#### When `type` is "PRIMARY" <a href="#nested-registrar_info-block-has-the-following-structure">`registrar_info`</a> will be exported.
-#### When `type` is "SECONDARY" <a href="#nested-transfer_status_details-block-has-the-following-structure">`transfer_status_details`</a> will be exported.
+#### When `type` is "PRIMARY" [`registrar_info`](#nested-registrar_info-block-has-the-following-structure) will be exported.
+#### When `type` is "SECONDARY" [`transfer_status_details`](#nested-transfer_status_details-block-has-the-following-structure) will be exported.
 
 ### Nested `registrar_info` block has the following structure:
 

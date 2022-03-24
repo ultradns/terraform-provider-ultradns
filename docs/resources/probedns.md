@@ -80,8 +80,8 @@ The following arguments are supported:
 * `query_name` - (Optional) (String) The name that should be queried.
 * `tcp_only` - (Optional) (Boolean) Indicates whether or not the probe should use TCP only, or first UDP then TCP. Default value set to false.
 * `response` - (Optional) (Block Set, Max:1) Nested block describing the strings to match the response that will generate a warning or failure. The structure of this block is described below.
-* `run_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
-* `avg_run_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) run-time for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `run_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the [`limit`](#nested-limit-block-has-the-following-structure) block described below.
+* `avg_run_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) run-time for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the [`limit`](#nested-limit-block-has-the-following-structure) block described below.
 
 ### Nested `limit` block has the following structure:
 
