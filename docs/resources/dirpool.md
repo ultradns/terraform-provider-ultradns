@@ -186,7 +186,7 @@ Default value set to false.
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the corresponding record in rdata. Must be a value between 0 and 2147483647, inclusive.
 * `all_non_configured` - (Optional) (Boolean) Indicates whether or not the associated rdata is used for all non-configured geographical territories and SourceIP ranges. At most, one entry in rdataInfo can have this set to true. If this is set to true, then geoInfo and ipInfo are ignored. Default value set to false.
 * `geo_group_name` - (Optional) (String) The name of the GeoIP group.
-* `geo_codes` - (Optional) (String List) The codes for the geographical territories that make up this group.
+* `geo_codes` - (Optional) (String List) The codes for the geographical territories that make up this group. [Valid GEO codes](#valid-geo-codes).
 * `ip_group_name` - (Optional) (String) The name of the SourceIP group.
 * `ip` - (Optional) (Block Set) List of nested blocks describing the IP addresses and IP ranges this SourceIP group contains. The structure of this block is described below.
 
@@ -194,7 +194,7 @@ Default value set to false.
 
 * `all_non_configured` - (Optional) (Boolean) Indicates whether or not “no response” is returned for all non-configured geographical territories and IP ranges. This can only be set to true if there is no entry in rdataInfo with allNonConfigured set to true. If this is set to true, then geoInfo and ipInfo are ignored. Default value set to false.
 * `geo_group_name` - (Optional) (String) The name for the “no response” GeoIP group.
-* `geo_codes` - (Optional) (String List) The codes for the geographical territories that make up the “no response” group.
+* `geo_codes` - (Optional) (String List) The codes for the geographical territories that make up the “no response” group. [Valid GEO codes](#valid-geo-codes).
 * `ip_group_name` - (Optional) (String) The name of the “no response” SourceIP group.
 * `ip` - (Optional) (Block Set) List of nested blocks describing the IP addresses and IP range for the “no response” SourceIP group. The structure of this block is described below.
 
@@ -218,3 +218,30 @@ Example:
 ```terraform
 $ terraform import ultradns_dirpool.example "www.example.com.:example.com.:A (1)" 
 ```
+
+
+## Valid GEO Codes:
+
+| Code 	| Meaning | Equivalent ISO codes |
+| :--- 	| :----: | :--- |
+|_________________________|__________________________________________________|__________________________________________________|
+| `A1`  | Anonymous Proxy | None |
+|_________________________|__________________________________________________|__________________________________________________|
+| `A2`	| Satellite Provider | None |
+|_________________________|__________________________________________________|__________________________________________________|
+| `A3`	| Unknown / Uncategorized IPs | None |
+|_________________________|__________________________________________________|__________________________________________________|
+| `NAM`	| North America (including Central America and the Caribbean) | `AG`,`AI`,`AN`,`AW`,`BB`,`BL`,`BM`,</br>`BQ`,`BS`,`BZ`,`CA`,`CR`,`CU`,`CW`,</br>`DM`,`DO`,`GD`,`GL`,`GP`,`GT`,`HN`,</br>`HT`,`JM`,`KN`,`KY`,`LC`,`MF`,`MQ`,</br>`MS`,`MX`,`NI`,`PA`,`PM`,`PR`,`SV`,</br>`SX`,`TC`,`TT`,`U3`,`US`,`VC`,`VG`,</br>`VI` |
+|_________________________|__________________________________________________|__________________________________________________|
+| `SAM`	| South America | `AR`,`BO`,`BR`,`CL`,`CO`,`EC`,`FK`,</br>`GF`,`GS`,`GY`,`PE`,`PY`,`SR`,`U4`,</br>`UY`,`VE` |
+|_________________________|__________________________________________________|__________________________________________________|
+| `EUR`	| Europe | `AD`,`AL`,`AM`,`AT`,`AX`,`AZ`,`BA`,</br>`BE`,`BG`,`BY`,`CH`,`CZ`,`DE`,`DK`,</br>`EE`,`ES`,`FI`,`FO`,`FR`,`GB`,`GE`,</br>`GG`,`GI`,`GR`,`HR`,`HU`,`IE`,`IM`,</br>`IS`,`IT`,`JE`,`LI`,`LT`,`LU`,`LV`,</br>`MC`,`MD`,`ME`,`MK`,`MT`,`NL`,`NO`,</br>`PL`,`PT`,`RO`,`RS`,`SE`,`SI`,`SJ`,</br>`SK`,`SM`,`U5`,`UA`,`VA` |
+|_________________________|__________________________________________________|__________________________________________________|
+| `AFR`	| Africa | `AO`,`BF`,`BI`,`BJ`,`BW`,`CD`,`CF`,</br>`CG`,`CI`,`CM`,`CV`,`DJ`,`DZ`,`EG`,</br>`EH`,`ER`,`ET`,`GA`,`GH`,`GM`,`GN`,</br>`GQ`,`GW`,`KE`,`KM`,`LR`,`LS`,`LY`,</br>`MA`,`MG`,`ML`,`MR`,`MU`,`MW`,`MZ`,</br>`NA`,`NE`,`NG`,`RE`,`RW`,`SC`,`SD`,</br>`SH`,`SL`,`SN`,`SO`,`SS`,`ST`,`SZ`,</br>`TD`,`TG`,`TN`,`TZ`,`U7`,`UG`,`YT`,</br>`ZA`,`ZM`,`ZW` |
+|_________________________|__________________________________________________|__________________________________________________|
+| `ASI`	| Asia (including Middle East and the Russian Federation) | `AE`,`AF`,`BD`,`BH`,`BN`,`BT`,`CN`,</br>`CY`,`HK`,`ID`,`IL`,`IN`,`IO`,`IQ`,</br>`IR`,`JO`,`JP`,`KG`,`KH`,`KP`,`KR`,</br>`KW`,`KZ`,`LA`,`LB`,`LK`,`MM`,`MN`,</br>`MO`,`MV`,`MY`,`NP`,`OM`,`PH`,`PK`,</br>`PS`,`QA`,`RU`,`SA`,`SG`,`SY`,`TH`,</br>`TJ`,`TL`,`TM`,`TR`,`TW`,`U6`,`U8`,</br>`UZ`,`VN`,`YE` |
+|_________________________|__________________________________________________|__________________________________________________|
+| `OCN`	| Australia / Oceania | `AS`,`AU`,`CC`,`CK`,`CX`,`FJ`,`FM`,</br>`GU`,`HM`,`KI`,`MH`,`MP`,`NC`,`NF`,</br>`NR`,`NU`,`NZ`,`PF`,`PG`,`PN`,`PW`,</br>`SB`,`TK`,`TO`,`TV`,`U9`,`UM`,`VU`,</br>`WF`,`WS` |
+|_________________________|__________________________________________________|__________________________________________________|
+| `ANT`	| Antarctica | `AQ`, `TF`, `BV` |
+|_________________________|__________________________________________________|__________________________________________________|
