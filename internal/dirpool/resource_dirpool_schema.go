@@ -15,7 +15,6 @@ func resourceDIRPoolSchema() map[string]*schema.Schema {
 		Type:     schema.TypeInt,
 		Computed: true,
 	}
-
 	dirPoolSchema["rdata_info"] = &schema.Schema{
 		Type:     schema.TypeSet,
 		Required: true,
