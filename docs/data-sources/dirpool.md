@@ -36,20 +36,20 @@ Below are the supported resource record types with the corresponding number:<br/
 
 In addition to all of the arguments above, the following attributes are exported:
 
-* `pool_description` - (Computed) (String) An optional description of the Directional (DIR) field.
+* `pool_description` - (Computed) (String) Allows for an additional description of the Directional (DIR) pool.
 * `conflict_resolve` - (Computed) (String) When there is a conflict between a matching GeoIP group and a matching SourceIP group, this will determine which should take precedence. This only applies to a mixed pool (contains both GeoIP and SourceIP data).
-* `ignore_ecs` - (Computed) (Boolean) Whether to ignore the EDNSO (which is an extended label type allowing for greater DNS message size) Client Subnet data when available in the DNS request.</br>
+* `ignore_ecs` - (Computed) (Boolean) Whether to ignore the EDNSO (which is an extended label type allowing for greater DNS messaging size) Client Subnet data when available in the DNS request.</br>
 `false`= EDNSO data will be used for IP directional routing.</br>
 `true` = EDNSO data will not be used and IP directional routing decisions will always use the IP address of the recursive server.
-* `no_response` - (Computed) (Block Set, Max: 1) Nested block describing certain geographical territories and IP addresses that will get no response if they try to access the directional pool. The structure of this block is described below.
+* `no_response` - (Computed) (Block Set, Max: 1) Nested block describing certain geographical territories and IP addresses that will not get a response if they try to access the directional pool. The structure of this block is described below.
 * `rdata_info` - (Computed) (Block Set, Min: 1) List of nested blocks describing the pool records. The structure of this block is described below.
 
 ### Nested `rdata_info` block has the following structure:
 
 * `rdata` - (Computed) (String) The IPv4/IPv6 address, CNAME, MX, TXT, or SRV format data.
-* `type` - (Computed) (String) The type of pool record.
+* `type` - (Computed) (String) The type for the specified pool record.
 * `ttl` - (Computed) (Integer) The time to live (in seconds) for the corresponding record in rdata. Must be a value between 0 and 2147483647, inclusive.
-* `all_non_configured` - (Computed) (Boolean) Indicates whether or not the associated rdata is used for all non-configured geographical territories and SourceIP ranges. At most, one entry in rdataInfo can have this set to true.
+* `all_non_configured` - (Computed) (Boolean) Indicates whether or not the associated rdata is used for all of the non-configured geographical territories and SourceIP ranges. At most, one entry in rdataInfo can have this set to `true`.
 * `geo_group_name` - (Computed) (String) The name of the GeoIP group.
 * `geo_codes` - (Computed) (String List) The codes for the geographical territories that make up this group.
 * `ip_group_name` - (Computed) (String) The name of the SourceIP group.
@@ -57,7 +57,7 @@ In addition to all of the arguments above, the following attributes are exported
 
 ### Nested `no_response` block has the following structure:
 
-* `all_non_configured` - (Computed) (Boolean) Indicates whether or not “no response” is returned for all non-configured geographical territories and IP ranges. This can only be set to true if there is no entry in rdataInfo with allNonConfigured set to true.
+* `all_non_configured` - (Computed) (Boolean) Indicates whether or not “no response” is returned for all of the non-configured geographical territories and IP ranges. This can only be set to `true` if there is no entry for rdataInfo, with allNonConfigured is set to `true`.
 * `geo_group_name` - (Computed) (String) The name for the “no response” GeoIP group.
 * `geo_codes` - (Computed) (String List) The codes for the geographical territories that make up the “no response” group.
 * `ip_group_name` - (Computed) (String) The name of the “no response” SourceIP group.
@@ -65,7 +65,7 @@ In addition to all of the arguments above, the following attributes are exported
 
 ### Nested `ip` block has the following structure:
 
-* `start` - (Computed) (String) The starting IP address (v4 or v6) for a SourceIP range.
-* `end` - (Computed) (String) The ending IP address (v4 or v6) for a SourceIP range.
-* `cidr` - (Computed) (String) The CIDR format (IPv4 or IPv6) for an IP address range.
-* `address` - (Computed) (String) A single IPv4 address.
+* `start` - (Computed) (String) The starting IP address (IPv4 or IPv6).
+* `end` - (Computed) (String) The ending IP address (IPv4 or IPv6).
+* `cidr` - (Computed) (String) The CIDR format (IPv4 or IPv6) for an IP address range. 
+* `address` - (Computed) (String) A single IPv4 or IPv6 address.

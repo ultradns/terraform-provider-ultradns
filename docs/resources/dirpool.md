@@ -53,7 +53,7 @@ resource "ultradns_dirpool" "a" {
 }
 ```
 
-### Create DIR pool record of Type PTR (12)
+### Create DIR pool record of type PTR (12)
 
 ```terraform
 resource "ultradns_dirpool" "ptr" {
@@ -71,7 +71,7 @@ resource "ultradns_dirpool" "ptr" {
 }
 ```
 
-### Create DIR pool record of Type MX (15)
+### Create DIR pool record of type MX (15)
 
 ```terraform
 resource "ultradns_dirpool" "mx" {
@@ -89,7 +89,7 @@ resource "ultradns_dirpool" "mx" {
 }
 ```
 
-### Create DIR pool record of Type TXT (16)
+### Create DIR pool record of type TXT (16)
 
 ```terraform
 resource "ultradns_dirpool" "txt" {
@@ -107,14 +107,14 @@ resource "ultradns_dirpool" "txt" {
 }
 ```
 
-### Create DIR pool record of Type AAAA (28)
+### Create DIR pool record of type AAAA (28)
 
 ```terraform
 resource "ultradns_dirpool" "aaaa" {
     zone_name = "example.com."
     owner_name = "aaaa"
     record_type = "AAAA"
-    pool_description = "DIR Pool Resource of Type AAAA"
+    pool_description = "DIR Pool Resource of type AAAA"
     ignore_ecs = true
     conflict_resolve = "IP"
     rdata_info{
@@ -138,7 +138,7 @@ resource "ultradns_dirpool" "aaaa" {
 }
 ```
 
-### Create DIR pool record of Type SRV (33)
+### Create DIR pool record of type SRV (33)
 
 ```terraform
 resource "ultradns_dirpool" "srv" {
@@ -170,21 +170,21 @@ Below are the supported resource record types with the corresponding number:<br/
 `TXT (16)`
 `AAAA (28)`
 `SRV (33)`
-* `pool_description` - (Optional) (String) An optional description of the Directional (DIR) field.
-* `conflict_resolve` - (Optional) (String) When there is a conflict between a matching GeoIP group and a matching SourceIP group, this will determine which should take precedence. This only applies to a mixed pool (contains both GeoIP and SourceIP data). Valid values are `GEO` and `IP`. Default value set to `GEO`
-* `ignore_ecs` - (Optional) (Boolean) Whether to ignore the EDNSO (which is an extended label type allowing for greater DNS message size) Client Subnet data when available in the DNS request.</br>
+* `pool_description` - (Optional) (String) Allows for an additional description of the Directional (DIR) pool.
+* `conflict_resolve` - (Optional) (String) When there is a conflict between a matching GeoIP group and a matching SourceIP group, this will determine which should take precedence. This only applies to a mixed pool (contains both GeoIP and SourceIP data). Valid values are `GEO` and `IP`. Default value set to `GEO`.
+* `ignore_ecs` - (Optional) (Boolean) Whether to ignore the EDNSO (which is an extended label type allowing for greater DNS messaging size) Client Subnet data when available in the DNS request.</br>
 `false`= EDNSO data will be used for IP directional routing.</br>
 `true` = EDNSO data will not be used and IP directional routing decisions will always use the IP address of the recursive server.</br>
 Default value set to false.
-* `no_response` - (Optional) (Block Set, Max: 1) Nested block describing certain geographical territories and IP addresses that will get no response if they try to access the directional pool. The structure of this block is described below.
+* `no_response` - (Optional) (Block Set, Max: 1) Nested block describing certain geographical territories and IP addresses that will not get a response if they try to access the directional pool. The structure of this block is described below.
 * `rdata_info` - (Required) (Block Set, Min: 1) List of nested blocks describing the pool records. The structure of this block is described below.
 
 ### Nested `rdata_info` block has the following structure:
 
 * `rdata` - (Required) (String) The IPv4/IPv6 address, CNAME, MX, TXT, or SRV format data.
-* `type` - (Computed) (String) The type of pool record.
+* `type` - (Computed) (String) The type for the specified pool record.
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the corresponding record in rdata. Must be a value between 0 and 2147483647, inclusive.
-* `all_non_configured` - (Optional) (Boolean) Indicates whether or not the associated rdata is used for all non-configured geographical territories and SourceIP ranges. At most, one entry in rdataInfo can have this set to true. If this is set to true, then geoInfo and ipInfo are ignored. Default value set to false.
+* `all_non_configured` - (Optional) (Boolean) Indicates whether or not the associated rdata is used for all of the non-configured geographical territories and SourceIP ranges. At most, one entry in rdataInfo can have this set to true. If this is set to true, then geoInfo (`geo_group_name` and `geo_codes` ) and ipInfo (`ip_group_name` and `ip`) are ignored. Default value set to `false`.
 * `geo_group_name` - (Optional) (String) The name of the GeoIP group.
 * `geo_codes` - (Optional) (String List) The codes for the geographical territories that make up this group. [Valid GEO codes](#valid-geo-codes).
 * `ip_group_name` - (Optional) (String) The name of the SourceIP group.
@@ -192,7 +192,7 @@ Default value set to false.
 
 ### Nested `no_response` block has the following structure:
 
-* `all_non_configured` - (Optional) (Boolean) Indicates whether or not “no response” is returned for all non-configured geographical territories and IP ranges. This can only be set to true if there is no entry in rdataInfo with allNonConfigured set to true. If this is set to true, then geoInfo and ipInfo are ignored. Default value set to false.
+* `all_non_configured` - (Optional) (Boolean) Indicates whether or not “no response” is returned for all of the non-configured geographical territories and IP ranges. This can only be set to `true` if there is no entry for rdataInfo, with allNonConfigured is set to `true`. If this is set to true, then geoInfo (`geo_group_name` and `geo_codes` ) and ipInfo (`ip_group_name` and `ip`) are ignored. Default value set to `false`.
 * `geo_group_name` - (Optional) (String) The name for the “no response” GeoIP group.
 * `geo_codes` - (Optional) (String List) The codes for the geographical territories that make up the “no response” group. [Valid GEO codes](#valid-geo-codes).
 * `ip_group_name` - (Optional) (String) The name of the “no response” SourceIP group.
@@ -200,10 +200,10 @@ Default value set to false.
 
 ### Nested `ip` block has the following structure:
 
-* `start` - (Optional) (String) The starting IP address (v4 or v6) for a SourceIP range. If start is present, end must be present as well. `cidr` and `address` must not be present.
-* `end` - (Optional) (String) The ending IP address (v4 or v6) for a SourceIP range. If end is present, start must be present as well. `cidr` and `address` must not be present.
-* `cidr` - (Optional) (String) The CIDR format (IPv4 or IPv6) for an IP address range. If CIDR is present, the `start`, `end`, and `address` must not be present.
-* `address` - (Optional) (String) A single IPv4 address. If address is present, the `start`, `end`, and `CIDR` must not be present.
+* `start` - (Optional) (String) The starting IP address (IPv4 or IPv6). If the start value is present, the end value must be present as well. `Cidr` and `address` cannot be present.
+* `end` - (Optional) (String) The ending IP address (IPv4 or IPv6). If the end value is present, the start value must be present as well. `cidr` and `address` cannot be present.
+* `cidr` - (Optional) (String) The CIDR format (IPv4 or IPv6) for an IP address range. If `cidr` is present, the `start`, `end`, and `address` cannot be present.
+* `address` - (Optional) (String) A single IPv4 or IPv6 address. If `address` is present, the `start`, `end`, and `CIDR` cannot be present.
 
 
 ## Import
