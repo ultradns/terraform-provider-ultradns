@@ -106,7 +106,7 @@ Valid values are `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_C
 * `threshold` - (Required) (Integer) Number of agents that must agree for a probe state to be changed.
 * `pool_record` - (Optional) (String) The pool record associated with this probe. Specified when creating a record-level probe.
 * `transaction` - (Required) (Block Set, Min:1) List of nested blocks describing the http requests sent for a single probe. The structure of this block is described below.
-* `total_limit` - (Optional) (Block Set, Max:1) Nested block describing the total amount of time spent on all http transactions. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `total_limit` - (Optional) (Block Set, Max:1) Nested block describing the total amount of time spent on all http transactions. The structure of this block follows the same structure as the [`limit`](#nested-limit-block-has-the-following-structure) block described below.
 
 ### Nested `transaction` block has the following structure:
 
@@ -125,10 +125,10 @@ Valid values are `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_C
 Any combination of HTTP codes between 100-599 separated by "|" </br>For example:</br>
 `201|302`
 * `search_string` - (Optional) (Block Set, Max:1) Nested block describing the strings required to be searched for a probe’s successful response. This does not search the status line or headers. The structure of this block is described below.
-* `connect_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe stays connected to the resource. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
-* `avg_connect_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) time to connect for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
-* `run_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
-* `avg_run_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) run-time for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the <a href="#nested-limit-block-has-the-following-structure">`limit`</a> block described below.
+* `connect_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe stays connected to the resource. The structure of this block follows the same structure as the [`limit`](#nested-limit-block-has-the-following-structure) block described below.
+* `avg_connect_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) time to connect for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the [`limit`](#nested-limit-block-has-the-following-structure) block described below.
+* `run_limit` - (Optional) (Block Set, Max:1) Nested block describing how long the probe should run. The structure of this block follows the same structure as the [`limit`](#nested-limit-block-has-the-following-structure) block described below.
+* `avg_run_limit` - (Optional) (Block Set, Max:1) Nested block describing the mean (average) run-time for the five most recent probes that have run on each agent. This is only used for Traffic Controller pools. The structure of this block follows the same structure as the [`limit`](#nested-limit-block-has-the-following-structure) block described below.
 
 ### Nested `limit` block has the following structure:
 

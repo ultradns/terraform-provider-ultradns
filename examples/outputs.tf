@@ -26,6 +26,10 @@ output "tcpool" {
   value = data.ultradns_tcpool.tcpool
 }
 
+output "dirpool" {
+  value = data.ultradns_dirpool.dirpool
+}
+
 output "probehttp" {
   value = data.ultradns_probe_http.probehttp
 }

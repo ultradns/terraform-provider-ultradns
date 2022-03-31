@@ -50,9 +50,9 @@ Example: `IP_RANGE, NOTIFY_IP`
 
 #### When `type` is "SECONDARY" the below attributes will be exported.
 
-* `primary_name_server_1` - (Computed) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described below. It is the info of primary name server.
-* `primary_name_server_2` - (Computed) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described below. It is the info of first backup primary name server.
-* `primary_name_server_3` - (Computed) (Block Set) The structure of this block follows the same structure as the <a href="#nested-name_server-block-has-the-following-structure">`name_server`</a> block described below. It is the info of second backup primary name server.
+* `primary_name_server_1` - (Computed) (Block Set) The structure of this block follows the same structure as the [`name_server`](#nested-name_server-block-has-the-following-structure) block described below. It is the info of primary name server.
+* `primary_name_server_2` - (Computed) (Block Set) The structure of this block follows the same structure as the [`name_server`](#nested-name_server-block-has-the-following-structure) block described below. It is the info of first backup primary name server.
+* `primary_name_server_3` - (Computed) (Block Set) The structure of this block follows the same structure as the [`name_server`](#nested-name_server-block-has-the-following-structure) block described below. It is the info of second backup primary name server.
 * `notification_email_address` - (Computed) (String) The Notification Email for a secondary zone.
 * `transfer_status_details` - (Computed) (Block Set) Nested block describing the zone transfer details. The structure of this block is described below.
 

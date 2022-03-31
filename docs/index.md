@@ -7,7 +7,7 @@ description: |-
 
 # UltraDNS Provider
 
-The UltraDNS provider is a plugin for <a href="https://www.terraform.io">Terraform</a> used to manage UltraDNS resources using HashiCorp Configuration Language (HCL). You must configure the provider with the proper credentials before you can use it.
+The UltraDNS provider is a plugin for [Terraform](https://www.terraform.io) used to manage UltraDNS resources using HashiCorp Configuration Language (HCL). You must configure the provider with the proper credentials before you can use it.
 
 ## Example Usage
 
@@ -44,7 +44,7 @@ Usage:
 provider "ultradns" {
  username = "username"
  password = "password"
- hosturl = "https://api.ultradns.net/"
+ hosturl = "https://api.ultradns.com/"
 }
 ```
 
