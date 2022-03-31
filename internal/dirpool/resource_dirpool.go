@@ -165,10 +165,6 @@ func getRDataInfo(rdataInfoData map[string]interface{}) *dirpool.RDataInfo {
 		geoInfo.Name = val.(string)
 	}
 
-	if val, ok := rdataInfoData["geo_force_overlap"]; ok {
-		geoInfo.ForceOverlap = val.(bool)
-	}
-
 	if val, ok := rdataInfoData["geo_codes"]; ok {
 		geoCodesData := val.(*schema.Set).List()
 		geoInfo.Codes = make([]string, len(geoCodesData))
