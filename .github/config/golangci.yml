@@ -15,11 +15,12 @@ linters:
     - interfacer
     - scopelint
     - maligned
+    - exhaustivestruct
 
     # suppress type assertion warnings since we assert the same we passed
     - forcetypeassert
     # all struct has omitempty, so all fields in struct are not required
-    - exhaustivestruct
+    - exhaustruct
     # disable gofumpt since it has conflict with wsl(white space letter) linter
     - gofumpt
     # integration tests need to done in sequential manner
