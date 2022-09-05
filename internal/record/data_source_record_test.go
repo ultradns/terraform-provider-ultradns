@@ -157,6 +157,24 @@ func TestAccDataSourceRecord(t *testing.T) {
 			{
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_record",
+					"srv",
+					zoneName,
+					tfacctest.RandString(3),
+					"SOA",
+					testAccResourceRecordSRV(zoneName),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_srv", ""),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "record_type", "SRV"),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "ttl", "112600"),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_srv", "record_data.0", "ns11.example.com primary_domain 1111111111 86400 7200 4000000 112600"),
+				),
+			},
+
+			{
+				Config: acctest.TestAccDataSourceRRSet(
+					"ultradns_record",
 					"sshfp",
 					zoneName,
 					tfacctest.RandString(3),

@@ -3,6 +3,7 @@ package record
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
@@ -11,6 +12,7 @@ import (
 )
 
 const recordTypeStringNS = "NS"
+const recordTypeStringSOA = "SOA"
 
 func ResourceRecord() *schema.Resource {
 	return &schema.Resource{
@@ -33,10 +35,20 @@ func resourceRecordCreate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetData := rrset.NewRRSetWithRecordData(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
-	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
+	// SOA records cannot be created/deleted, so here update the (always) existing SOA record instead
+	if rrSetKeyData.RecordType == recordTypeStringSOA {
+		tflog.Debug(ctx, "[DEBUG] SOA records can't be created due to API restrictions, so they are being updated in-place")
+		_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
 
-	if err != nil {
-		return diag.FromErr(err)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	} else {
+		_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
+
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	rd.SetId(rrSetKeyData.RecordID())
@@ -97,6 +109,13 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 
 	if rrSetKeyData.RecordType == recordTypeStringNS {
 		return resourceNSRecordDelete(rd, meta)
+	}
+
+	// We cannot delete the SOA record, so we leave it in place.
+	if rrSetKeyData.RecordType == recordTypeStringSOA {
+		tflog.Debug(ctx, "[DEBUG] SOA records can't be deleted due to API restrictions, so they're being left in place.")
+		rd.SetId("")
+		return diags
 	}
 
 	_, err := services.RecordService.Delete(rrSetKeyData)

@@ -48,6 +48,18 @@ resource "ultradns_record" "cname" {
 }
 ```
 
+### Create DNS record of type SOA (6)
+
+```terraform
+resource "ultradns_record" "soa" {
+    zone_name = "example.com."
+    owner_name = "example.com."
+    record_type = "SOA"
+    ttl = 112600
+    record_data = ["ns11.example.com primary_domain 1111111111 86400 7200 4000000 112600"]
+}
+```
+
 ### Create DNS record of type PTR (12)
 
 ```terraform
@@ -143,6 +155,7 @@ Below are the supported resource record types with the corresponding number:<br/
 `A (1)`
 `NS (2)`
 `CNAME (5)`
+`SOA (6)`
 `PTR (12)`
 `MX (15)`
 `TXT (16)`

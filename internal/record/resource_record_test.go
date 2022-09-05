@@ -168,6 +168,21 @@ func TestAccResourceRecord(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
+				Config: testAccResourceRecordSOA(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.srv", ""),
+					resource.TestCheckResourceAttr("ultradns_record.srv", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.srv", "record_type", "SOA"),
+					resource.TestCheckResourceAttr("ultradns_record.srv", "ttl", "112600"),
+					resource.TestCheckResourceAttr("ultradns_record.srv", "record_data.0", "ns11.example.com primary_domain 1111111111 86400 7200 4000000 112600"),
+				),
+			},
+			{
+				ResourceName:      "ultradns_record.srv",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
 				Config: testAccResourceRecordSSHFP(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.sshfp", ""),
@@ -347,6 +362,20 @@ func testAccResourceRecordSRV(zoneName string) string {
 		record_type = "SRV"
 		ttl = 800
 		record_data = ["5 6 7 example.com."]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), tfacctest.RandString(3))
+}
+
+func testAccResourceRecordSOA(zoneName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "soa" {
+		zone_name = "${resource.ultradns_zone.primary_record.id}"
+		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
+		record_type = "SOA"
+		ttl = 112600
+		record_data = ["ns11.example.com primary_domain 1111111111 86400 7200 4000000 112600"]
 	}
 	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), tfacctest.RandString(3))
 }
