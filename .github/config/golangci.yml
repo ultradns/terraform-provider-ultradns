@@ -16,6 +16,14 @@ linters:
     - scopelint
     - maligned
     - exhaustivestruct
+    - nosnakecase
+    - structcheck
+    - varcheck
+    - deadcode
+    - ifshort
+    - rowserrcheck
+    - sqlclosecheck
+    - wastedassign
 
     # suppress type assertion warnings since we assert the same we passed
     - forcetypeassert
