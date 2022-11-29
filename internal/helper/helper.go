@@ -27,6 +27,10 @@ func RecordTypeDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 	oldRecordType := helper.GetRecordTypeFullString(old)
 	newRecordType := helper.GetRecordTypeFullString(new)
 
+	if len(oldRecordType) == 0 && len(newRecordType) == 0 {
+		return false
+	}
+
 	return oldRecordType == newRecordType || oldRecordType == new
 }
 
