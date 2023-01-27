@@ -2,15 +2,23 @@ package record
 
 import (
 	"context"
+	"strings"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	sdkrrset "github.com/ultradns/ultradns-go-sdk/pkg/rrset"
 )
 
-const recordTypeStringNS = "NS"
+const (
+	recordTypeStringNS = "NS"
+	recordTypeStringSOA = "SOA"
+	recordTypeNumberSOA = "6"
+	errSOAInvalidFormat = "SOA record format is Invalid. Expected: '<Nameserver> <E-Mail> <REFRESH> <RETRY> <EXPIRE> <MINIMUM>' Found:"
+)
 
 func ResourceRecord() *schema.Resource {
 	return &schema.Resource{
@@ -33,6 +41,10 @@ func resourceRecordCreate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetData := rrset.NewRRSetWithRecordData(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
+	if rrSetKeyData.RecordType == recordTypeStringSOA || rrSetKeyData.RecordType == recordTypeNumberSOA {
+		return resourceSOARecordUpdate(rd, services, rrSetData, rrSetKeyData)
+	}
+
 	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
 
 	if err != nil {
@@ -51,7 +63,11 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 
 	if rrSetKey.RecordType == recordTypeStringNS {
-		return resourceNSRecordRead(rd, meta)
+		return resourceNSRecordRead(rd, services)
+	}
+
+	if rrSetKey.RecordType == recordTypeStringSOA {
+		return resourceSOARecordRead(rd, services)
 	}
 
 	_, resList, err := services.RecordService.Read(rrSetKey)
@@ -77,7 +93,11 @@ func resourceRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	if rrSetKeyData.RecordType == recordTypeStringNS {
-		return resourceNSRecordUpdate(rd, meta)
+		return resourceNSRecordUpdate(rd, services, rrSetData)
+	}
+
+	if rrSetKeyData.RecordType == recordTypeStringSOA {
+		return resourceSOARecordUpdate(rd, services, rrSetData, rrSetKeyData)
 	}
 
 	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
@@ -96,7 +116,13 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	if rrSetKeyData.RecordType == recordTypeStringNS {
-		return resourceNSRecordDelete(rd, meta)
+		return resourceNSRecordDelete(rd, services)
+	}
+
+	if rrSetKeyData.RecordType == recordTypeStringSOA {
+		rd.SetId("")
+
+		return diags
 	}
 
 	_, err := services.RecordService.Delete(rrSetKeyData)
@@ -112,10 +138,9 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	return diags
 }
 
-func resourceNSRecordRead(rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceNSRecordRead(rd *schema.ResourceData, services *service.Service) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	services := meta.(*service.Service)
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 	_, resList, err := services.RecordService.Read(rrSetKey)
 
@@ -150,9 +175,7 @@ func resourceNSRecordRead(rd *schema.ResourceData, meta interface{}) diag.Diagno
 	return diags
 }
 
-func resourceNSRecordUpdate(rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	services := meta.(*service.Service)
-	rrSetData := rrset.NewRRSetWithRecordData(rd)
+func resourceNSRecordUpdate(rd *schema.ResourceData, services *service.Service, rrSetData *sdkrrset.RRSet) diag.Diagnostics {
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, resList, err := services.RecordService.Read(rrSetKeyData)
@@ -177,13 +200,12 @@ func resourceNSRecordUpdate(rd *schema.ResourceData, meta interface{}) diag.Diag
 		return diag.FromErr(er)
 	}
 
-	return resourceNSRecordRead(rd, meta)
+	return resourceNSRecordRead(rd, services)
 }
 
-func resourceNSRecordDelete(rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceNSRecordDelete(rd *schema.ResourceData, services *service.Service) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	services := meta.(*service.Service)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, resList, err := services.RecordService.Read(rrSetKeyData)
@@ -227,77 +249,68 @@ func resourceNSRecordDelete(rd *schema.ResourceData, meta interface{}) diag.Diag
 	return diags
 }
 
-func getMatchedRecordData(state []interface{}, server []string) []string {
-	data := []string{}
-	dataMap := make(map[string]bool)
+func resourceSOARecordRead(rd *schema.ResourceData, services *service.Service) diag.Diagnostics {
+	var diags diag.Diagnostics
 
-	for _, val := range state {
-		dataMap[val.(string)] = true
+	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
+	_, resList, err := services.RecordService.Read(rrSetKey)
+
+	if err != nil {
+		rd.SetId("")
+
+		return nil
 	}
 
-	for _, val := range server {
-		if dataMap[val] {
-			data = append(data, val)
+	if len(resList.RRSets) > 0 {
+		if err = rrset.FlattenRRSet(resList, rd); err != nil {
+			return diag.FromErr(err)
+		}
+
+		recordDataArr := strings.Split(resList.RRSets[0].RData[0], " ")
+		recordDataArr[1] = formatSOAEmail(recordDataArr[1])
+		recordDataArr = append(recordDataArr[:2], recordDataArr[3:]...)
+		recordData := []string{strings.Join(recordDataArr, " ")}
+
+		if err := rd.Set("record_data", helper.GetSchemaSetFromList(recordData)); err != nil {
+			return diag.FromErr(err)
 		}
 	}
 
-	return data
+	return diags
 }
 
-func getUnMatchedRecordData(state []interface{}, server []string) []string {
-	data := []string{}
-	dataMap := make(map[string]bool)
+func resourceSOARecordUpdate(rd *schema.ResourceData, services *service.Service, rrSetData *sdkrrset.RRSet,rrSetKeyData *sdkrrset.RRSetKey) diag.Diagnostics {
+	_, resList, err := services.RecordService.Read(rrSetKeyData)
 
-	for _, val := range state {
-		dataMap[val.(string)] = true
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
-	for _, val := range server {
-		if !dataMap[val] {
-			data = append(data, val)
-		}
+	_, new := rd.GetChange("record_data")
+
+	serverRData := strings.Split(resList.RRSets[0].RData[0], " ")
+	newRData := strings.Split(new.(*schema.Set).List()[0].(string), " ")
+
+	if len(newRData) != 6 {
+		return diag.FromErr(fmt.Errorf("%s %s", errSOAInvalidFormat, strings.Join(newRData, " ")))
 	}
 
-	return data
-}
+	serverRData[0] = newRData[0]
+	serverRData[1] = escapeSOAEmail(newRData[1])
+	serverRData[3] = newRData[2]
+	serverRData[4] = newRData[3]
+	serverRData[5] = newRData[4]
+	serverRData[6] = newRData[5]
 
-func getDiffRecordData(first []interface{}, second []interface{}) []string {
-	data := []string{}
-	dataMap := make(map[string]bool)
+	rrSetData.RData = []string{strings.Join(serverRData, " ")}
 
-	for _, val := range first {
-		dataMap[val.(string)] = true
+	_, er := services.RecordService.Update(rrSetKeyData, rrSetData)
+
+	if er != nil {
+		return diag.FromErr(er)
 	}
 
-	for _, val := range second {
-		if !dataMap[val.(string)] {
-			data = append(data, val.(string))
-		}
-	}
+	rd.SetId(rrSetKeyData.RecordID())
 
-	return data
-}
-
-func rmRecordData(data, target []string) []string {
-	dataMap := make(map[string]bool)
-
-	for _, val := range data {
-		dataMap[val] = true
-	}
-
-	for i, val := range target {
-		if dataMap[val] {
-			target[i] = target[len(target)-1]
-			target[len(target)-1] = ""
-			target = target[:len(target)-1]
-		}
-	}
-
-	return target
-}
-
-func addRecordData(data, target []string) []string {
-	target = append(target, data...)
-
-	return target
+	return resourceSOARecordRead(rd, services)
 }
