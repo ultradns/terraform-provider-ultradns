@@ -60,6 +60,7 @@ func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
 		"A": true, "1": true,
 		"NS": true, "2": true,
 		"CNAME": true, "5": true,
+		"SOA": true, "6": true,
 		"PTR": true, "12": true,
 		"MX": true, "15": true,
 		"TXT": true, "16": true,
