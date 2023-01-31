@@ -103,6 +103,33 @@ func TestAccResourceRecord(t *testing.T) {
 				),
 			},
 			{
+				Config: testAccResourceRecordSOA(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.soa", ""),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "record_type", "SOA"),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "ttl", "800"),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. antonyrohith.akash@neustarsecurityservices.com. 10800 3600 2592000 10800"),
+				),
+			},
+			{
+				ResourceName:      "ultradns_record.soa",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: testAccUpdateResourceRecordSOA(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.soa", ""),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "record_type", "SOA"),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "ttl", "800"),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. test.antonyrohith.akash@neustarsecurityservices.com. 10800 3600 2592000 10800"),
+				),
+			},
+			{
 				Config: testAccResourceRecordPTR(zoneName),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.ptr", ""),
@@ -279,6 +306,34 @@ func testAccResourceRecordCNAME(zoneName string) string {
 		record_data = ["example.com."]
 	}
 	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), strings.TrimSuffix(zoneName, "."), tfacctest.RandString(3))
+}
+
+func testAccResourceRecordSOA(zoneName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "soa" {
+		zone_name = "%s"
+		owner_name = "%s"
+		record_type = "6"
+		ttl = 800
+		record_data = ["udns1.ultradns.net. antonyrohith.akash@neustarsecurityservices.com. 10800 3600 2592000 10800"]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), strings.TrimSuffix(zoneName, "."), zoneName)
+}
+
+func testAccUpdateResourceRecordSOA(zoneName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "soa" {
+		zone_name = "%s"
+		owner_name = "%s"
+		record_type = "SOA"
+		ttl = 800
+		record_data = ["udns1.ultradns.net. test.antonyrohith.akash@neustarsecurityservices.com. 10800 3600 2592000 10800"]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName),zoneName, strings.TrimSuffix(zoneName, "."))
 }
 
 func testAccResourceRecordPTR(zoneName string) string {
