@@ -25,7 +25,6 @@ import (
 
 func Provider() *schema.Provider {
 	return &schema.Provider{
-
 		ConfigureContextFunc: providerConfigureContext,
 
 		Schema: providerSchema(),
@@ -74,13 +73,11 @@ func providerConfigureContext(ctx context.Context, rd *schema.ResourceData) (int
 	}
 
 	client, err := client.NewClient(cnf)
-
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
 
 	service, err := service.NewService(client)
-
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}

@@ -12,7 +12,6 @@ import (
 
 func DataSourceZone() *schema.Resource {
 	return &schema.Resource{
-
 		ReadContext: dataSourceZoneRead,
 
 		Schema: dataSourceZoneSchema(),
@@ -31,7 +30,6 @@ func dataSourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	}
 
 	_, zoneResponse, err := services.ZoneService.ReadZone(zoneName)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}

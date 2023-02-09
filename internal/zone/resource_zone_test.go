@@ -167,7 +167,6 @@ func testAccCheckZoneExists(resourceName string) resource.TestCheckFunc {
 
 		services := acctest.TestAccProvider.Meta().(*service.Service)
 		_, _, err := services.ZoneService.ReadZone(rs.Primary.ID)
-
 		if err != nil {
 			return err
 		}

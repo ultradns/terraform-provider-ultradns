@@ -2,8 +2,8 @@ package record
 
 import (
 	"context"
-	"strings"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	recordTypeStringNS = "NS"
+	recordTypeStringNS  = "NS"
 	recordTypeStringSOA = "SOA"
 	recordTypeNumberSOA = "6"
 	errSOAInvalidFormat = "SOA record format is Invalid. Expected: '<Nameserver> <E-Mail> <REFRESH> <RETRY> <EXPIRE> <MINIMUM>' Found:"
@@ -21,7 +21,6 @@ const (
 
 func ResourceRecord() *schema.Resource {
 	return &schema.Resource{
-
 		CreateContext: resourceRecordCreate,
 		ReadContext:   resourceRecordRead,
 		UpdateContext: resourceRecordUpdate,
@@ -47,7 +46,6 @@ func resourceRecordCreate(ctx context.Context, rd *schema.ResourceData, meta int
 	}
 
 	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -64,7 +62,6 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, resList, err := services.RecordService.Read(rrSetKey)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -122,7 +119,6 @@ func resourceRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetData := rrset.NewRRSetWithRecordData(rd)
 
 	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -135,7 +131,6 @@ func resourceNSRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta i
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, resList, err := services.RecordService.Read(rrSetKeyData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -166,7 +161,6 @@ func resourceSOARecordUpdate(ctx context.Context, rd *schema.ResourceData, meta 
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, resList, err := services.RecordService.Read(rrSetKeyData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -217,7 +211,6 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	}
 
 	_, err := services.RecordService.Delete(rrSetKeyData)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -235,7 +228,6 @@ func resourceNSRecordDelete(rd *schema.ResourceData, services *service.Service) 
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, resList, err := services.RecordService.Read(rrSetKeyData)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -250,7 +242,6 @@ func resourceNSRecordDelete(rd *schema.ResourceData, services *service.Service) 
 
 	if len(oldRecordData) == len(resList.RRSets[0].RData) {
 		_, err := services.RecordService.Delete(rrSetKeyData)
-
 		if err != nil {
 			rd.SetId("")
 

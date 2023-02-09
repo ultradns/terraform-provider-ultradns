@@ -16,7 +16,6 @@ import (
 
 func ResourceProbePING() *schema.Resource {
 	return &schema.Resource{
-
 		CreateContext: resourceProbePINGCreate,
 		ReadContext:   resourceProbePINGRead,
 		UpdateContext: resourceProbePINGUpdate,
@@ -38,7 +37,6 @@ func resourceProbePINGCreate(ctx context.Context, rd *schema.ResourceData, meta 
 	rrSetKeyData.RecordType = probe.RecordTypeA
 
 	res, err := services.ProbeService.Create(rrSetKeyData, probeData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -59,7 +57,6 @@ func resourceProbePINGRead(ctx context.Context, rd *schema.ResourceData, meta in
 	rrSetKey := probe.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkprobe.PING
 	_, probeData, err := services.ProbeService.Read(rrSetKey)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -83,7 +80,6 @@ func resourceProbePINGUpdate(ctx context.Context, rd *schema.ResourceData, meta 
 	rrSetKeyData := probe.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.ProbeService.Update(rrSetKeyData, probeData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -98,7 +94,6 @@ func resourceProbePINGDelete(ctx context.Context, rd *schema.ResourceData, meta 
 	rrSetKeyData := probe.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.ProbeService.Delete(rrSetKeyData)
-
 	if err != nil {
 		rd.SetId("")
 

@@ -13,7 +13,6 @@ import (
 
 func DataSourceRecord() *schema.Resource {
 	return &schema.Resource{
-
 		ReadContext: dataSourceRecordRead,
 
 		Schema: rrset.DataSourceRRSetSchema(),
@@ -27,7 +26,6 @@ func dataSourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta int
 
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 	_, resList, err := services.RecordService.Read(rrSetKeyData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -44,12 +42,12 @@ func dataSourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta int
 			recordDataArr[1] = formatSOAEmail(recordDataArr[1])
 			recordDataArr = append(recordDataArr[:2], recordDataArr[3:]...)
 			recordData := []string{strings.Join(recordDataArr, " ")}
-			
+
 			if err := rd.Set("record_data", helper.GetSchemaSetFromList(recordData)); err != nil {
 				return diag.FromErr(err)
 			}
 		}
-		
+
 	}
 
 	return diags

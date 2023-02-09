@@ -12,7 +12,6 @@ import (
 
 func DataSourceSLBPool() *schema.Resource {
 	return &schema.Resource{
-
 		ReadContext: dataSourceSLBPoolRead,
 
 		Schema: dataSourceSLBPoolSchema(),
@@ -27,7 +26,6 @@ func dataSourceSLBPoolRead(ctx context.Context, rd *schema.ResourceData, meta in
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 	rrSetKeyData.PType = pool.SLB
 	_, resList, err := services.RecordService.Read(rrSetKeyData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}

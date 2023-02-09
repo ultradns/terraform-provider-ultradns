@@ -15,7 +15,6 @@ import (
 
 func ResourceSLBPool() *schema.Resource {
 	return &schema.Resource{
-
 		CreateContext: resourceSLBPoolCreate,
 		ReadContext:   resourceSLBPoolRead,
 		UpdateContext: resourceSLBPoolUpdate,
@@ -35,7 +34,6 @@ func resourceSLBPoolCreate(ctx context.Context, rd *schema.ResourceData, meta in
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
 	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -52,7 +50,6 @@ func resourceSLBPoolRead(ctx context.Context, rd *schema.ResourceData, meta inte
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkpool.SLB
 	_, resList, err := services.RecordService.Read(rrSetKey)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -74,7 +71,6 @@ func resourceSLBPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta in
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -89,7 +85,6 @@ func resourceSLBPoolDelete(ctx context.Context, rd *schema.ResourceData, meta in
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.RecordService.Delete(rrSetKeyData)
-
 	if err != nil {
 		rd.SetId("")
 
