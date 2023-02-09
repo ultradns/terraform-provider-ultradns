@@ -81,10 +81,19 @@ func escapeSOAEmail(email string) string {
 	index1 := strings.Index(email, "@")
 	index2 := strings.LastIndex(email[:index1], ".")
 
+	if index2 == -1 {
+		return email[:index1] + "." + email[index1+1:]
+	}
+
 	return strings.Replace(email[:index2]+"\\"+email[index2:], "@", ".", 1)
 }
 
 func formatSOAEmail(email string) string {
 	index := strings.Index(email, "\\.")
+
+	if index == -1 {
+		return strings.Replace(email, ".", "@", 1)
+	}
+
 	return email[:index] + "." + strings.Replace(email[index+2:], ".", "@", 1)
 }
