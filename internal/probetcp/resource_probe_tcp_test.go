@@ -30,7 +30,6 @@ func TestAccResourceProbeTCP(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "threshold", "2"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "interval", "ONE_MINUTE"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "port", "443"),
-					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "response.0.fail", "fail"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "connect_limit.0.fail", "5"),
 				),
 			},
@@ -45,8 +44,7 @@ func TestAccResourceProbeTCP(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "threshold", "2"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "interval", "TEN_MINUTES"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "port", "443"),
-					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "control_ip", "www.ultradns.com"),
-					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "response.0.fail", "failure"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "control_ip", ""),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_sb", "connect_limit.0.fail", "8"),
 				),
 			},
@@ -65,8 +63,6 @@ func TestAccResourceProbeTCP(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc", "threshold", "2"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc", "interval", "HALF_MINUTE"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc", "port", "443"),
-					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc", "query_name", "www.ultradns.com"),
-					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc", "response.0.fail", "fail"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc", "connect_limit.0.warning", "10"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc", "connect_limit.0.critical", "11"),
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc", "connect_limit.0.fail", "12"),
@@ -76,7 +72,7 @@ func TestAccResourceProbeTCP(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      "ultradns_probe_tcp.dns_tc",
+				ResourceName:      "ultradns_probe_tcp.tcp_tc",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -114,11 +110,9 @@ func testAccResourceProbeTCPForSBPool(zoneName, ownerName string) string {
 		interval = "ONE_MINUTE"
 		agents = ["NEW_YORK","DALLAS"]
 		threshold = 2
-		port = 55
-		tcp_only = true
-		type = "SOA"
+		port = 443
 		connect_limit{
-			fail = "fail"
+			fail = 5
 		}
 	}
 	`, acctest.TestAccResourceSBPool(zoneName, ownerName))
@@ -134,11 +128,7 @@ func testAccResourceUpdateProbeTCPForSBPool(zoneName, ownerName string) string {
 		interval = "TEN_MINUTES"
 		agents = ["NEW_YORK","DALLAS"]
 		threshold = 2
-		query_name = "www.ultradns.com"
-		connect_limie{
-			fail = "failure"
-		}
-		avg_connect_limit{
+		connect_limit{
 			fail = 8
 		}
 	}
@@ -148,22 +138,22 @@ func testAccResourceUpdateProbeTCPForSBPool(zoneName, ownerName string) string {
 func testAccResourceProbeTCPForTCPool(zoneName, ownerName string) string {
 	return fmt.Sprintf(`
 	%s
-	resource "ultradns_probe_tcp" "tcp"_tc" {
+	resource "ultradns_probe_tcp" "tcp_tc" {
 		zone_name = "${resource.ultradns_zone.primary_tcpool.id}"
 		owner_name = "${resource.ultradns_tcpool.a.owner_name}"
 		interval = "HALF_MINUTE"
 		agents = ["NEW_YORK","DALLAS","PALO_ALTO"]
 		threshold = 2
-		query_name = "www.ultradns.com"
+		port = 443
 		connect_limit{
-			warning = "warning" 
-			critical = "critical"
-			fail = "fail"
-		}
-		avg_connect_limit{
-			warning = 10 
+			warning = 10
 			critical = 11
 			fail = 12
+		}
+		avg_connect_limit{
+			warning = 13
+			critical = 14
+			fail = 15
 		}
 	}
 	`, acctest.TestAccResourceTCPool(zoneName, ownerName))
@@ -178,11 +168,11 @@ func testAccResourceUpdateProbeTCPForTCPool(zoneName, ownerName string) string {
 		interval = "FIFTEEN_MINUTES"
 		agents = ["NEW_YORK","DALLAS"]
 		threshold = 2
-		port = 80
+		port = 443
 		connect_limit{
-			warning = "warn" 
-			critical = "critical_warning"
-			fail = "failure"
+			warning = 11
+			critical = 12
+			fail = 13
 		}
 		avg_connect_limit{
 			warning = 14 

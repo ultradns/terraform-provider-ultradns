@@ -25,10 +25,6 @@ func flattenProbeTCP(probeData *sdkprobe.Probe, rd *schema.ResourceData) error {
 	if details.Limits != nil {
 		limits := details.Limits
 
-		if err := rd.Set("response", probe.GetSearchStringList(limits.Response)); err != nil {
-			return err
-		}
-
 		if err := rd.Set("connect_limit", probe.GetLimitList(limits.Connect)); err != nil {
 			return err
 		}
