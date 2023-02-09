@@ -132,6 +132,22 @@ resource "ultradns_record" "apex" {
 }
 ```
 
+### Manage the fields of a SOA record
+UltraDNS does not allow the creation or deletion of a zone SOA record. The resource can be used to manage all of the fields of the SOA _except for_ the zone serial number which is managed by UltraDNS.
+
+The record data for SOA is a string with space separated fields for `mname`, `rname`, `refresh`, `retry`, `expire`, `minimum`
+
+```terraform
+resource "ultradns_record" "soa" {
+    zone_name = "example.com."
+    owner_name = "example.com."
+    record_type = "SOA"
+    ttl = 86400
+    record_data = ["ns.example.com admin@example.com 7200 3600 1209600 36000"]
+}
+```
+
+
 ## Argument Reference
 
 The following arguments are supported:
@@ -143,6 +159,7 @@ Below are the supported resource record types with the corresponding number:<br/
 `A (1)`
 `NS (2)`
 `CNAME (5)`
+`SOA (6)`
 `PTR (12)`
 `MX (15)`
 `TXT (16)`
