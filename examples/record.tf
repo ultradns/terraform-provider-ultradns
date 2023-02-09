@@ -27,6 +27,15 @@ resource "ultradns_record" "cname" {
     record_data = ["example.com."]
 }
 
+## Record Resource of Type SOA (6)
+resource "ultradns_record" "soa" {
+    zone_name = "example.com."
+    owner_name = "example.com."
+    record_type = "SOA"
+    ttl = 86400
+    record_data = ["ns.example.com admin@example.com 7200 3600 1209600 36000"]
+}
+
 ## Record Resource of Type PTR (12)
 resource "ultradns_record" "ptr" {
     zone_name = "${resource.ultradns_zone.primary.id}"
