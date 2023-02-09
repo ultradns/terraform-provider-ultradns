@@ -10,20 +10,20 @@ jobs:
     steps:
       - 
         name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - 
         name: Fetching GO version from repo
         run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
       - 
         name: Setup GO environment
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
       - 
         name: Code linter
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
         with: 
-          args: -v --config=./.github/config/golangci.yml
+          args: -v
       - 
         name: Running acceptace test
         run: TF_ACC=1 go test -v ./...
@@ -41,13 +41,13 @@ jobs:
     steps:
       - 
         name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - 
         name: Fetching GO version from repo
         run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
       - 
         name: Setup GO environment
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
       - 
