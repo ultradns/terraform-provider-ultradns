@@ -63,7 +63,7 @@ The following arguments are used to filter the probes:
 ->
 1) If `guid` is provided, the probe with that guid is returned, and other filter options are not considered.</br>
 2) If there is a conflict between probes due to filter options other than `guid`, the last created probe is returned.</br>
-3) If no probe is found for the filter options, an error is returned.  
+3) If no probe is found for the filter options, an error is returned.
 
 ## Attributes Reference
 

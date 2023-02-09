@@ -18,25 +18,13 @@ func dataSourceprobeTCPSchema() map[string]*schema.Schema {
 		Computed: true,
 	}
 
-	probeTCPSchema["response"] = &schema.Schema{
-		Type:     schema.TypeList,
-		Computed: true,
-		Elem:     probe.SearchStringResource(),
-	}
-
 	probeTCPSchema["connect_limit"] = &schema.Schema{
 		Type:     schema.TypeList,
 		Computed: true,
 		Elem:     probe.LimitResource(),
 	}
 
-	probeTCPSchema["run_limit"] = &schema.Schema{
-		Type:     schema.TypeList,
-		Computed: true,
-		Elem:     probe.LimitResource(),
-	}
-
-	probeTCPSchema["avg_run_limit"] = &schema.Schema{
+	probeTCPSchema["avg_connect_limit"] = &schema.Schema{
 		Type:     schema.TypeList,
 		Computed: true,
 		Elem:     probe.LimitResource(),

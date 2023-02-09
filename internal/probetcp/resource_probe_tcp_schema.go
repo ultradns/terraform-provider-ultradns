@@ -11,19 +11,12 @@ func resourceProbeTCPSchema() map[string]*schema.Schema {
 	probeTCPSchema["port"] = &schema.Schema{
 		Type:     schema.TypeInt,
 		Optional: true,
-		Default:  80,
+		Default:  443,
 	}
 
 	probeTCPSchema["control_ip"] = &schema.Schema{
 		Type:     schema.TypeString,
 		Optional: true,
-	}
-
-	probeTCPSchema["response"] = &schema.Schema{
-		Type:     schema.TypeList,
-		Optional: true,
-		MaxItems: 1,
-		Elem:     probe.SearchStringResource(),
 	}
 
 	probeTCPSchema["connect_limit"] = &schema.Schema{

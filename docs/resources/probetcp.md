@@ -41,13 +41,13 @@ resource "ultradns_probe_tcp" "tcp_tc" {
 	port = 6
 	control_ip = "192.168.1.1"
 	connect_limit{
-		warning = 6 
+		warning = 6
 		critical = 9
 		fail = 11
 	}
 	avg_connect_limit{
-		warning = 5 
-		critical = 8 
+		warning = 5
+		critical = 8
 		fail = 10
 	}
 }
