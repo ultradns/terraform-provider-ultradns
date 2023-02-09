@@ -16,7 +16,6 @@ import (
 
 func ResourceProbeDNS() *schema.Resource {
 	return &schema.Resource{
-
 		CreateContext: resourceProbeDNSCreate,
 		ReadContext:   resourceProbeDNSRead,
 		UpdateContext: resourceProbeDNSUpdate,
@@ -38,7 +37,6 @@ func resourceProbeDNSCreate(ctx context.Context, rd *schema.ResourceData, meta i
 	rrSetKeyData.RecordType = probe.RecordTypeA
 
 	res, err := services.ProbeService.Create(rrSetKeyData, probeData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -59,7 +57,6 @@ func resourceProbeDNSRead(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKey := probe.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkprobe.DNS
 	_, probeData, err := services.ProbeService.Read(rrSetKey)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -83,7 +80,6 @@ func resourceProbeDNSUpdate(ctx context.Context, rd *schema.ResourceData, meta i
 	rrSetKeyData := probe.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.ProbeService.Update(rrSetKeyData, probeData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -98,7 +94,6 @@ func resourceProbeDNSDelete(ctx context.Context, rd *schema.ResourceData, meta i
 	rrSetKeyData := probe.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.ProbeService.Delete(rrSetKeyData)
-
 	if err != nil {
 		rd.SetId("")
 

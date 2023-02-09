@@ -12,7 +12,6 @@ import (
 
 func DataSourceRDPool() *schema.Resource {
 	return &schema.Resource{
-
 		ReadContext: dataSourceRDPoolRead,
 
 		Schema: dataSourceRDPoolSchema(),
@@ -27,7 +26,6 @@ func dataSourceRDPoolRead(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 	rrSetKeyData.PType = pool.RD
 	_, resList, err := services.RecordService.Read(rrSetKeyData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}

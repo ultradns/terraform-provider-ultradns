@@ -110,7 +110,7 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.soa", "owner_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.soa", "record_type", "SOA"),
 					resource.TestCheckResourceAttr("ultradns_record.soa", "ttl", "800"),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. antonyrohith.akash@neustarsecurityservices.com. 10800 3600 2592000 10800"),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. sample@example.com. 10800 3600 2592000 10800"),
 				),
 			},
 			{
@@ -126,7 +126,7 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.soa", "owner_name", zoneName),
 					resource.TestCheckResourceAttr("ultradns_record.soa", "record_type", "SOA"),
 					resource.TestCheckResourceAttr("ultradns_record.soa", "ttl", "800"),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. test.antonyrohith.akash@neustarsecurityservices.com. 10800 3600 2592000 10800"),
+					resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. test.sample@example.com. 10800 3600 2592000 10800"),
 				),
 			},
 			{
@@ -317,7 +317,7 @@ func testAccResourceRecordSOA(zoneName string) string {
 		owner_name = "%s"
 		record_type = "6"
 		ttl = 800
-		record_data = ["udns1.ultradns.net. antonyrohith.akash@neustarsecurityservices.com. 10800 3600 2592000 10800"]
+		record_data = ["udns1.ultradns.net. sample@example.com. 10800 3600 2592000 10800"]
 	}
 	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), strings.TrimSuffix(zoneName, "."), zoneName)
 }
@@ -331,9 +331,9 @@ func testAccUpdateResourceRecordSOA(zoneName string) string {
 		owner_name = "%s"
 		record_type = "SOA"
 		ttl = 800
-		record_data = ["udns1.ultradns.net. test.antonyrohith.akash@neustarsecurityservices.com. 10800 3600 2592000 10800"]
+		record_data = ["udns1.ultradns.net. test.sample@example.com. 10800 3600 2592000 10800"]
 	}
-	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName),zoneName, strings.TrimSuffix(zoneName, "."))
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, strings.TrimSuffix(zoneName, "."))
 }
 
 func testAccResourceRecordPTR(zoneName string) string {

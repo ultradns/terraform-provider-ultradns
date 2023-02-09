@@ -80,7 +80,7 @@ func addRecordData(data, target []string) []string {
 func escapeSOAEmail(email string) string {
 	index1 := strings.Index(email, "@")
 	index2 := strings.LastIndex(email[:index1], ".")
-	
+
 	return strings.Replace(email[:index2]+"\\"+email[index2:], "@", ".", 1)
 }
 

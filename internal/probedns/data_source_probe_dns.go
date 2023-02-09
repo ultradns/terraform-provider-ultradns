@@ -17,7 +17,6 @@ import (
 
 func DataSourceprobeDNS() *schema.Resource {
 	return &schema.Resource{
-
 		ReadContext: dataSourceprobeDNSRead,
 
 		Schema: dataSourceprobeDNSSchema(),
@@ -42,7 +41,6 @@ func readProbeDNS(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta int
 	services := meta.(*service.Service)
 
 	_, probeData, err := services.ProbeService.Read(rrSetKey)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -60,7 +58,6 @@ func listProbeDNS(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta int
 	}
 
 	_, probeDataList, err := services.ProbeService.List(rrSetKey, query)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -107,7 +104,6 @@ func setMatchedProbeDNS(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.P
 func setProbeDNSDetails(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
 	details := &dns.Details{}
 	jsonStr, err := json.Marshal(probeData.Details.(map[string]interface{}))
-
 	if err != nil {
 		diag.FromErr(err)
 	}

@@ -56,7 +56,7 @@ func ComputedDescriptionDiffSuppress(k, old, new string, rd *schema.ResourceData
 func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	var supportedRRType = map[string]bool{
+	supportedRRType := map[string]bool{
 		"A": true, "1": true,
 		"NS": true, "2": true,
 		"CNAME": true, "5": true,

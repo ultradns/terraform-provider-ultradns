@@ -16,7 +16,6 @@ import (
 
 func ResourceProbeHTTP() *schema.Resource {
 	return &schema.Resource{
-
 		CreateContext: resourceProbeHTTPCreate,
 		ReadContext:   resourceProbeHTTPRead,
 		UpdateContext: resourceProbeHTTPUpdate,
@@ -38,7 +37,6 @@ func resourceProbeHTTPCreate(ctx context.Context, rd *schema.ResourceData, meta 
 	rrSetKeyData.RecordType = probe.RecordTypeA
 
 	res, err := services.ProbeService.Create(rrSetKeyData, probeData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -59,7 +57,6 @@ func resourceProbeHTTPRead(ctx context.Context, rd *schema.ResourceData, meta in
 	rrSetKey := probe.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkprobe.HTTP
 	_, probeData, err := services.ProbeService.Read(rrSetKey)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -83,7 +80,6 @@ func resourceProbeHTTPUpdate(ctx context.Context, rd *schema.ResourceData, meta 
 	rrSetKeyData := probe.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.ProbeService.Update(rrSetKeyData, probeData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -98,7 +94,6 @@ func resourceProbeHTTPDelete(ctx context.Context, rd *schema.ResourceData, meta 
 	rrSetKeyData := probe.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.ProbeService.Delete(rrSetKeyData)
-
 	if err != nil {
 		rd.SetId("")
 

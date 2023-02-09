@@ -15,7 +15,6 @@ import (
 
 func ResourceTCPool() *schema.Resource {
 	return &schema.Resource{
-
 		CreateContext: resourceTCPoolCreate,
 		ReadContext:   resourceTCPoolRead,
 		UpdateContext: resourceTCPoolUpdate,
@@ -35,7 +34,6 @@ func resourceTCPoolCreate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
 	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -52,7 +50,6 @@ func resourceTCPoolRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkpool.TC
 	_, resList, err := services.RecordService.Read(rrSetKey)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -74,7 +71,6 @@ func resourceTCPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -89,7 +85,6 @@ func resourceTCPoolDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.RecordService.Delete(rrSetKeyData)
-
 	if err != nil {
 		rd.SetId("")
 

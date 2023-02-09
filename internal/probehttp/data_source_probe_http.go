@@ -17,7 +17,6 @@ import (
 
 func DataSourceprobeHTTP() *schema.Resource {
 	return &schema.Resource{
-
 		ReadContext: dataSourceprobeHTTPRead,
 
 		Schema: dataSourceprobeHTTPSchema(),
@@ -42,7 +41,6 @@ func readProbeHTTP(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta in
 	services := meta.(*service.Service)
 
 	_, probeData, err := services.ProbeService.Read(rrSetKey)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -60,7 +58,6 @@ func listProbeHTTP(rrSetKey *sdkrrset.RRSetKey, rd *schema.ResourceData, meta in
 	}
 
 	_, probeDataList, err := services.ProbeService.List(rrSetKey, query)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -107,7 +104,6 @@ func setMatchedProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeDataList []*sdkprobe.
 func setProbeHTTPDetails(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe.Probe, rd *schema.ResourceData) diag.Diagnostics {
 	details := &http.Details{}
 	jsonStr, err := json.Marshal(probeData.Details.(map[string]interface{}))
-
 	if err != nil {
 		diag.FromErr(err)
 	}

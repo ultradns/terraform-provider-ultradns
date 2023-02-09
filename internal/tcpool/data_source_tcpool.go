@@ -12,7 +12,6 @@ import (
 
 func DataSourceTCPool() *schema.Resource {
 	return &schema.Resource{
-
 		ReadContext: dataSourceTCPoolRead,
 
 		Schema: dataSourceTCPoolSchema(),
@@ -27,7 +26,6 @@ func dataSourceTCPoolRead(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 	rrSetKeyData.PType = pool.TC
 	_, resList, err := services.RecordService.Read(rrSetKeyData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
