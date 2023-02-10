@@ -15,7 +15,6 @@ import (
 
 func ResourceSFPool() *schema.Resource {
 	return &schema.Resource{
-
 		CreateContext: resourceSFPoolCreate,
 		ReadContext:   resourceSFPoolRead,
 		UpdateContext: resourceSFPoolUpdate,
@@ -35,7 +34,6 @@ func resourceSFPoolCreate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
 	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -52,7 +50,6 @@ func resourceSFPoolRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkpool.SF
 	_, resList, err := services.RecordService.Read(rrSetKey)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -74,7 +71,6 @@ func resourceSFPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.RecordService.Update(rrSetKeyData, rrSetData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -89,7 +85,6 @@ func resourceSFPoolDelete(ctx context.Context, rd *schema.ResourceData, meta int
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
 	_, err := services.RecordService.Delete(rrSetKeyData)
-
 	if err != nil {
 		rd.SetId("")
 

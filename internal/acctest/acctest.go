@@ -36,8 +36,10 @@ var (
 	testUserAgent = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
 )
 
-var TestAccProviders map[string]*schema.Provider
-var TestAccProvider *schema.Provider
+var (
+	TestAccProviders map[string]*schema.Provider
+	TestAccProvider  *schema.Provider
+)
 
 func init() {
 	TestAccProvider = provider.Provider()
@@ -58,13 +60,11 @@ func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.Resour
 	}
 
 	client, err := client.NewClient(cnf)
-
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
 
 	service, err := service.NewService(client)
-
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
@@ -108,7 +108,6 @@ func TestAccCheckRecordResourceExists(resourceName, pType string) resource.TestC
 		rrSetKey := rrset.GetRRSetKeyFromID(rs.Primary.ID)
 		rrSetKey.PType = pType
 		_, _, err := services.RecordService.Read(rrSetKey)
-
 		if err != nil {
 			return err
 		}
@@ -129,7 +128,6 @@ func TestAccCheckProbeResourceExists(resourceName, pType string) resource.TestCh
 		rrSetKey := probe.GetRRSetKeyFromID(rs.Primary.ID)
 		rrSetKey.PType = pType
 		_, _, err := services.ProbeService.Read(rrSetKey)
-
 		if err != nil {
 			return err
 		}

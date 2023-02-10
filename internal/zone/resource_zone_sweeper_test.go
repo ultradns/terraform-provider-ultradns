@@ -31,7 +31,6 @@ func testAccZoneSweeper(r string) error {
 	services := acctest.TestAccProvider.Meta().(*service.Service)
 	query := testAccGetZoneSweeperQueryString()
 	_, zoneList, err := services.ZoneService.ListZone(query)
-
 	if err != nil {
 		return err
 	}

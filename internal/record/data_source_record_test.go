@@ -72,6 +72,24 @@ func TestAccDataSourceRecord(t *testing.T) {
 			{
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_record",
+					"soa",
+					zoneName,
+					zoneName,
+					"SOA",
+					testAccResourceRecordSOA(zoneName),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_soa", ""),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "record_type", "SOA"),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "ttl", "800"),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "record_data.0", "udns1.ultradns.net. sample@example.com. 10800 3600 2592000 10800"),
+				),
+			},
+			{
+				Config: acctest.TestAccDataSourceRRSet(
+					"ultradns_record",
 					"ptr",
 					zoneName,
 					tfacctest.RandString(3),

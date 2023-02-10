@@ -30,7 +30,6 @@ func resourceZoneCreate(ctx context.Context, rd *schema.ResourceData, meta inter
 	zoneData := newZone(rd)
 
 	_, err := services.ZoneService.CreateZone(zoneData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -48,7 +47,6 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 	zoneID := rd.Id()
 
 	_, zoneResponse, err := services.ZoneService.ReadZone(zoneID)
-
 	if err != nil {
 		rd.SetId("")
 
@@ -86,7 +84,6 @@ func resourceZoneUpdate(ctx context.Context, rd *schema.ResourceData, meta inter
 	zoneData := newZone(rd)
 
 	_, err := services.ZoneService.UpdateZone(zoneName, zoneData)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -101,7 +98,6 @@ func resourceZoneDelete(ctx context.Context, rd *schema.ResourceData, meta inter
 	zoneName := rd.Id()
 
 	_, err := services.ZoneService.DeleteZone(zoneName)
-
 	if err != nil {
 		rd.SetId("")
 
