@@ -5,6 +5,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/dirgroupgeo"
+	"github.com/ultradns/terraform-provider-ultradns/internal/dirgroupip"
 	"github.com/ultradns/terraform-provider-ultradns/internal/dirpool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/probedns"
 	"github.com/ultradns/terraform-provider-ultradns/internal/probehttp"
@@ -29,30 +31,34 @@ func Provider() *schema.Provider {
 		Schema: providerSchema(),
 
 		ResourcesMap: map[string]*schema.Resource{
-			"ultradns_zone":       zone.ResourceZone(),
-			"ultradns_record":     record.ResourceRecord(),
-			"ultradns_rdpool":     rdpool.ResourceRDPool(),
-			"ultradns_sfpool":     sfpool.ResourceSFPool(),
-			"ultradns_slbpool":    slbpool.ResourceSLBPool(),
-			"ultradns_sbpool":     sbpool.ResourceSBPool(),
-			"ultradns_tcpool":     tcpool.ResourceTCPool(),
-			"ultradns_dirpool":    dirpool.ResourceDIRPool(),
-			"ultradns_probe_http": probehttp.ResourceProbeHTTP(),
-			"ultradns_probe_ping": probeping.ResourceProbePING(),
-			"ultradns_probe_dns":  probedns.ResourceProbeDNS(),
+			"ultradns_zone":         zone.ResourceZone(),
+			"ultradns_record":       record.ResourceRecord(),
+			"ultradns_rdpool":       rdpool.ResourceRDPool(),
+			"ultradns_sfpool":       sfpool.ResourceSFPool(),
+			"ultradns_slbpool":      slbpool.ResourceSLBPool(),
+			"ultradns_sbpool":       sbpool.ResourceSBPool(),
+			"ultradns_tcpool":       tcpool.ResourceTCPool(),
+			"ultradns_dirpool":      dirpool.ResourceDIRPool(),
+			"ultradns_probe_http":   probehttp.ResourceProbeHTTP(),
+			"ultradns_probe_ping":   probeping.ResourceProbePING(),
+			"ultradns_probe_dns":    probedns.ResourceProbeDNS(),
+			"ultradns_dirgroup_ip":  dirgroupip.ResourceIPGroup(),
+			"ultradns_dirgroup_geo": dirgroupgeo.ResourceGeoGroup(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"ultradns_zone":       zone.DataSourceZone(),
-			"ultradns_record":     record.DataSourceRecord(),
-			"ultradns_rdpool":     rdpool.DataSourceRDPool(),
-			"ultradns_sfpool":     sfpool.DataSourceSFPool(),
-			"ultradns_slbpool":    slbpool.DataSourceSLBPool(),
-			"ultradns_sbpool":     sbpool.DataSourceSBPool(),
-			"ultradns_tcpool":     tcpool.DataSourceTCPool(),
-			"ultradns_dirpool":    dirpool.DataSourceDIRPool(),
-			"ultradns_probe_http": probehttp.DataSourceprobeHTTP(),
-			"ultradns_probe_ping": probeping.DataSourceprobePING(),
-			"ultradns_probe_dns":  probedns.DataSourceprobeDNS(),
+			"ultradns_zone":         zone.DataSourceZone(),
+			"ultradns_record":       record.DataSourceRecord(),
+			"ultradns_rdpool":       rdpool.DataSourceRDPool(),
+			"ultradns_sfpool":       sfpool.DataSourceSFPool(),
+			"ultradns_slbpool":      slbpool.DataSourceSLBPool(),
+			"ultradns_sbpool":       sbpool.DataSourceSBPool(),
+			"ultradns_tcpool":       tcpool.DataSourceTCPool(),
+			"ultradns_dirpool":      dirpool.DataSourceDIRPool(),
+			"ultradns_probe_http":   probehttp.DataSourceprobeHTTP(),
+			"ultradns_probe_ping":   probeping.DataSourceprobePING(),
+			"ultradns_probe_dns":    probedns.DataSourceprobeDNS(),
+			"ultradns_dirgroup_ip":  dirgroupip.DataSourceIPGroup(),
+			"ultradns_dirgroup_geo": dirgroupgeo.DataSourceGeoGroup(),
 		},
 	}
 }
