@@ -178,7 +178,7 @@ Records can be imported by combining their `owner_name`, `zone_name`, and `recor
 Example : `www.example.com.:example.com.:A (1)`.
 
 
--> For import, the `owner_name` and `zone_name` must be a FQDN, and `record_type` should have the type as well as the corresponding number as shown in the example below.
+-> For import, the `owner_name` and `zone_name` must be a FQDN, and `record_type` must have the type as well as the corresponding number as shown in the example below.
 
 Example:
 ```
