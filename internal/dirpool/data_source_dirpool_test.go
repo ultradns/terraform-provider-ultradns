@@ -1,6 +1,7 @@
 package dirpool_test
 
 import (
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -27,9 +28,9 @@ func TestAccDataSourceDIRPool(t *testing.T) {
 					"ultradns_dirpool",
 					"a",
 					zoneName,
-					ownerNameTypeA+"."+zoneName,
+					strings.ToUpper(ownerNameTypeA)+"."+zoneName,
 					"1",
-					testAccResourceDIRPoolA(zoneName, ownerNameTypeA),
+					testAccResourceDIRPoolA(strings.ToUpper(zoneName), ownerNameTypeA),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_dirpool.data_a", pool.DIR),
@@ -50,10 +51,10 @@ func TestAccDataSourceDIRPool(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_dirpool",
 					"ptr",
-					zoneName,
+					strings.ToUpper(zoneName),
 					ownerNameTypePTR,
 					"PTR",
-					testAccResourceDIRPoolPTR(zoneName, ownerNameTypePTR),
+					testAccResourceDIRPoolPTR(zoneName, strings.ToUpper(ownerNameTypePTR)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_dirpool.data_ptr", pool.DIR),
@@ -74,9 +75,9 @@ func TestAccDataSourceDIRPool(t *testing.T) {
 					"ultradns_dirpool",
 					"mx",
 					zoneName,
-					ownerNameTypeMX,
+					strings.ToUpper(ownerNameTypeMX),
 					"MX",
-					testAccResourceDIRPoolMX(zoneName, ownerNameTypeMX),
+					testAccResourceDIRPoolMX(strings.ToUpper(zoneName), strings.ToUpper(ownerNameTypeMX)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_dirpool.data_mx", pool.DIR),
@@ -96,8 +97,8 @@ func TestAccDataSourceDIRPool(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_dirpool",
 					"txt",
-					zoneName,
-					ownerNameTypeTXT,
+					strings.ToUpper(zoneName),
+					strings.ToUpper(ownerNameTypeTXT),
 					"TXT",
 					testAccResourceDIRPoolTXT(zoneName, ownerNameTypeTXT),
 				),

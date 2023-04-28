@@ -33,7 +33,7 @@ func TestAccResourceZonePrimary(t *testing.T) {
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName),
+				Config: acctest.TestAccResourceZonePrimary(zoneResourceName, strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
@@ -83,7 +83,7 @@ func TestAccResourceZoneSecondary(t *testing.T) {
 		CheckDestroy: testAccCheckZoneDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceZoneSecondary(zoneName),
+				Config: testAccResourceZoneSecondary(strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckZoneExists(resourceName),
 					resource.TestCheckResourceAttr(resourceName, "name", zoneName),

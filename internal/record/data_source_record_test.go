@@ -1,6 +1,7 @@
 package record_test
 
 import (
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -21,9 +22,9 @@ func TestAccDataSourceRecord(t *testing.T) {
 					"ultradns_record",
 					"a",
 					zoneName,
-					ownerNameTypeA+"."+zoneName,
+					strings.ToUpper(ownerNameTypeA)+"."+zoneName,
 					"1",
-					testAccResourceRecordA(zoneName, ownerNameTypeA),
+					testAccResourceRecordA(zoneName, strings.ToUpper(ownerNameTypeA)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_a", ""),
@@ -38,10 +39,10 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_record",
 					"ns",
-					zoneName,
+					strings.ToUpper(zoneName),
 					zoneName,
 					"2",
-					testAccResourceRecordNS(zoneName),
+					testAccResourceRecordNS(strings.ToUpper(zoneName)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_ns", ""),
@@ -56,8 +57,8 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_record",
 					"cname",
-					zoneName,
-					tfacctest.RandString(3),
+					strings.ToUpper(zoneName),
+					strings.ToUpper(tfacctest.RandString(3)),
 					"CNAME",
 					testAccResourceRecordCNAME(zoneName),
 				),
@@ -74,7 +75,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 					"ultradns_record",
 					"soa",
 					zoneName,
-					zoneName,
+					strings.ToUpper(zoneName),
 					"SOA",
 					testAccResourceRecordSOA(zoneName),
 				),
@@ -92,7 +93,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 					"ultradns_record",
 					"ptr",
 					zoneName,
-					tfacctest.RandString(3),
+					strings.ToUpper(tfacctest.RandString(3)),
 					"PTR",
 					testAccResourceRecordPTR(zoneName),
 				),
@@ -108,7 +109,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_record",
 					"mx",
-					zoneName,
+					strings.ToUpper(zoneName),
 					tfacctest.RandString(3),
 					"MX",
 					testAccResourceRecordMX(zoneName),
@@ -128,7 +129,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 					zoneName,
 					tfacctest.RandString(3),
 					"TXT",
-					testAccResourceRecordTXT(zoneName),
+					testAccResourceRecordTXT(strings.ToUpper(zoneName)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_txt", ""),
@@ -142,8 +143,8 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_record",
 					"aaaa",
-					zoneName,
-					tfacctest.RandString(3),
+					strings.ToUpper(zoneName),
+					strings.ToUpper(tfacctest.RandString(3)),
 					"AAAA",
 					testAccResourceRecordAAAA(zoneName),
 				),
@@ -193,10 +194,10 @@ func TestAccDataSourceRecord(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_record",
 					"apex",
-					zoneName,
+					strings.ToUpper(zoneName),
 					tfacctest.RandString(3),
 					"APEXALIAS",
-					testAccResourceRecordAPEXALIAS(zoneName),
+					testAccResourceRecordAPEXALIAS(strings.ToUpper(zoneName)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_apex", ""),

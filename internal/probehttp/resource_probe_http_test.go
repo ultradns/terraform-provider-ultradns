@@ -2,6 +2,7 @@ package probehttp_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -20,7 +21,7 @@ func TestAccResourceProbeHTTP(t *testing.T) {
 		CheckDestroy: acctest.TestAccCheckProbeResourceDestroy("ultradns_probe_http", probe.HTTP),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceProbeHTTPForSBPool(zoneNameSB, ownerName),
+				Config: testAccResourceProbeHTTPForSBPool(strings.ToUpper(zoneNameSB), strings.ToUpper(ownerName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("ultradns_probe_http.http_sb", probe.HTTP),
 					resource.TestCheckResourceAttr("ultradns_probe_http.http_sb", "zone_name", zoneNameSB),
@@ -46,7 +47,7 @@ func TestAccResourceProbeHTTP(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceUpdateProbeHTTPForSBPool(zoneNameSB, ownerName),
+				Config: testAccResourceUpdateProbeHTTPForSBPool(zoneNameSB, strings.ToUpper(ownerName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("ultradns_probe_http.http_sb", probe.HTTP),
 					resource.TestCheckResourceAttr("ultradns_probe_http.http_sb", "zone_name", zoneNameSB),
@@ -66,7 +67,7 @@ func TestAccResourceProbeHTTP(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceProbeHTTPForTCPool(zoneNameTC, ownerName),
+				Config: testAccResourceProbeHTTPForTCPool(strings.ToUpper(zoneNameTC), ownerName),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("ultradns_probe_http.http_tc", probe.HTTP),
 					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc", "zone_name", zoneNameTC),

@@ -1,6 +1,7 @@
 package probehttp_test
 
 import (
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -22,8 +23,8 @@ func TestAccDataSourceProbeHTTP(t *testing.T) {
 				Config: acctest.TestAccDataSourceProbe(
 					"ultradns_probe_http",
 					"http_sb",
-					zoneNameSB,
-					ownerName,
+					strings.ToUpper(zoneNameSB),
+					strings.ToUpper(ownerName),
 					testAccResourceProbeHTTPForSBPool(zoneNameSB, ownerName),
 				),
 				Check: resource.ComposeTestCheckFunc(
@@ -49,11 +50,11 @@ func TestAccDataSourceProbeHTTP(t *testing.T) {
 				Config: acctest.TestAccDataSourceProbeWithOptions(
 					"ultradns_probe_http",
 					"http_tc",
-					zoneNameTC,
-					ownerName,
+					strings.ToUpper(zoneNameTC),
+					strings.ToUpper(ownerName),
 					"TEN_MINUTES",
 					"192.168.1.1",
-					testAccResourceUpdateProbeHTTPForTCPool(zoneNameTC, ownerName),
+					testAccResourceUpdateProbeHTTPForTCPool(strings.ToUpper(zoneNameTC), ownerName),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("data.ultradns_probe_http.data_http_tc", sdkprobe.HTTP),

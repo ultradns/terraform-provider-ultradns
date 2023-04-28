@@ -23,7 +23,7 @@ func TestAccResourceSLBPool(t *testing.T) {
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_slbpool", pool.SLB),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceSLBPoolA(zoneName, ownerNameTypeA),
+				Config: testAccResourceSLBPoolA(strings.ToUpper(zoneName), strings.ToUpper(ownerNameTypeA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_slbpool.a", pool.SLB),
 					resource.TestCheckResourceAttr("ultradns_slbpool.a", "zone_name", zoneName),
@@ -46,7 +46,7 @@ func TestAccResourceSLBPool(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateSLBPoolA(zoneName, ownerNameTypeA),
+				Config: testAccResourceUpdateSLBPoolA(strings.ToUpper(zoneName), ownerNameTypeA),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_slbpool.a", pool.SLB),
 					resource.TestCheckResourceAttr("ultradns_slbpool.a", "zone_name", zoneName),
@@ -79,7 +79,7 @@ func TestAccResourceSLBPool(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceSLBPoolAAAA(zoneName, ownerNameTypeAAAA),
+				Config: testAccResourceSLBPoolAAAA(zoneName, strings.ToUpper(ownerNameTypeAAAA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_slbpool.aaaa", pool.SLB),
 					resource.TestCheckResourceAttr("ultradns_slbpool.aaaa", "zone_name", zoneName),
@@ -107,7 +107,7 @@ func TestAccResourceSLBPool(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateSLBPoolAAAA(zoneName, ownerNameTypeAAAA),
+				Config: testAccResourceUpdateSLBPoolAAAA(strings.ToUpper(zoneName), ownerNameTypeAAAA),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_slbpool.aaaa", pool.SLB),
 					resource.TestCheckResourceAttr("ultradns_slbpool.aaaa", "zone_name", zoneName),

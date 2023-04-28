@@ -23,10 +23,10 @@ func TestAccDataSourceSFPool(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_sfpool",
 					"a",
-					zoneName,
+					strings.ToUpper(zoneName),
 					ownerNameTypeA+"."+zoneName,
 					"1",
-					testAccResourceSFPoolA(zoneName, ownerNameTypeA),
+					testAccResourceSFPoolA(zoneName, strings.ToUpper(ownerNameTypeA)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_sfpool.data_a", pool.SF),
@@ -52,7 +52,7 @@ func TestAccDataSourceSFPool(t *testing.T) {
 					"ultradns_sfpool",
 					"aaaa",
 					strings.TrimSuffix(zoneName, "."),
-					ownerNameTypeAAAA,
+					strings.ToUpper(ownerNameTypeAAAA),
 					"AAAA",
 					testAccResourceSFPoolAAAA(zoneName, ownerNameTypeAAAA),
 				),

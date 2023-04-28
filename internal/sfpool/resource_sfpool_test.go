@@ -23,7 +23,7 @@ func TestAccResourceSFPool(t *testing.T) {
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_sfpool", pool.SF),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceSFPoolA(zoneName, ownerNameTypeA),
+				Config: testAccResourceSFPoolA(strings.ToUpper(zoneName), strings.ToUpper(ownerNameTypeA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_sfpool.a", pool.SF),
 					resource.TestCheckResourceAttr("ultradns_sfpool.a", "zone_name", zoneName),
@@ -45,7 +45,7 @@ func TestAccResourceSFPool(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateSFPoolA(zoneName, ownerNameTypeA),
+				Config: testAccResourceUpdateSFPoolA(strings.ToUpper(zoneName), ownerNameTypeA),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_sfpool.a", pool.SF),
 					resource.TestCheckResourceAttr("ultradns_sfpool.a", "zone_name", zoneName),
@@ -67,7 +67,7 @@ func TestAccResourceSFPool(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceSFPoolAAAA(zoneName, ownerNameTypeAAAA),
+				Config: testAccResourceSFPoolAAAA(zoneName, strings.ToUpper(ownerNameTypeAAAA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_sfpool.aaaa", pool.SF),
 					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "zone_name", zoneName),
@@ -89,7 +89,7 @@ func TestAccResourceSFPool(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateSFPoolAAAA(zoneName, ownerNameTypeAAAA),
+				Config: testAccResourceUpdateSFPoolAAAA(strings.ToUpper(zoneName), strings.ToUpper(ownerNameTypeAAAA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_sfpool.aaaa", pool.SF),
 					resource.TestCheckResourceAttr("ultradns_sfpool.aaaa", "zone_name", zoneName),

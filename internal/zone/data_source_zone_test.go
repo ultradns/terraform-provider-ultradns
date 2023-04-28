@@ -2,6 +2,7 @@ package zone_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -22,6 +23,23 @@ func TestAccDataSourceZonePrimary(t *testing.T) {
 				Config: testAccDataSourceZone(
 					"primary",
 					acctest.TestAccResourceZonePrimary("primary", zoneName),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(dataSourceName, "name", zoneName),
+					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestAccount),
+					resource.TestCheckResourceAttr(dataSourceName, "type", zone.Primary),
+					resource.TestCheckResourceAttr(dataSourceName, "dnssec_status", defaultDNSSECStatus),
+					resource.TestCheckResourceAttr(dataSourceName, "status", defaultZoneStatus),
+					resource.TestCheckResourceAttr(dataSourceName, "owner", acctest.TestUsername),
+					resource.TestCheckResourceAttr(dataSourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(dataSourceName, "notify_addresses.#", defaultCount),
+					resource.TestCheckResourceAttr(dataSourceName, "restrict_ip.#", defaultCount),
+				),
+			},
+			{
+				Config: testAccDataSourceZone(
+					"primary",
+					acctest.TestAccResourceZonePrimary("primary", strings.ToUpper(zoneName)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(dataSourceName, "name", zoneName),
