@@ -12,6 +12,7 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			Required:         true,
 			ForceNew:         true,
 			DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
+			StateFunc:		  helper.CaseInSensitiveState,
 		},
 		"account_name": {
 			Type:        schema.TypeString,

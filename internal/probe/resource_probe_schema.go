@@ -14,12 +14,14 @@ func ResourceProbeSchema() map[string]*schema.Schema {
 			Required:         true,
 			ForceNew:         true,
 			DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
+			StateFunc:		  helper.CaseInSensitiveState,
 		},
 		"owner_name": {
 			Type:             schema.TypeString,
 			Required:         true,
 			ForceNew:         true,
 			DiffSuppressFunc: helper.OwnerFQDNDiffSuppress,
+			StateFunc:		  helper.CaseInSensitiveState,
 		},
 		"interval": {
 			Type:     schema.TypeString,
