@@ -1,6 +1,7 @@
 package tcpool_test
 
 import (
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -21,10 +22,10 @@ func TestAccDataSourceTCPool(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_tcpool",
 					"a",
-					zoneName,
-					ownerName+"."+zoneName,
+					strings.ToUpper(zoneName),
+					strings.ToUpper(ownerName+"."+zoneName),
 					"1",
-					acctest.TestAccResourceTCPool(zoneName, ownerName),
+					acctest.TestAccResourceTCPool(strings.ToUpper(zoneName), strings.ToUpper(ownerName)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_tcpool.data_a", pool.TC),

@@ -2,6 +2,7 @@ package probeping_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -20,7 +21,7 @@ func TestAccResourceProbePING(t *testing.T) {
 		CheckDestroy: acctest.TestAccCheckProbeResourceDestroy("ultradns_probe_ping", probe.PING),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceProbePINGForSBPool(zoneNameSB, ownerName),
+				Config: testAccResourceProbePINGForSBPool(zoneNameSB, strings.ToUpper(ownerName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("ultradns_probe_ping.ping_sb", probe.PING),
 					resource.TestCheckResourceAttr("ultradns_probe_ping.ping_sb", "zone_name", zoneNameSB),
@@ -37,7 +38,7 @@ func TestAccResourceProbePING(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateProbePINGForSBPool(zoneNameSB, ownerName),
+				Config: testAccResourceUpdateProbePINGForSBPool(strings.ToUpper(zoneNameSB), ownerName),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("ultradns_probe_ping.ping_sb", probe.PING),
 					resource.TestCheckResourceAttr("ultradns_probe_ping.ping_sb", "zone_name", zoneNameSB),
@@ -59,7 +60,7 @@ func TestAccResourceProbePING(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceProbePINGForTCPool(zoneNameTC, ownerName),
+				Config: testAccResourceProbePINGForTCPool(strings.ToUpper(zoneNameTC), strings.ToUpper(ownerName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("ultradns_probe_ping.ping_tc", probe.PING),
 					resource.TestCheckResourceAttr("ultradns_probe_ping.ping_tc", "zone_name", zoneNameTC),
@@ -92,7 +93,7 @@ func TestAccResourceProbePING(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceUpdateProbePINGForTCPool(zoneNameTC, ownerName),
+				Config: testAccResourceUpdateProbePINGForTCPool(strings.ToUpper(zoneNameTC), strings.ToUpper(ownerName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("ultradns_probe_ping.ping_tc", probe.PING),
 					resource.TestCheckResourceAttr("ultradns_probe_ping.ping_tc", "zone_name", zoneNameTC),

@@ -2,6 +2,7 @@ package tcpool_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -21,7 +22,7 @@ func TestAccResourceTCPool(t *testing.T) {
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_tcpool", pool.TC),
 		Steps: []resource.TestStep{
 			{
-				Config: acctest.TestAccResourceTCPool(zoneName, ownerName),
+				Config: acctest.TestAccResourceTCPool(strings.ToUpper(zoneName), ownerName),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_tcpool.a", pool.TC),
 					resource.TestCheckResourceAttr("ultradns_tcpool.a", "zone_name", zoneName),
@@ -41,7 +42,7 @@ func TestAccResourceTCPool(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateTCPool(zoneName, ownerName),
+				Config: testAccResourceUpdateTCPool(zoneName, strings.ToUpper(ownerName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_tcpool.a", pool.TC),
 					resource.TestCheckResourceAttr("ultradns_tcpool.a", "zone_name", zoneName),

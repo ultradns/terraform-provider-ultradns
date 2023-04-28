@@ -24,9 +24,9 @@ func TestAccDataSourceSLBPool(t *testing.T) {
 					"ultradns_slbpool",
 					"a",
 					zoneName,
-					ownerNameTypeA+"."+zoneName,
+					strings.ToUpper(ownerNameTypeA+"."+zoneName),
 					"1",
-					testAccResourceSLBPoolA(zoneName, ownerNameTypeA),
+					testAccResourceSLBPoolA(strings.ToUpper(zoneName), ownerNameTypeA),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_slbpool.data_a", pool.SLB),
@@ -53,8 +53,8 @@ func TestAccDataSourceSLBPool(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_slbpool",
 					"aaaa",
-					strings.TrimSuffix(zoneName, "."),
-					ownerNameTypeAAAA,
+					strings.ToUpper(strings.TrimSuffix(zoneName, ".")),
+					strings.ToUpper(ownerNameTypeAAAA),
 					"AAAA",
 					testAccResourceSLBPoolAAAA(zoneName, ownerNameTypeAAAA),
 				),

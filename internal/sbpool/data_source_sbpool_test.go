@@ -1,6 +1,7 @@
 package sbpool_test
 
 import (
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -21,10 +22,10 @@ func TestAccDataSourceSBPool(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_sbpool",
 					"a",
-					zoneName,
-					ownerName+"."+zoneName,
+					strings.ToUpper(zoneName),
+					strings.ToUpper(ownerName+"."+zoneName),
 					"1",
-					acctest.TestAccResourceSBPool(zoneName, ownerName),
+					acctest.TestAccResourceSBPool(strings.ToUpper(zoneName), strings.ToUpper(ownerName)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_sbpool.data_a", pool.SB),

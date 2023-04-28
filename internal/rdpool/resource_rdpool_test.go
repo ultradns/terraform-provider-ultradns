@@ -2,6 +2,7 @@ package rdpool_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -22,7 +23,7 @@ func TestAccResourceRDPool(t *testing.T) {
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_rdpool", pool.RD),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceRDPoolA(zoneName, ownerNameTypeA),
+				Config: testAccResourceRDPoolA(zoneName, strings.ToUpper(ownerNameTypeA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_rdpool.a", pool.RD),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "zone_name", zoneName),
@@ -35,7 +36,7 @@ func TestAccResourceRDPool(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateRDPoolA(zoneName, ownerNameTypeA),
+				Config: testAccResourceUpdateRDPoolA(strings.ToUpper(zoneName), strings.ToUpper(ownerNameTypeA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_rdpool.a", pool.RD),
 					resource.TestCheckResourceAttr("ultradns_rdpool.a", "zone_name", zoneName),
@@ -53,7 +54,7 @@ func TestAccResourceRDPool(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceRDPoolAAAA(zoneName, ownerNameTypeAAAA),
+				Config: testAccResourceRDPoolAAAA(strings.ToUpper(zoneName), ownerNameTypeAAAA),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_rdpool.aaaa", pool.RD),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "zone_name", zoneName),
@@ -66,7 +67,7 @@ func TestAccResourceRDPool(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateRDPoolAAAA(zoneName, ownerNameTypeAAAA),
+				Config: testAccResourceUpdateRDPoolAAAA(zoneName, strings.ToUpper(ownerNameTypeAAAA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_rdpool.aaaa", pool.RD),
 					resource.TestCheckResourceAttr("ultradns_rdpool.aaaa", "zone_name", zoneName),

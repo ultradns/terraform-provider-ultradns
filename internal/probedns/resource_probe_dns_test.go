@@ -2,6 +2,7 @@ package probedns_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -37,7 +38,7 @@ func TestAccResourceProbeDNS(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceUpdateProbeDNSForSBPool(zoneNameSB, ownerName),
+				Config: testAccResourceUpdateProbeDNSForSBPool(zoneNameSB, strings.ToUpper(ownerName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("ultradns_probe_dns.dns_sb", probe.DNS),
 					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb", "zone_name", zoneNameSB),
@@ -60,7 +61,7 @@ func TestAccResourceProbeDNS(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceProbeDNSForTCPool(zoneNameTC, ownerName),
+				Config: testAccResourceProbeDNSForTCPool(strings.ToUpper(zoneNameTC), ownerName),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("ultradns_probe_dns.dns_tc", probe.DNS),
 					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_tc", "zone_name", zoneNameTC),

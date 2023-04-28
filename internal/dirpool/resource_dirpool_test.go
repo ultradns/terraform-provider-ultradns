@@ -2,6 +2,7 @@ package dirpool_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -21,7 +22,7 @@ func TestAccResourceDirPool(t *testing.T) {
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_dirpool", pool.DIR),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceDIRPoolA(zoneName, ownerNameA),
+				Config: testAccResourceDIRPoolA(zoneName, strings.ToUpper(ownerNameA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_dirpool.a", pool.DIR),
 					resource.TestCheckResourceAttr("ultradns_dirpool.a", "zone_name", zoneName),
