@@ -24,9 +24,9 @@ func TestAccDataSourceRDPool(t *testing.T) {
 					"ultradns_rdpool",
 					"a",
 					strings.TrimSuffix(zoneName, "."),
-					ownerNameTypeA,
+					strings.ToUpper(ownerNameTypeA),
 					"A",
-					testAccResourceRDPoolA(zoneName, ownerNameTypeA),
+					testAccResourceRDPoolA(strings.ToUpper(zoneName), strings.ToUpper(ownerNameTypeA)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_rdpool.data_a", pool.RD),
@@ -43,8 +43,8 @@ func TestAccDataSourceRDPool(t *testing.T) {
 				Config: acctest.TestAccDataSourceRRSet(
 					"ultradns_rdpool",
 					"aaaa",
-					zoneName,
-					ownerNameTypeA+"."+zoneName,
+					strings.ToUpper(zoneName),
+					strings.ToUpper(ownerNameTypeA+"."+zoneName),
 					"28",
 					testAccResourceRDPoolAAAA(zoneName, ownerNameTypeAAAA),
 				),

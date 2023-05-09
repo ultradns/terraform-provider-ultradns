@@ -22,7 +22,7 @@ func TestAccResourceRecord(t *testing.T) {
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_record", ""),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceRecordA(zoneName, ownerNameTypeA),
+				Config: testAccResourceRecordA(zoneName, strings.ToUpper(ownerNameTypeA)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.a", ""),
 					resource.TestCheckResourceAttr("ultradns_record.a", "zone_name", zoneName),
@@ -33,7 +33,7 @@ func TestAccResourceRecord(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccUpdateResourceRecordA(zoneName, ownerNameTypeA),
+				Config: testAccUpdateResourceRecordA(strings.ToUpper(zoneName), ownerNameTypeA),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.a", ""),
 					resource.TestCheckResourceAttr("ultradns_record.a", "zone_name", zoneName),
@@ -49,7 +49,7 @@ func TestAccResourceRecord(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceRecordNS(zoneName),
+				Config: testAccResourceRecordNS(strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.ns", ""),
 					resource.TestCheckResourceAttr("ultradns_record.ns", "zone_name", zoneName),
@@ -77,7 +77,7 @@ func TestAccResourceRecord(t *testing.T) {
 				ImportStateVerifyIgnore: []string{"record_data"},
 			},
 			{
-				Config: testAccResourceRecordNSwithOwner(zoneName, ownerNameTypeNS),
+				Config: testAccResourceRecordNSwithOwner(strings.ToUpper(zoneName), ownerNameTypeNS),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.ns_owner", ""),
 					resource.TestCheckResourceAttr("ultradns_record.ns_owner", "zone_name", zoneName),
@@ -103,7 +103,7 @@ func TestAccResourceRecord(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceRecordSOA(zoneName),
+				Config: testAccResourceRecordSOA(strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.soa", ""),
 					resource.TestCheckResourceAttr("ultradns_record.soa", "zone_name", zoneName),
@@ -130,7 +130,7 @@ func TestAccResourceRecord(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceRecordPTR(zoneName),
+				Config: testAccResourceRecordPTR(strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.ptr", ""),
 					resource.TestCheckResourceAttr("ultradns_record.ptr", "zone_name", zoneName),
@@ -160,7 +160,7 @@ func TestAccResourceRecord(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceRecordTXT(zoneName),
+				Config: testAccResourceRecordTXT(strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.txt", ""),
 					resource.TestCheckResourceAttr("ultradns_record.txt", "zone_name", zoneName),
@@ -170,7 +170,7 @@ func TestAccResourceRecord(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceRecordAAAA(zoneName),
+				Config: testAccResourceRecordAAAA(strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.aaaa", ""),
 					resource.TestCheckResourceAttr("ultradns_record.aaaa", "zone_name", zoneName),
@@ -180,7 +180,7 @@ func TestAccResourceRecord(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccResourceRecordSRV(zoneName),
+				Config: testAccResourceRecordSRV(strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.srv", ""),
 					resource.TestCheckResourceAttr("ultradns_record.srv", "zone_name", zoneName),
@@ -210,7 +210,7 @@ func TestAccResourceRecord(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			{
-				Config: testAccResourceRecordAPEXALIAS(zoneName),
+				Config: testAccResourceRecordAPEXALIAS(strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("ultradns_record.apex", ""),
 					resource.TestCheckResourceAttr("ultradns_record.apex", "zone_name", zoneName),

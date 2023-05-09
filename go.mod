@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.17.0
-	github.com/ultradns/ultradns-go-sdk v1.4.1-20230224143201-0d8b0f6
+	github.com/ultradns/ultradns-go-sdk v1.5.0-20230427041528-45f370f
 )
 
 require (

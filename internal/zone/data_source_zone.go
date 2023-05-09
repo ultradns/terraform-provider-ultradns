@@ -2,6 +2,7 @@ package zone
 
 import (
 	"context"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -26,7 +27,7 @@ func dataSourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	zoneName := ""
 
 	if val, ok := rd.GetOk("name"); ok {
-		zoneName = val.(string)
+		zoneName = strings.ToLower(val.(string))
 	}
 
 	_, zoneResponse, err := services.ZoneService.ReadZone(zoneName)

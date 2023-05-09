@@ -1,6 +1,7 @@
 package probedns_test
 
 import (
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -24,7 +25,7 @@ func TestAccDataSourceProbeDNS(t *testing.T) {
 					"dns_sb",
 					zoneNameSB,
 					ownerName,
-					testAccResourceProbeDNSForSBPool(zoneNameSB, ownerName),
+					testAccResourceProbeDNSForSBPool(strings.ToUpper(zoneNameSB), strings.ToUpper(ownerName)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("data.ultradns_probe_dns.data_dns_sb", sdkprobe.DNS),

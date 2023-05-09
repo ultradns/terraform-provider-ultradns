@@ -1,6 +1,7 @@
 package probeping_test
 
 import (
+	"strings"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -22,9 +23,9 @@ func TestAccDataSourceProbePING(t *testing.T) {
 				Config: acctest.TestAccDataSourceProbe(
 					"ultradns_probe_ping",
 					"ping_sb",
-					zoneNameSB,
+					strings.ToUpper(zoneNameSB),
 					ownerName,
-					testAccResourceProbePINGForSBPool(zoneNameSB, ownerName),
+					testAccResourceProbePINGForSBPool(zoneNameSB, strings.ToUpper(ownerName)),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckProbeResourceExists("data.ultradns_probe_ping.data_ping_sb", sdkprobe.PING),
@@ -46,7 +47,7 @@ func TestAccDataSourceProbePING(t *testing.T) {
 					"ultradns_probe_ping",
 					"ping_tc",
 					zoneNameTC,
-					ownerName,
+					strings.ToUpper(ownerName),
 					"FIFTEEN_MINUTES",
 					"",
 					testAccResourceUpdateProbePINGForTCPool(zoneNameTC, ownerName),

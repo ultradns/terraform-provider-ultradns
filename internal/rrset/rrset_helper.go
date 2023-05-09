@@ -13,7 +13,7 @@ func newRRSet(rd *schema.ResourceData) *rrset.RRSet {
 	rrSetData := &rrset.RRSet{}
 
 	if val, ok := rd.GetOk("owner_name"); ok {
-		rrSetData.OwnerName = val.(string)
+		rrSetData.OwnerName = strings.ToLower(val.(string))
 	}
 
 	if val, ok := rd.GetOk("record_type"); ok {
@@ -62,11 +62,11 @@ func NewRRSetKey(rd *schema.ResourceData) *rrset.RRSetKey {
 	rrSetKeyData := &rrset.RRSetKey{}
 
 	if val, ok := rd.GetOk("zone_name"); ok {
-		rrSetKeyData.Zone = val.(string)
+		rrSetKeyData.Zone = strings.ToLower(val.(string))
 	}
 
 	if val, ok := rd.GetOk("owner_name"); ok {
-		rrSetKeyData.Owner = val.(string)
+		rrSetKeyData.Owner = strings.ToLower(val.(string))
 	}
 
 	if val, ok := rd.GetOk("record_type"); ok {

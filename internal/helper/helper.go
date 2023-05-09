@@ -9,6 +9,10 @@ import (
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 )
 
+func CaseInSensitiveState(val any) string {
+	return strings.ToLower(val.(string))
+}
+
 func ZoneFQDNDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 	return helper.GetZoneFQDN(old) == helper.GetZoneFQDN(new)
 }
@@ -17,7 +21,7 @@ func OwnerFQDNDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 	zoneName := ""
 
 	if val, ok := rd.GetOk("zone_name"); ok {
-		zoneName = val.(string)
+		zoneName = strings.ToLower(val.(string))
 	}
 
 	return helper.GetOwnerFQDN(old, zoneName) == helper.GetOwnerFQDN(new, zoneName)
@@ -43,11 +47,11 @@ func ComputedDescriptionDiffSuppress(k, old, new string, rd *schema.ResourceData
 	ownerName := ""
 
 	if val, ok := rd.GetOk("zone_name"); ok {
-		zoneName = val.(string)
+		zoneName = strings.ToLower(val.(string))
 	}
 
 	if val, ok := rd.GetOk("owner_name"); ok {
-		ownerName = val.(string)
+		ownerName = strings.ToLower(val.(string))
 	}
 
 	return old == helper.GetOwnerFQDN(ownerName, zoneName) && new == ""

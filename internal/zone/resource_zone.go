@@ -2,6 +2,7 @@ package zone
 
 import (
 	"context"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -135,7 +136,7 @@ func getZoneProperties(rd *schema.ResourceData) *zone.Properties {
 	properties := &zone.Properties{}
 
 	if val, ok := rd.GetOk("name"); ok {
-		properties.Name = val.(string)
+		properties.Name = strings.ToLower(val.(string))
 	}
 
 	if val, ok := rd.GetOk("account_name"); ok {
