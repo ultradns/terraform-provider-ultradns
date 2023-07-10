@@ -57,11 +57,13 @@ func getRDataInfoSet(rrSetData *sdkrrset.RRSet) *schema.Set {
 
 		if rdataInfoData.GeoInfo != nil {
 			rdataInfo["geo_group_name"] = rdataInfoData.GeoInfo.Name
+			rdataInfo["geo_account_level"] = rdataInfoData.GeoInfo.IsAccountLevel
 			rdataInfo["geo_codes"] = helper.GetSchemaSetFromList(rdataInfoData.GeoInfo.Codes)
 		}
 
 		if rdataInfoData.IPInfo != nil {
 			rdataInfo["ip_group_name"] = rdataInfoData.IPInfo.Name
+			rdataInfo["ip_account_level"] = rdataInfoData.IPInfo.IsAccountLevel
 			rdataInfo["ip"] = getSourceIPInfoSet(rdataInfoData.IPInfo.IPs)
 		}
 

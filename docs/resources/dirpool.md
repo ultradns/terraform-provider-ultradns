@@ -30,6 +30,7 @@ resource "ultradns_dirpool" "a" {
         rdata = "192.168.1.2"
         geo_group_name = "geo_group"
         geo_codes = ["NAM","EUR"]
+        geo_account_level = false
         ip_group_name = "ip_group"
         ip{
             address = "200.1.1.1"
@@ -46,6 +47,7 @@ resource "ultradns_dirpool" "a" {
         geo_group_name = "geo_response_group"
         geo_codes = ["AG"]
         ip_group_name = "ip_response_group"
+        ip_account_level = false
         ip{
             address = "2.2.2.2"
         }
@@ -63,6 +65,7 @@ resource "ultradns_dirpool" "ptr" {
     rdata_info{
         rdata = "ns1.example.com."
         geo_group_name = "geo_group"
+        geo_account_level = false
         geo_codes = ["NAM","EUR"]
     }
     no_response{
@@ -99,7 +102,7 @@ resource "ultradns_dirpool" "txt" {
     rdata_info{
         rdata = "text data"
         geo_group_name = "geo_group"
-        geo_codes = ["NAM","EUR"]
+        geo_account_level = true
     }
     no_response{
         all_non_configured = true
@@ -122,10 +125,7 @@ resource "ultradns_dirpool" "aaaa" {
         geo_group_name = "geo_group"
         geo_codes = ["EUR"]
         ip_group_name = "ip_group"
-        ip{
-            start = "aaaa:bbbb:cccc:dddd:eeee:ffff:1111:4444"
-            end = "aaaa:bbbb:cccc:dddd:eeee:ffff:1111:6666"
-        }
+        ip_account_level = true
     }
     no_response{
         geo_group_name = "geo_response_group"
@@ -186,6 +186,7 @@ Default value set to false.
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the corresponding record in rdata. Must be a value between 0 and 2147483647, inclusive.
 * `all_non_configured` - (Optional) (Boolean) Indicates whether or not the associated rdata is used for all of the non-configured geographical territories and SourceIP ranges. At most, one entry in rdataInfo can have this set to true. If this is set to true, then geoInfo (`geo_group_name` and `geo_codes` ) and ipInfo (`ip_group_name` and `ip`) are ignored. Default value set to `false`.
 * `geo_group_name` - (Optional) (String) The name of the GeoIP group.
+* `geo_account_level` - (Optional) (Boolean) Indicates whether or not the GeoIP group is defined in account level. If this is set to true, then `geo_codes` cannot be present.
 * `geo_codes` - (Optional) (String List) The codes for the geographical territories that make up this group. [Valid GEO codes](#valid-geo-codes).
 * `ip_group_name` - (Optional) (String) The name of the SourceIP group.
 * `ip` - (Optional) (Block Set) List of nested blocks describing the IP addresses and IP ranges this SourceIP group contains. The structure of this block is described below.
@@ -196,6 +197,7 @@ Default value set to false.
 * `geo_group_name` - (Optional) (String) The name for the “no response” GeoIP group.
 * `geo_codes` - (Optional) (String List) The codes for the geographical territories that make up the “no response” group. [Valid GEO codes](#valid-geo-codes).
 * `ip_group_name` - (Optional) (String) The name of the “no response” SourceIP group.
+* `ip_account_level` - (Optional) (Boolean) Indicates whether or not the IP group is defined in account level. If this is set to true, then `ip` cannot be present.
 * `ip` - (Optional) (Block Set) List of nested blocks describing the IP addresses and IP range for the “no response” SourceIP group. The structure of this block is described below.
 
 ### Nested `ip` block has the following structure:

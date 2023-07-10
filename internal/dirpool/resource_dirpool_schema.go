@@ -78,6 +78,10 @@ func rdataInfoResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+			"geo_account_level": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
 			"ip_group_name": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -86,6 +90,10 @@ func rdataInfoResource() *schema.Resource {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     sourceIPResource(),
+			},
+			"ip_account_level": {
+				Type:     schema.TypeBool,
+				Optional: true,
 			},
 		},
 	}
@@ -111,6 +119,10 @@ func noResponseResource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+			"geo_account_level": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
 			"ip_group_name": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -119,6 +131,10 @@ func noResponseResource() *schema.Resource {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     sourceIPResource(),
+			},
+			"ip_account_level": {
+				Type:     schema.TypeBool,
+				Optional: true,
 			},
 		},
 	}

@@ -18,6 +18,8 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/client"
+	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/geo"
+	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/ip"
 )
 
 const (
@@ -136,6 +138,32 @@ func TestAccCheckProbeResourceExists(resourceName, pType string) resource.TestCh
 	}
 }
 
+func TestAccCheckDirGroupResourceExists(resourceName, resourceType, resourceID string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[resourceName]
+
+		if !ok {
+			return errors.ResourceNotFoundError(resourceName)
+		}
+
+		services := TestAccProvider.Meta().(*service.Service)
+		switch {
+		case resourceType == ip.DirGroupType:
+			_, dirGroupResponse, _, err := services.DirGroupIPService.Read(resourceID)
+			if err != nil || dirGroupResponse.Name != rs.Primary.ID {
+				return err
+			}
+
+		case resourceType == geo.DirGroupType:
+			_, dirGroupResponse, _, err := services.DirGroupGeoService.Read(resourceID)
+			if err != nil || dirGroupResponse.Name != rs.Primary.ID {
+				return err
+			}
+		}
+
+		return nil
+	}
+}
 func TestAccCheckRecordResourceDestroy(resourceName, pType string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		for _, rs := range s.RootModule().Resources {
@@ -182,6 +210,24 @@ func TestAccCheckProbeResourceDestroy(resourceName, pType string) resource.TestC
 	}
 }
 
+func TestAccCheckDirGroupResourceDestroy(resourceName, resourceType, resourceID string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		for _, rs := range s.RootModule().Resources {
+			if rs.Type != resourceName {
+				continue
+			}
+
+			services := TestAccProvider.Meta().(*service.Service)
+			_, dirGroupResponse, _, err := services.DirGroupGeoService.Read(resourceID)
+			if err == nil {
+				if dirGroupResponse.Name == rs.Primary.ID {
+					return errors.ResourceNotDestroyedError(rs.Primary.ID)
+				}
+			}
+		}
+		return nil
+	}
+}
 func GetRandomZoneName() string {
 	return randZoneNamePrefix + acctest.RandString(randStringLength) + randZoneNameSuffix
 }

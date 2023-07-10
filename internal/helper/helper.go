@@ -98,6 +98,14 @@ func GetProbeIDFromURI(uri string) string {
 	return splitURI(uri, "probes/")
 }
 
+func GetGeoIdFromURI(uri string) string {
+	return splitURI(uri, "geo/")
+}
+
+func GetIPIdFromURI(uri string) string {
+	return splitURI(uri, "ip/")
+}
+
 func splitURI(uri, split string) string {
 	splitStringData := strings.Split(uri, split)
 

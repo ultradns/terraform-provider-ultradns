@@ -168,6 +168,9 @@ func getRDataInfo(rdataInfoData map[string]interface{}) *dirpool.RDataInfo {
 			geoInfo.Codes[i] = geoCode.(string)
 		}
 	}
+	if val, ok := rdataInfoData["geo_account_level"]; ok {
+		geoInfo.IsAccountLevel = val.(bool)
+	}
 
 	if val, ok := rdataInfoData["ip_group_name"]; ok {
 		ipInfo.Name = val.(string)
@@ -176,6 +179,10 @@ func getRDataInfo(rdataInfoData map[string]interface{}) *dirpool.RDataInfo {
 	if val, ok := rdataInfoData["ip"]; ok {
 		sourceIPInfoDataList := val.(*schema.Set).List()
 		ipInfo.IPs = getSourceIPInfoList(sourceIPInfoDataList)
+	}
+
+	if val, ok := rdataInfoData["ip_account_level"]; ok {
+		ipInfo.IsAccountLevel = val.(bool)
 	}
 
 	return rdataInfo
