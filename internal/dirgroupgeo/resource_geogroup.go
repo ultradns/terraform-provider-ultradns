@@ -51,10 +51,18 @@ func resourceGeoGroupRead(ctx context.Context, rd *schema.ResourceData, meta int
 		return diag.FromErr(err)
 	}
 
-	rd.Set("name", geoGroup.Name)
-	rd.Set("account_name", helper.GetAccountName(geoID))
-	rd.Set("description", geoGroup.Description)
-	rd.Set("codes", geoGroup.Codes)
+	if err := rd.Set("name", geoGroup.Name); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := rd.Set("account_name", helper.GetAccountName(geoID)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := rd.Set("description", geoGroup.Description); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := rd.Set("codes", geoGroup.Codes); err != nil {
+		return diag.FromErr(err)
+	}
 
 	return diags
 }

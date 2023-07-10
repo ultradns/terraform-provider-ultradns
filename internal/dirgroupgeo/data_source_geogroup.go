@@ -28,10 +28,18 @@ func dataSourceGeoGroupRead(ctx context.Context, rd *schema.ResourceData, meta i
 	}
 
 	rd.SetId(geoGroupData.DirGroupGeoID())
-	rd.Set("name", geoGroup.Name)
-	rd.Set("account_name", helper.GetAccountNameFromURI(uri))
-	rd.Set("description", geoGroup.Description)
-	rd.Set("codes", geoGroup.Codes)
+	if err := rd.Set("name", geoGroup.Name); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := rd.Set("account_name", helper.GetAccountNameFromURI(uri)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := rd.Set("description", geoGroup.Description); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := rd.Set("codes", geoGroup.Codes); err != nil {
+		return diag.FromErr(err)
+	}
 	return diags
 
 }

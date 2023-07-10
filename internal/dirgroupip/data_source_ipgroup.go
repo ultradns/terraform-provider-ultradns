@@ -29,10 +29,18 @@ func dataSourceIPGroupRead(ctx context.Context, rd *schema.ResourceData, meta in
 	}
 
 	rd.SetId(ipGroupData.DirGroupIPID())
-	rd.Set("name", ipGroup.Name)
-	rd.Set("account_name", helper.GetAccountNameFromURI(uri))
-	rd.Set("description", ipGroup.Description)
-	rd.Set("ip", getSourceIPInfoSet(ipGroup.IPs))
+	if err := rd.Set("name", ipGroup.Name); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := rd.Set("account_name", helper.GetAccountNameFromURI(uri)); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := rd.Set("description", ipGroup.Description); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := rd.Set("ip", getSourceIPInfoSet(ipGroup.IPs)); err != nil {
+		return diag.FromErr(err)
+	}
 	return diags
 
 }
