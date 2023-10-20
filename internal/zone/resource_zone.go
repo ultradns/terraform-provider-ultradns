@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
@@ -50,7 +51,7 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 	_, zoneResponse, err := services.ZoneService.ReadZone(zoneID)
 	if err != nil {
 		rd.SetId("")
-
+		tflog.Error(ctx, err.Error())
 		return nil
 	}
 
