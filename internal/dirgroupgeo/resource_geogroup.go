@@ -3,6 +3,7 @@ package dirgroupgeo
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
@@ -48,6 +49,7 @@ func resourceGeoGroupRead(ctx context.Context, rd *schema.ResourceData, meta int
 
 	_, geoGroup, _, err := services.DirGroupGeoService.Read(geoID)
 	if err != nil {
+		tflog.Error(ctx, err.Error())
 		return diag.FromErr(err)
 	}
 

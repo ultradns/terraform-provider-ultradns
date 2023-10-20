@@ -16,7 +16,7 @@ terraform {
   required_providers {
     ultradns = {
       source = "ultradns/ultradns"
-      version = ">= 1.3.0"
+      version = ">= 1.8.0"
     }
   }
 }

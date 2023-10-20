@@ -3,6 +3,7 @@ package sfpool
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/pool"
@@ -52,7 +53,7 @@ func resourceSFPoolRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	_, resList, err := services.RecordService.Read(rrSetKey)
 	if err != nil {
 		rd.SetId("")
-
+		tflog.Error(ctx, err.Error())
 		return nil
 	}
 
