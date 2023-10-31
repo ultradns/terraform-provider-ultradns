@@ -57,7 +57,7 @@ The following arguments are supported:
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
 * `record_type` - (Required) (String) Must be formatted as a well-known resource record type (A), or the corresponding number for the type (1).<br/>
 Below are the supported resource record types with the corresponding number:<br/>
-`A (1)`
+`A (1)` `AAAA (28)`
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
 * `pool_description` - (Optional) (String) An optional description of the Traffic Controller (TC) field.
 * `run_probes` - (Optional) (Boolean) Indicates whether or not the probes are run for this pool. Default value set to true.
