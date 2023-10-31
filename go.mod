@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/terraform-plugin-log v0.4.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.17.0
-	github.com/ultradns/ultradns-go-sdk v1.5.0-20230427130837-23c9b0c
+	github.com/ultradns/ultradns-go-sdk v1.6.0-20231027132637-68384b1
 )
 
 require (
