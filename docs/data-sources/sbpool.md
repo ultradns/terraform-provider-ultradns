@@ -30,6 +30,7 @@ The following arguments are supported:
 * `record_type` - (Required) (String) Must be formatted as a well-known resource record type (A), or the corresponding number for the type (1).<br/>
 Below are the supported resource record types with the corresponding number:<br/>
 `A (1)`
+`AAAA (28)`
 
 
 ## Attributes Reference
