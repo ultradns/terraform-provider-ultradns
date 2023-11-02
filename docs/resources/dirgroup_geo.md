@@ -1,5 +1,5 @@
 ---
-subcategory: "Geo"
+subcategory: "DirGroup-Geo"
 layout: "ultradns"
 page_title: "ULTRADNS: ultradns_dirgroup_geo"
 description: |-
