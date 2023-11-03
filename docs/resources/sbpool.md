@@ -54,6 +54,48 @@ resource "ultradns_sbpool" "a" {
 }
 ```
 
+### Create SB pool record of type AAAA (28)
+
+```terraform
+resource "ultradns_sbpool" "aaaa" {
+    zone_name = "example.com."
+    owner_name = "aaaa"
+    record_type = "AAAA"
+    ttl = 120
+    pool_description = "SB Pool Resource of Type AAAA"
+    run_probes = true
+    act_on_probes = true
+    order = "ROUND_ROBIN"
+    failure_threshold = 2
+    max_active = 1
+    max_served = 1
+    rdata_info{
+        priority = 2
+        threshold = 1
+        rdata = "2001:db8:85a3:0:0:8a2e:370:7335"
+        failover_delay = 2
+        run_probes = true
+        state = "ACTIVE"
+    }
+    rdata_info{
+        priority = 1
+        threshold = 1
+        rdata = "2001:db8:85a3:0:0:8a2e:370:7336"
+        failover_delay = 1
+        run_probes = false
+        state = "NORMAL"
+    }
+    backup_record{
+        rdata = "2001:db8:85a3:0:0:8a2e:370:7337"
+        failover_delay = 1
+    }
+    backup_record{
+        rdata = "2001:db8:85a3:0:0:8a2e:370:7338"
+        failover_delay = 1
+    }
+}
+```
+
 ## Argument Reference
 
 The following arguments are supported:
@@ -63,6 +105,7 @@ The following arguments are supported:
 * `record_type` - (Required) (String) Must be formatted as a well-known resource record type (A), or the corresponding number for the type (1).<br/>
 Below are the supported resource record types with the corresponding number:<br/>
 `A (1)`
+`AAAA (28)`
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
 * `pool_description` - (Optional) (String) An optional description of the SiteBacker (SB) field.
 * `run_probes` - (Optional) (Boolean) Indicates whether or not the probes are run for this pool. Default value set to true.

@@ -1,5 +1,5 @@
 ---
-subcategory: "IP"
+subcategory: "DirGroup-IP"
 layout: "ultradns"
 page_title: "ULTRADNS: ultradns_dirgroup_ip"
 description: |-
