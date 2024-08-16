@@ -12,14 +12,14 @@ func ResourceRRSetSchema() map[string]*schema.Schema {
 			Required:         true,
 			ForceNew:         true,
 			DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
-			StateFunc:		  helper.CaseInSensitiveState,
+			StateFunc:        helper.CaseInSensitiveState,
 		},
 		"owner_name": {
 			Type:             schema.TypeString,
 			Required:         true,
 			ForceNew:         true,
 			DiffSuppressFunc: helper.OwnerFQDNDiffSuppress,
-			StateFunc:		  helper.CaseInSensitiveState,
+			StateFunc:        helper.CaseInSensitiveState,
 		},
 		"record_type": {
 			Type:             schema.TypeString,
@@ -34,10 +34,12 @@ func ResourceRRSetSchema() map[string]*schema.Schema {
 			Default:  86400,
 		},
 		"record_data": {
-			Type:     schema.TypeSet,
-			Required: true,
-			Set:      schema.HashString,
-			MinItems: 1,
+			Type:                  schema.TypeSet,
+			Required:              true,
+			Set:                   schema.HashString,
+			MinItems:              1,
+			DiffSuppressFunc:      helper.RecordDataDiffSuppress,
+			DiffSuppressOnRefresh: true,
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},

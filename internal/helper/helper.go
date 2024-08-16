@@ -14,10 +14,18 @@ func CaseInSensitiveState(val any) string {
 }
 
 func ZoneFQDNDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
+	if len(old) == 0 || len(new) == 0 {
+		return false
+	}
+
 	return helper.GetZoneFQDN(old) == helper.GetZoneFQDN(new)
 }
 
 func OwnerFQDNDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
+	if len(old) == 0 || len(new) == 0 {
+		return false
+	}
+
 	zoneName := ""
 
 	if val, ok := rd.GetOk("zone_name"); ok {
@@ -36,6 +44,41 @@ func RecordTypeDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 	}
 
 	return oldRecordType == newRecordType || oldRecordType == new
+}
+
+func RecordDataDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
+	recordType := ""
+
+	if val, ok := rd.GetOk("record_type"); ok {
+		recordType = helper.GetRecordTypeFullString(val.(string))
+	}
+
+	switch recordType {
+	case "CAA (257)":
+		return CAARecordDiffSuppress(k, old, new, rd)
+	default:
+		return false
+	}
+
+	return false
+}
+
+func CAARecordDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
+
+	keyIndex := strings.LastIndex(k, ".")
+	if keyIndex != -1 {
+		k = string(k[:keyIndex])
+	}
+
+	o, n := rd.GetChange(k)
+	oldData := o.(*schema.Set)
+	newData := n.(*schema.Set)
+
+	if oldData.Len() == 0 || newData.Len() == 0 {
+		return false
+	}
+
+	return trimCAARecord(oldData) == trimCAARecord(newData)
 }
 
 func URIDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
@@ -70,7 +113,11 @@ func RecordTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
 		"TXT": true, "16": true,
 		"AAAA": true, "28": true,
 		"SRV": true, "33": true,
+		"DS": true, "43": true,
 		"SSHFP": true, "44": true,
+		"SVCB": true, "64": true,
+		"HTTPS": true, "65": true,
+		"CAA": true, "257": true,
 		"APEXALIAS": true, "65282": true,
 	}
 
@@ -114,4 +161,18 @@ func splitURI(uri, split string) string {
 	}
 
 	return ""
+}
+
+func trimCAARecord(data *schema.Set) string {
+	result := make([]string, data.Len())
+
+	for i, d := range data.List() {
+		splitStringData := strings.Split(d.(string), " ")
+		if len(splitStringData) == 3 {
+			splitStringData[2] = strings.Trim(splitStringData[2], "\"")
+		}
+		result[i] = strings.Join(splitStringData, " ")
+	}
+
+	return strings.Join(result, ",")
 }
