@@ -1,12 +1,15 @@
 package helper
 
 import (
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record"
 )
 
 func CaseInSensitiveState(val any) string {
@@ -53,24 +56,15 @@ func RecordDataDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 		recordType = helper.GetRecordTypeFullString(val.(string))
 	}
 
-	switch recordType {
-	case "CAA (257)":
-		return CAARecordDiffSuppress(k, old, new, rd)
-	default:
-		return false
+	if recordType == record.CAA || recordType == record.SVCB || recordType == record.HTTPS {
+		return PresentationDiffSuppress(recordType, rd)
 	}
 
 	return false
 }
 
-func CAARecordDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
-
-	keyIndex := strings.LastIndex(k, ".")
-	if keyIndex != -1 {
-		k = string(k[:keyIndex])
-	}
-
-	o, n := rd.GetChange(k)
+func PresentationDiffSuppress(recordType string, rd *schema.ResourceData) bool {
+	o, n := rd.GetChange("record_data")
 	oldData := o.(*schema.Set)
 	newData := n.(*schema.Set)
 
@@ -78,7 +72,16 @@ func CAARecordDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 		return false
 	}
 
-	return trimCAARecord(oldData) == trimCAARecord(newData)
+	switch recordType {
+	case record.CAA:
+		return trimCAARecord(oldData) == trimCAARecord(newData)
+	case record.SVCB:
+		return formatSVCBRecord(oldData) == formatSVCBRecord(newData)
+	case record.HTTPS:
+		return formatSVCBRecord(oldData) == formatSVCBRecord(newData)
+	}
+
+	return false
 }
 
 func URIDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
@@ -175,4 +178,119 @@ func trimCAARecord(data *schema.Set) string {
 	}
 
 	return strings.Join(result, ",")
+}
+
+func formatSVCBRecord(data *schema.Set) string {
+	result := ""
+	svcData := data.List()[0].(string)
+	svcDataSplt := strings.SplitAfterN(svcData, " ", 3)
+	result = svcDataSplt[0] + " " + svcDataSplt[1]
+
+	if len(svcDataSplt) == 3 {
+		result = result + " " + formatSVCParams(svcDataSplt[2])
+	}
+
+	return result
+}
+
+func formatSVCParams(svcParams string) string {
+	svcParams = strings.TrimPrefix(svcParams, "(")
+	svcParams = strings.TrimSuffix(svcParams, ")")
+	svcParams = strings.TrimSpace(svcParams)
+	svcParamsSplit := strings.Split(svcParams, " ")
+	svcParamsMap := make(map[int]string)
+
+	for _, v := range svcParamsSplit {
+		key := -1
+		value := ""
+		paramSplit := strings.Split(v, "=")
+		if len(paramSplit) > 0 {
+			key = getSvcKeyNumber(paramSplit[0])
+		}
+		if len(paramSplit) > 1 {
+			value = strings.Trim(paramSplit[1], "\"")
+		}
+		svcParamsMap[key] = value
+	}
+
+	keys := make([]int, 0)
+	for k, _ := range svcParamsMap {
+		keys = append(keys, k)
+	}
+
+	sort.Ints(keys)
+
+	result := ""
+	for _, k := range keys {
+		result += getSvcParamText(k, svcParamsMap[k])
+	}
+
+	return strings.TrimSpace(result)
+}
+
+func getSvcKeyNumber(s string) int {
+	svcKey := strings.ToUpper(s)
+	switch svcKey {
+	case "MANDATORY":
+		return 0
+	case "ALPN":
+		return 1
+	case "NO-DEFAULT-ALPN":
+		return 2
+	case "PORT":
+		return 3
+	case "IPV4HINT":
+		return 4
+	case "ECH":
+		return 5
+	case "IPV6HINT":
+		return 6
+	case "DOHPATH":
+		return 7
+	case "OHTTP":
+		return 8
+	}
+
+	if strings.HasPrefix(svcKey, "KEY") {
+		splt := strings.Split(svcKey, "KEY")
+		i, err := strconv.Atoi(splt[1])
+		if err != nil {
+			return -1
+		}
+		return i
+	}
+	return -1
+}
+
+func getSvcParamText(key int, value string) string {
+	switch key {
+	case 0:
+		return "mandatory=" + value + " "
+	case 1:
+		return "alpn=" + value + " "
+	case 2:
+		return "no-default-alpn "
+	case 3:
+		return "port=" + value + " "
+	case 4:
+		return "ipv4hint=" + value + " "
+	case 5:
+		return "ech=" + value + " "
+	case 6:
+		return "ipv6hint=" + value + " "
+	case 7:
+		return "dohpath=" + value + " "
+	case 8:
+		return "ohttp "
+	}
+
+	if key > 8 {
+		keyStr := strconv.Itoa(key)
+		if len(value) == 0 {
+			return "Key" + keyStr + " "
+		} else {
+			return "Key" + keyStr + "=" + value + " "
+		}
+	}
+	return ""
 }
