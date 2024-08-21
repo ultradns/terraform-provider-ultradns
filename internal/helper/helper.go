@@ -287,9 +287,9 @@ func getSvcParamText(key int, value string) string {
 	if key > 8 {
 		keyStr := strconv.Itoa(key)
 		if len(value) == 0 {
-			return "Key" + keyStr + " "
+			return "key" + keyStr + " "
 		} else {
-			return "Key" + keyStr + "=" + value + " "
+			return "key" + keyStr + "=" + value + " "
 		}
 	}
 	return ""
