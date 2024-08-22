@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	provhelper "github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/ip"
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
@@ -48,10 +49,16 @@ func resourceIPGroupRead(ctx context.Context, rd *schema.ResourceData, meta inte
 	services := meta.(*service.Service)
 	ipID := rd.Id()
 
-	_, ipGroup, _, err := services.DirGroupIPService.Read(ipID)
+	res, ipGroup, _, err := services.DirGroupIPService.Read(ipID)
 	//_, _, err := services.DirGroupIPService.Read(ipID)
+
+	if err != nil && res != nil && res.Status == provhelper.RESOURCE_NOT_FOUND {
+		rd.SetId("")
+		tflog.Debug(ctx, err.Error())
+		return nil
+	}
+
 	if err != nil {
-		tflog.Error(ctx, err.Error())
 		return diag.FromErr(err)
 	}
 

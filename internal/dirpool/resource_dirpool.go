@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/record/dirpool"
@@ -49,11 +50,16 @@ func resourceDIRPoolRead(ctx context.Context, rd *schema.ResourceData, meta inte
 	services := meta.(*service.Service)
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkpool.DIR
-	_, resList, err := services.RecordService.Read(rrSetKey)
-	if err != nil {
+	res, resList, err := services.RecordService.Read(rrSetKey)
+
+	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
 		rd.SetId("")
-		tflog.Error(ctx, err.Error())
+		tflog.Debug(ctx, err.Error())
 		return nil
+	}
+
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	if len(resList.RRSets) > 0 {

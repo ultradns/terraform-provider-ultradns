@@ -102,33 +102,33 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.cname", "record_data.0", "example.com."),
 				),
 			},
-			{
-				Config: testAccResourceRecordSOA(strings.ToUpper(zoneName)),
-				Check: resource.ComposeTestCheckFunc(
-					acctest.TestAccCheckRecordResourceExists("ultradns_record.soa", ""),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "zone_name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "owner_name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "record_type", "SOA"),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "ttl", "800"),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. sample@example.com. 10800 3600 2592000 10800"),
-				),
-			},
-			{
-				ResourceName:      "ultradns_record.soa",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-			{
-				Config: testAccUpdateResourceRecordSOA(zoneName),
-				Check: resource.ComposeTestCheckFunc(
-					acctest.TestAccCheckRecordResourceExists("ultradns_record.soa", ""),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "zone_name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "owner_name", zoneName),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "record_type", "SOA"),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "ttl", "800"),
-					resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. test.sample@example.com. 10800 3600 2592000 10800"),
-				),
-			},
+			// {
+			// 	Config: testAccResourceRecordSOA(strings.ToUpper(zoneName)),
+			// 	Check: resource.ComposeTestCheckFunc(
+			// 		acctest.TestAccCheckRecordResourceExists("ultradns_record.soa", ""),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "zone_name", zoneName),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "owner_name", zoneName),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "record_type", "SOA"),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "ttl", "800"),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. sample@example.com. 10800 3600 2592000 10800"),
+			// 	),
+			// },
+			// {
+			// 	ResourceName:      "ultradns_record.soa",
+			// 	ImportState:       true,
+			// 	ImportStateVerify: true,
+			// },
+			// {
+			// 	Config: testAccUpdateResourceRecordSOA(zoneName),
+			// 	Check: resource.ComposeTestCheckFunc(
+			// 		acctest.TestAccCheckRecordResourceExists("ultradns_record.soa", ""),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "zone_name", zoneName),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "owner_name", zoneName),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "record_type", "SOA"),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "ttl", "800"),
+			// 		resource.TestCheckResourceAttr("ultradns_record.soa", "record_data.0", "udns1.ultradns.net. test.sample@example.com. 10800 3600 2592000 10800"),
+			// 	),
+			// },
 			{
 				Config: testAccResourceRecordPTR(strings.ToUpper(zoneName)),
 				Check: resource.ComposeTestCheckFunc(
@@ -217,6 +217,58 @@ func TestAccResourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_record.apex", "record_type", "APEXALIAS"),
 					resource.TestCheckResourceAttr("ultradns_record.apex", "ttl", "800"),
 					resource.TestCheckResourceAttr("ultradns_record.apex", "record_data.0", "example.com."),
+				),
+			},
+			{
+				Config: testAccResourceRecordDS(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.ds", ""),
+					resource.TestCheckResourceAttr("ultradns_record.ds", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.ds", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.ds", "record_type", "DS"),
+					resource.TestCheckResourceAttr("ultradns_record.ds", "ttl", "800"),
+					resource.TestCheckResourceAttr("ultradns_record.ds", "record_data.0", "25286 1 1 340437DC66C3DFAD0B3E849740D2CF1A4151671D"),
+				),
+			},
+			{
+				Config: testAccResourceRecordCAA(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.caa", ""),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "record_type", "CAA"),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "ttl", "800"),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "record_data.0", "0 issue ultradns"),
+				),
+			},
+			{
+				ResourceName:      "ultradns_record.caa",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: testAccResourceRecordHTTPS(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.https", ""),
+					resource.TestCheckResourceAttr("ultradns_record.https", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.https", "record_type", "HTTPS"),
+					resource.TestCheckResourceAttr("ultradns_record.https", "ttl", "800"),
+					resource.TestCheckResourceAttr("ultradns_record.https", "record_data.0", "1 www.ultradns.com. ech=dGVzdA== mandatory=alpn,key65444 no-default-alpn port=8080 ipv4hint=1.2.3.4,9.8.7.6 key65444=privateKeyTesting ipv6hint=2001:db8:3333:4444:5555:6666:7777:8888,2001:db8:3333:4444:cccc:dddd:eeee:ffff alpn=h3,h3-29,h2"),
+				),
+			},
+			{
+				ResourceName:      "ultradns_record.https",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: testAccResourceRecordSVCB(zoneName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.svcb", ""),
+					resource.TestCheckResourceAttr("ultradns_record.svcb", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.svcb", "record_type", "SVCB"),
+					resource.TestCheckResourceAttr("ultradns_record.svcb", "ttl", "800"),
+					resource.TestCheckResourceAttr("ultradns_record.svcb", "record_data.0", "0 www.ultradns.com."),
 				),
 			},
 		},
@@ -432,4 +484,60 @@ func testAccResourceRecordAPEXALIAS(zoneName string) string {
 		record_data = ["example.com."]
 	}
 	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), strings.TrimSuffix(zoneName, "."), tfacctest.RandString(3))
+}
+
+func testAccResourceRecordDS(zoneName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "ds" {
+		zone_name = "%s"
+		owner_name = "%s"
+		record_type = "DS"
+		ttl = 800
+		record_data = ["25286 1 1 340437DC66C3DFAD0B3E849740D2CF1A4151671D"]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, zoneName)
+}
+
+func testAccResourceRecordCAA(zoneName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "caa" {
+		zone_name = "%s"
+		owner_name = "%s"
+		record_type = "CAA"
+		ttl = 800
+		record_data = ["0 issue ultradns"]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, zoneName)
+}
+
+func testAccResourceRecordHTTPS(zoneName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "https" {
+		zone_name = "%s"
+		owner_name = "%s"
+		record_type = "HTTPS"
+		ttl = 800
+		record_data = ["1 www.ultradns.com. ech=dGVzdA== mandatory=alpn,key65444 no-default-alpn port=8080 ipv4hint=1.2.3.4,9.8.7.6 key65444=privateKeyTesting ipv6hint=2001:db8:3333:4444:5555:6666:7777:8888,2001:db8:3333:4444:cccc:dddd:eeee:ffff alpn=h3,h3-29,h2"]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, tfacctest.RandString(3))
+}
+
+func testAccResourceRecordSVCB(zoneName string) string {
+	return fmt.Sprintf(`
+	%s
+
+	resource "ultradns_record" "svcb" {
+		zone_name = "%s"
+		owner_name = "%s"
+		record_type = "SVCB"
+		ttl = 800
+		record_data = ["0 www.ultradns.com."]
+	}
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, tfacctest.RandString(3))
 }

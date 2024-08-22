@@ -1,6 +1,6 @@
 module github.com/ultradns/terraform-provider-ultradns
 
-go 1.19
+go 1.22
 
 require (
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
@@ -8,6 +8,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.17.0
 	github.com/ultradns/ultradns-go-sdk v1.6.2-20240501171831-432d643
 )
+
 
 require (
 	github.com/agext/levenshtein v1.2.2 // indirect
@@ -48,7 +49,7 @@ require (
 	github.com/zclconf/go-cty v1.10.0 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/oauth2 v0.19.0 // indirect
+	golang.org/x/oauth2 v0.22.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

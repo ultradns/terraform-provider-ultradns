@@ -36,7 +36,9 @@ func resourceProbeTCPCreate(ctx context.Context, rd *schema.ResourceData, meta i
 	probeData := getNewProbeTCP(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
-	rrSetKeyData.RecordType = probe.RecordTypeA
+	if val, ok := rd.GetOk("pool_type"); ok {
+		rrSetKeyData.RecordType = val.(string)
+	}
 
 	res, err := services.ProbeService.Create(rrSetKeyData, probeData)
 
@@ -59,12 +61,16 @@ func resourceProbeTCPRead(ctx context.Context, rd *schema.ResourceData, meta int
 	services := meta.(*service.Service)
 	rrSetKey := probe.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkprobe.TCP
-	_, probeData, err := services.ProbeService.Read(rrSetKey)
+	res, probeData, err := services.ProbeService.Read(rrSetKey)
+
+	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
+		rd.SetId("")
+		tflog.Debug(ctx, err.Error())
+		return nil
+	}
 
 	if err != nil {
-		rd.SetId("")
-		tflog.Error(ctx, err.Error())
-		return nil
+		return diag.FromErr(err)
 	}
 
 	if err = probe.FlattenRRSetKey(rrSetKey, rd); err != nil {
@@ -72,6 +78,10 @@ func resourceProbeTCPRead(ctx context.Context, rd *schema.ResourceData, meta int
 	}
 
 	if err = flattenProbeTCP(probeData, rd); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := rd.Set("pool_type", rrSetKey.RecordType); err != nil {
 		return diag.FromErr(err)
 	}
 

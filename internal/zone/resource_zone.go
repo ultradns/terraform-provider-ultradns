@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	provhelper "github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
 	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
@@ -48,11 +49,15 @@ func resourceZoneRead(ctx context.Context, rd *schema.ResourceData, meta interfa
 	services := meta.(*service.Service)
 	zoneID := rd.Id()
 
-	_, zoneResponse, err := services.ZoneService.ReadZone(zoneID)
-	if err != nil {
+	res, zoneResponse, err := services.ZoneService.ReadZone(zoneID)
+	if err != nil && res != nil && res.Status == provhelper.RESOURCE_NOT_FOUND {
 		rd.SetId("")
-		tflog.Error(ctx, err.Error())
+		tflog.Debug(ctx, err.Error())
 		return nil
+	}
+
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	if zoneResponse.Properties != nil {

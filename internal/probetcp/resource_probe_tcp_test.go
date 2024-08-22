@@ -94,6 +94,24 @@ func TestAccResourceProbeTCP(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc", "avg_connect_limit.0.fail", "16"),
 				),
 			},
+			{
+				Config: testAccResourceProbeTCPForTCPoolAAAA(zoneNameTC, ownerName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckProbeResourceExists("ultradns_probe_tcp.tcp_tc_aaaa", probe.TCP),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "zone_name", zoneNameTC),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "owner_name", ownerName+"."+zoneNameTC),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "agents.#", "3"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "threshold", "2"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "interval", "HALF_MINUTE"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "port", "443"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "connect_limit.0.warning", "10"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "connect_limit.0.critical", "11"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "connect_limit.0.fail", "12"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "avg_connect_limit.0.warning", "13"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "avg_connect_limit.0.critical", "14"),
+					resource.TestCheckResourceAttr("ultradns_probe_tcp.tcp_tc_aaaa", "avg_connect_limit.0.fail", "15"),
+				),
+			},
 		},
 	}
 
@@ -181,4 +199,29 @@ func testAccResourceUpdateProbeTCPForTCPool(zoneName, ownerName string) string {
 		}
 	}
 	`, acctest.TestAccResourceTCPool(zoneName, ownerName))
+}
+
+func testAccResourceProbeTCPForTCPoolAAAA(zoneName, ownerName string) string {
+	return fmt.Sprintf(`
+	%s
+	resource "ultradns_probe_tcp" "tcp_tc_aaaa" {
+		zone_name = "${resource.ultradns_zone.primary_tcpool.id}"
+		owner_name = "${resource.ultradns_tcpool.aaaa.owner_name}"
+		pool_type = "AAAA"
+		interval = "HALF_MINUTE"
+		agents = ["NEW_YORK","DALLAS","PALO_ALTO"]
+		threshold = 2
+		port = 443
+		connect_limit{
+			warning = 10
+			critical = 11
+			fail = 12
+		}
+		avg_connect_limit{
+			warning = 13
+			critical = 14
+			fail = 15
+		}
+	}
+	`, acctest.TestAccResourceTCPoolAAAA(zoneName, ownerName))
 }

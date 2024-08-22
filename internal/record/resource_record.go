@@ -62,11 +62,16 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	services := meta.(*service.Service)
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 
-	_, resList, err := services.RecordService.Read(rrSetKey)
-	if err != nil {
+	res, resList, err := services.RecordService.Read(rrSetKey)
+
+	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
 		rd.SetId("")
-		tflog.Error(ctx, err.Error())
+		tflog.Debug(ctx, err.Error())
 		return nil
+	}
+
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	if len(resList.RRSets) > 0 {

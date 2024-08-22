@@ -25,6 +25,7 @@ func TestAccDataSourceProbePING(t *testing.T) {
 					"ping_sb",
 					strings.ToUpper(zoneNameSB),
 					ownerName,
+					"A",
 					testAccResourceProbePINGForSBPool(zoneNameSB, strings.ToUpper(ownerName)),
 				),
 				Check: resource.ComposeTestCheckFunc(
@@ -48,6 +49,7 @@ func TestAccDataSourceProbePING(t *testing.T) {
 					"ping_tc",
 					zoneNameTC,
 					strings.ToUpper(ownerName),
+					"A"
 					"FIFTEEN_MINUTES",
 					"",
 					testAccResourceUpdateProbePINGForTCPool(zoneNameTC, ownerName),

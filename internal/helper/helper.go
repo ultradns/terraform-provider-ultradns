@@ -12,6 +12,8 @@ import (
 	"github.com/ultradns/ultradns-go-sdk/pkg/record"
 )
 
+const RESOURCE_NOT_FOUND = "404 Not Found"
+
 func CaseInSensitiveState(val any) string {
 	return strings.ToLower(val.(string))
 }

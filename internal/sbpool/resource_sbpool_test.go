@@ -73,6 +73,28 @@ func TestAccResourceSBPool(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			{
+				Config: acctest.TestAccResourceSBPoolAAAA(strings.ToUpper(zoneName), ownerName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_sbpool.aaaa", pool.SB),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "owner_name", ownerName+"."+zoneName),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "record_type", "AAAA"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "ttl", "120"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "status", "OK"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "pool_description", "SB Pool Resource of Type AAAA"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "run_probes", "true"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "act_on_probes", "true"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "order", "ROUND_ROBIN"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "failure_threshold", "2"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "max_active", "1"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "max_served", "1"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "backup_record.0.rdata", "2001:db8:85a3:0:0:8a2e:370:7337"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "backup_record.0.failover_delay", "1"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "backup_record.0.available_to_serve", "true"),
+					resource.TestCheckResourceAttr("ultradns_sbpool.aaaa", "rdata_info.#", "2"),
+				),
+			},
 		},
 	}
 

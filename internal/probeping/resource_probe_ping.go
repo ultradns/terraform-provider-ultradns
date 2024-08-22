@@ -57,11 +57,15 @@ func resourceProbePINGRead(ctx context.Context, rd *schema.ResourceData, meta in
 	services := meta.(*service.Service)
 	rrSetKey := probe.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkprobe.PING
-	_, probeData, err := services.ProbeService.Read(rrSetKey)
-	if err != nil {
+	res, probeData, err := services.ProbeService.Read(rrSetKey)
+	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
 		rd.SetId("")
-		tflog.Error(ctx, err.Error())
+		tflog.Debug(ctx, err.Error())
 		return nil
+	}
+
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	if err = probe.FlattenRRSetKey(rrSetKey, rd); err != nil {
@@ -69,6 +73,10 @@ func resourceProbePINGRead(ctx context.Context, rd *schema.ResourceData, meta in
 	}
 
 	if err = flattenProbePING(probeData, rd); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := rd.Set("pool_type", rrSetKey.RecordType); err != nil {
 		return diag.FromErr(err)
 	}
 

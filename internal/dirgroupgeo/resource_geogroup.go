@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	provhelper "github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/geo"
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
@@ -47,9 +48,15 @@ func resourceGeoGroupRead(ctx context.Context, rd *schema.ResourceData, meta int
 	services := meta.(*service.Service)
 	geoID := rd.Id()
 
-	_, geoGroup, _, err := services.DirGroupGeoService.Read(geoID)
+	res, geoGroup, _, err := services.DirGroupGeoService.Read(geoID)
+
+	if err != nil && res != nil && res.Status == provhelper.RESOURCE_NOT_FOUND {
+		rd.SetId("")
+		tflog.Debug(ctx, err.Error())
+		return nil
+	}
+
 	if err != nil {
-		tflog.Error(ctx, err.Error())
 		return diag.FromErr(err)
 	}
 
