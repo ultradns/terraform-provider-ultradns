@@ -236,7 +236,6 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func resourceNSRecordDelete(rd *schema.ResourceData, services *service.Service) diag.Diagnostics {
-	tflog.Trace(ctx, "Record resource delete context invoked")
 	var diags diag.Diagnostics
 
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
