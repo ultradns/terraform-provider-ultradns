@@ -52,20 +52,20 @@ func RecordTypeDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
 }
 
 func RecordDataDiffSuppress(k, old, new string, rd *schema.ResourceData) bool {
-	recordType := ""
+	recType := ""
 
 	if val, ok := rd.GetOk("record_type"); ok {
-		recordType = helper.GetRecordTypeFullString(val.(string))
+		recType = helper.GetRecordTypeFullString(val.(string))
 	}
 
-	if recordType == record.CAA || recordType == record.SVCB || recordType == record.HTTPS {
-		return PresentationDiffSuppress(recordType, rd)
+	if recType == record.CAA || recType == record.SVCB || recType == record.HTTPS {
+		return fmtDiffSuppress(recType, rd)
 	}
 
 	return false
 }
 
-func PresentationDiffSuppress(recordType string, rd *schema.ResourceData) bool {
+func fmtDiffSuppress(recordType string, rd *schema.ResourceData) bool {
 	o, n := rd.GetChange("record_data")
 	oldData := o.(*schema.Set)
 	newData := n.(*schema.Set)
@@ -76,11 +76,9 @@ func PresentationDiffSuppress(recordType string, rd *schema.ResourceData) bool {
 
 	switch recordType {
 	case record.CAA:
-		return trimCAARecord(oldData) == trimCAARecord(newData)
-	case record.SVCB:
-		return formatSVCBRecord(oldData) == formatSVCBRecord(newData)
-	case record.HTTPS:
-		return formatSVCBRecord(oldData) == formatSVCBRecord(newData)
+		return formatCAARecordSetToString(oldData) == formatCAARecordSetToString(newData)
+	case record.SVCB, record.HTTPS:
+		return formatSVCRecordSetToString(oldData) == formatSVCRecordSetToString(newData)
 	}
 
 	return false
@@ -168,31 +166,37 @@ func splitURI(uri, split string) string {
 	return ""
 }
 
-func trimCAARecord(data *schema.Set) string {
+func formatCAARecordSetToString(data *schema.Set) string {
 	result := make([]string, data.Len())
 
 	for i, d := range data.List() {
-		splitStringData := strings.Split(d.(string), " ")
-		if len(splitStringData) == 3 {
-			splitStringData[2] = strings.Trim(splitStringData[2], "\"")
-		}
-		result[i] = strings.Join(splitStringData, " ")
+		result[i] = FormatCAARecord(d.(string))
 	}
 
 	return strings.Join(result, ",")
 }
 
-func formatSVCBRecord(data *schema.Set) string {
-	result := ""
-	svcData := data.List()[0].(string)
-	svcDataSplt := strings.SplitAfterN(svcData, " ", 3)
-	result = svcDataSplt[0] + " " + svcDataSplt[1]
+func FormatCAARecord(rec string) string {
+	splitStringData := strings.SplitN(rec, " ", 3)
+	if len(splitStringData) == 3 {
+		splitStringData[2] = strings.Trim(splitStringData[2], "\"")
+		splitStringData[2] = "\"" + splitStringData[2] + "\""
+	}
+	return strings.Join(splitStringData, " ")
+}
+
+func formatSVCRecordSetToString(data *schema.Set) string {
+	return FormatSVCRecord(data.List()[0].(string))
+}
+
+func FormatSVCRecord(rec string) string {
+	svcDataSplt := strings.SplitN(rec, " ", 3)
 
 	if len(svcDataSplt) == 3 {
-		result = result + " " + formatSVCParams(svcDataSplt[2])
+		svcDataSplt[2] = formatSVCParams(svcDataSplt[2])
 	}
 
-	return result
+	return strings.Join(svcDataSplt, " ")
 }
 
 func formatSVCParams(svcParams string) string {

@@ -1,56 +1,74 @@
 package record
 
-import "strings"
+import (
+	"context"
+	"fmt"
+	"strings"
 
-func getMatchedRecordData(state []interface{}, server []string) []string {
-	data := []string{}
-	dataMap := make(map[string]bool)
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
+	"github.com/ultradns/ultradns-go-sdk/pkg/record"
+)
+
+func formatRecordData(rec, recType string) string {
+	switch recType {
+	case record.CAA:
+		return helper.FormatCAARecord(rec)
+	case record.SVCB, record.HTTPS:
+		return helper.FormatSVCRecord(rec)
+	}
+	return rec
+}
+
+func getMatchedRecordData(state []interface{}, server []string, recType string) []string {
+	res := []string{}
+	resMap := make(map[string]bool)
 
 	for _, val := range state {
-		dataMap[val.(string)] = true
+		resMap[formatRecordData(val.(string), recType)] = true
 	}
 
 	for _, val := range server {
-		if dataMap[val] {
-			data = append(data, val)
+		if resMap[val] {
+			res = append(res, val)
 		}
 	}
 
-	return data
+	return res
 }
 
-func getUnMatchedRecordData(state []interface{}, server []string) []string {
-	data := []string{}
-	dataMap := make(map[string]bool)
+func getUnMatchedRecordData(state []interface{}, server []string, recType string) []string {
+	res := []string{}
+	resMap := make(map[string]bool)
 
 	for _, val := range state {
-		dataMap[val.(string)] = true
+		resMap[formatRecordData(val.(string), recType)] = true
 	}
 
 	for _, val := range server {
-		if !dataMap[val] {
-			data = append(data, val)
+		if !resMap[val] {
+			res = append(res, val)
 		}
 	}
 
-	return data
+	return res
 }
 
-func getDiffRecordData(first []interface{}, second []interface{}) []string {
-	data := []string{}
-	dataMap := make(map[string]bool)
+func getDiffRecordData(first, second []interface{}, recType string) []string {
+	res := []string{}
+	resMap := make(map[string]bool)
 
 	for _, val := range first {
-		dataMap[val.(string)] = true
+		resMap[formatRecordData(val.(string), recType)] = true
 	}
 
 	for _, val := range second {
-		if !dataMap[val.(string)] {
-			data = append(data, val.(string))
+		if !resMap[formatRecordData(val.(string), recType)] {
+			res = append(res, val.(string))
 		}
 	}
 
-	return data
+	return res
 }
 
 func rmRecordData(data, target []string) []string {
@@ -96,4 +114,41 @@ func formatSOAEmail(email string) string {
 	}
 
 	return email[:index] + "." + strings.Replace(email[index+2:], ".", "@", 1)
+}
+
+func isRecordTypeShareCommonOwnerName(recordType string) bool {
+	rrtypeWithCommonOwner := map[string]bool{
+		"NS (2)":       true,
+		"HINFO (13)":   true,
+		"MX (15)":      true,
+		"TXT (16)":     true,
+		"RP (17)":      true,
+		"SRV (33)":     true,
+		"DS (43)":      true,
+		"CDS (59)":     true,
+		"CDNSKEY (60)": true,
+		"SPF (99)":     true,
+		"CAA (257)":    true,
+	}
+
+	if _, ok := rrtypeWithCommonOwner[recordType]; ok {
+		return true
+	}
+	return false
+}
+
+func formatCAARecord(ctx context.Context, recData []string) []string {
+	tflog.Debug(ctx, fmt.Sprintf("CAA Record before formatting - %s\n", recData))
+	for i, v := range recData {
+		recData[i] = helper.FormatCAARecord(v)
+	}
+	tflog.Debug(ctx, fmt.Sprintf("CAA Record after formatting - %s\n", recData))
+	return recData
+}
+
+func formatSVCRecord(ctx context.Context, recData []string) []string {
+	tflog.Debug(ctx, fmt.Sprintf("SVC Record before formatting - %s\n", recData))
+	recData[0] = helper.FormatSVCRecord(recData[0])
+	tflog.Debug(ctx, fmt.Sprintf("SVC Record after formatting - %s\n", recData))
+	return recData
 }
