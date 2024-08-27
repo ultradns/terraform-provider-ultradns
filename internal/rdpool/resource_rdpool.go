@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
@@ -30,6 +31,7 @@ func ResourceRDPool() *schema.Resource {
 }
 
 func resourceRDPoolCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Resource Distribution pool resource create context invoked")
 	services := meta.(*service.Service)
 	rrSetData := getNewRDPool(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
@@ -45,6 +47,7 @@ func resourceRDPoolCreate(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func resourceRDPoolRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Resource Distribution pool resource read context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
@@ -53,8 +56,8 @@ func resourceRDPoolRead(ctx context.Context, rd *schema.ResourceData, meta inter
 
 	res, resList, err := services.RecordService.Read(rrSetKey)
 	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
+		tflog.Warn(ctx, errors.ResourceNotFoundError(rd.Id()).Error())
 		rd.SetId("")
-		tflog.Debug(ctx, err.Error())
 		return nil
 	}
 
@@ -72,6 +75,7 @@ func resourceRDPoolRead(ctx context.Context, rd *schema.ResourceData, meta inter
 }
 
 func resourceRDPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Resource Distribution pool resource update context invoked")
 	services := meta.(*service.Service)
 	rrSetData := getNewRDPool(rd)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
@@ -85,6 +89,7 @@ func resourceRDPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func resourceRDPoolDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Resource Distribution pool resource delete context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)

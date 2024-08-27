@@ -6,13 +6,13 @@ import (
 )
 
 var (
-	errNotFound     = errors.New("not found")
+	errNotFound     = errors.New("Existing resource not found")
 	errNotDestroyed = errors.New("not destroyed")
 	errMismatched   = errors.New("mismatched")
 )
 
 func ResourceNotFoundError(key string) error {
-	return fmt.Errorf("resource - %s %w", key, errNotFound)
+	return fmt.Errorf("%w: key - '%s'", errNotFound, key)
 }
 
 func ResourceNotDestroyedError(key string) error {

@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/probe"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
@@ -31,6 +32,7 @@ func ResourceProbePING() *schema.Resource {
 }
 
 func resourceProbePINGCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "PING probe resource create context invoked")
 	services := meta.(*service.Service)
 	probeData := getNewProbePING(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
@@ -52,6 +54,7 @@ func resourceProbePINGCreate(ctx context.Context, rd *schema.ResourceData, meta 
 }
 
 func resourceProbePINGRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "PING probe resource read context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
@@ -59,8 +62,8 @@ func resourceProbePINGRead(ctx context.Context, rd *schema.ResourceData, meta in
 	rrSetKey.PType = sdkprobe.PING
 	res, probeData, err := services.ProbeService.Read(rrSetKey)
 	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
+		tflog.Warn(ctx, errors.ResourceNotFoundError(rd.Id()).Error())
 		rd.SetId("")
-		tflog.Debug(ctx, err.Error())
 		return nil
 	}
 
@@ -84,6 +87,7 @@ func resourceProbePINGRead(ctx context.Context, rd *schema.ResourceData, meta in
 }
 
 func resourceProbePINGUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "PING probe resource update context invoked")
 	services := meta.(*service.Service)
 	probeData := getNewProbePING(rd)
 	rrSetKeyData := probe.GetRRSetKeyFromID(rd.Id())
@@ -97,6 +101,7 @@ func resourceProbePINGUpdate(ctx context.Context, rd *schema.ResourceData, meta 
 }
 
 func resourceProbePINGDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "PING probe resource delete context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)

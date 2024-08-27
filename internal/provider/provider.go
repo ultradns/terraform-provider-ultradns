@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -85,5 +86,15 @@ func providerConfigureContext(ctx context.Context, rd *schema.ResourceData) (int
 		return nil, diag.FromErr(err)
 	}
 
+	initializeSDKLogger(client)
 	return service, diags
+}
+
+func initializeSDKLogger(c *client.Client) {
+	switch os.Getenv("TF_LOG") {
+	case "DEBUG":
+		c.EnableLogger(client.LogDebug, 0)
+	case "TRACE":
+		c.EnableLogger(client.LogTrace, 0)
+	}
 }

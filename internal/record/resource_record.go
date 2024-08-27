@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
@@ -36,6 +37,7 @@ func ResourceRecord() *schema.Resource {
 }
 
 func resourceRecordCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Record resource create context invoked")
 	services := meta.(*service.Service)
 	rrSetData := rrset.NewRRSetWithRecordData(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
@@ -57,6 +59,7 @@ func resourceRecordCreate(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Record resource read context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
@@ -65,8 +68,8 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 	res, resList, err := services.RecordService.Read(rrSetKey)
 
 	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
+		tflog.Warn(ctx, errors.ResourceNotFoundError(rd.Id()).Error())
 		rd.SetId("")
-		tflog.Debug(ctx, err.Error())
 		return nil
 	}
 
@@ -111,6 +114,7 @@ func resourceRecordRead(ctx context.Context, rd *schema.ResourceData, meta inter
 }
 
 func resourceRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Record resource update context invoked")
 	services := meta.(*service.Service)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
@@ -133,6 +137,7 @@ func resourceRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func resourceNSRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Record resource update context invoked")
 	services := meta.(*service.Service)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
@@ -163,6 +168,7 @@ func resourceNSRecordUpdate(ctx context.Context, rd *schema.ResourceData, meta i
 }
 
 func resourceSOARecordUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Record resource update context invoked")
 	services := meta.(*service.Service)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
 
@@ -201,6 +207,7 @@ func resourceSOARecordUpdate(ctx context.Context, rd *schema.ResourceData, meta 
 }
 
 func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Record resource delete context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
@@ -229,6 +236,7 @@ func resourceRecordDelete(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func resourceNSRecordDelete(rd *schema.ResourceData, services *service.Service) diag.Diagnostics {
+	tflog.Trace(ctx, "Record resource delete context invoked")
 	var diags diag.Diagnostics
 
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
