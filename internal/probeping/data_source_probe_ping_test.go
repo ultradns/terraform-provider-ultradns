@@ -49,7 +49,7 @@ func TestAccDataSourceProbePING(t *testing.T) {
 					"ping_tc",
 					zoneNameTC,
 					strings.ToUpper(ownerName),
-					"A"
+					"A",
 					"FIFTEEN_MINUTES",
 					"",
 					testAccResourceUpdateProbePINGForTCPool(zoneNameTC, ownerName),

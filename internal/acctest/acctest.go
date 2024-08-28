@@ -164,6 +164,7 @@ func TestAccCheckDirGroupResourceExists(resourceName, resourceType, resourceID s
 		return nil
 	}
 }
+
 func TestAccCheckRecordResourceDestroy(resourceName, pType string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		for _, rs := range s.RootModule().Resources {

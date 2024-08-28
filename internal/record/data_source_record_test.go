@@ -71,13 +71,12 @@ func TestAccDataSourceRecord(t *testing.T) {
 				),
 			},
 			// {
-			// 	Config: acctest.TestAccDataSourceRRSet(
+			// 	Config: acctest.TestAccDataSourceRRSetReadOnly(
 			// 		"ultradns_record",
 			// 		"soa",
+			// 		"${resource.ultradns_record.cname.zone_name}",
 			// 		zoneName,
-			// 		strings.ToUpper(zoneName),
 			// 		"SOA",
-			// 		testAccResourceRecordSOA(zoneName),
 			// 	),
 			// 	Check: resource.ComposeTestCheckFunc(
 			// 		acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_soa", ""),
@@ -272,7 +271,7 @@ func TestAccDataSourceRecord(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_record.data_https", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_https", "record_type", "HTTPS"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_https", "ttl", "800"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_https", "record_data.0", "1 www.ultradns.com. mandatory=alpn,key65444 alpn=\"h3,h3-29,h2\" no-default-alpn port=8080 ipv4hint=1.2.3.4,9.8.7.6  ech=dGVzdA== ipv6hint=2001:db8:3333:4444:5555:6666:7777:8888,2001:db8:3333:4444:cccc:dddd:eeee:ffff key65444=\"privateKeyTesting\""),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_https", "record_data.0", "1 www.ultradns.com. mandatory=alpn,key65444 alpn=\"h3,h3-29,h2\" no-default-alpn port=8080 ipv4hint=1.2.3.4,9.8.7.6 ech=dGVzdA== ipv6hint=2001:db8:3333:4444:5555:6666:7777:8888,2001:db8:3333:4444:cccc:dddd:eeee:ffff key65444=\"privateKeyTesting\""),
 				),
 			},
 		},

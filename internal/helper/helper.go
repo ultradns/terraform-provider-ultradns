@@ -198,7 +198,6 @@ func FormatSVCRecord(rec string) string {
 
 	return strings.Join(svcDataSplt, " ")
 }
-
 func formatSVCParams(svcParams string) string {
 	svcParams = strings.TrimPrefix(svcParams, "(")
 	svcParams = strings.TrimSuffix(svcParams, ")")
@@ -209,7 +208,7 @@ func formatSVCParams(svcParams string) string {
 	for _, v := range svcParamsSplit {
 		key := -1
 		value := ""
-		paramSplit := strings.Split(v, "=")
+		paramSplit := strings.SplitN(v, "=", 2)
 		if len(paramSplit) > 0 {
 			key = getSvcKeyNumber(paramSplit[0])
 		}
@@ -273,7 +272,7 @@ func getSvcParamText(key int, value string) string {
 	case 0:
 		return "mandatory=" + value + " "
 	case 1:
-		return "alpn=" + value + " "
+		return "alpn=\"" + value + "\" "
 	case 2:
 		return "no-default-alpn "
 	case 3:
@@ -285,7 +284,7 @@ func getSvcParamText(key int, value string) string {
 	case 6:
 		return "ipv6hint=" + value + " "
 	case 7:
-		return "dohpath=" + value + " "
+		return "dohpath=\"" + value + "\" "
 	case 8:
 		return "ohttp "
 	}
@@ -295,7 +294,7 @@ func getSvcParamText(key int, value string) string {
 		if len(value) == 0 {
 			return "key" + keyStr + " "
 		} else {
-			return "key" + keyStr + "=" + value + " "
+			return "key" + keyStr + "=\"" + value + "\" "
 		}
 	}
 	return ""
