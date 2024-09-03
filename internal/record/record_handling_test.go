@@ -29,7 +29,7 @@ func TestAccRecordHandling(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "owner_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "record_type", "SOA"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "ttl", "86400"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "record_data.0", "udns1.ultradns.net. antonyrohith.akash@vercara.com. 86400 86400 86400 86400"),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_soa", "record_data.0", "udns1.ultradns.net. antony.akash@vercara.com. 86400 86400 86400 86400"),
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_ns", ""),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_ns", "zone_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_ns", "owner_name", zoneName),

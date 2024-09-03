@@ -164,8 +164,18 @@ func resourceCommonOwnerRecordUpdate(ctx context.Context, rd *schema.ResourceDat
 
 	rrSetData.RData = resList.RRSets[0].RData
 
+	tflog.Debug(ctx, fmt.Sprintf("OLD CHANGE ----------------> %s \n", old.(*schema.Set).List()))
+	tflog.Debug(ctx, fmt.Sprintf("NEW CHANGE ----------------> %s \n", new.(*schema.Set).List()))
+
+	tflog.Debug(ctx, fmt.Sprintf("rmData  ----------------> %s \n", rmData))
+	tflog.Debug(ctx, fmt.Sprintf("addData ----------------> %s \n", addData))
+
+	tflog.Debug(ctx, fmt.Sprintf("Before Remove  ----------------> %s \n", rrSetData.RData))
+
 	rrSetData.RData = rmRecordData(rmData, rrSetData.RData)
+	tflog.Debug(ctx, fmt.Sprintf("After Remove  ----------------> %s \n", rrSetData.RData))
 	rrSetData.RData = addRecordData(addData, rrSetData.RData)
+	tflog.Debug(ctx, fmt.Sprintf("Final  ----------------> %s \n", rrSetData.RData))
 
 	if sdkhelper.GetRecordTypeFullString(rrSetKeyData.RecordType) == record.CAA {
 		rrSetData.RData = formatCAARecord(ctx, rrSetData.RData)
