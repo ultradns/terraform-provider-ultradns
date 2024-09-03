@@ -94,12 +94,64 @@ resource "ultradns_probe_http" "http_tc" {
 }
 ```
 
+### Create HTTP Probe for AAAA Pool
+
+```terraform
+resource "ultradns_probe_http" "http_tc" {
+	zone_name = "example.com."
+	owner_name = "tc.example.com."
+	pool_type = "AAAA"
+	interval = "HALF_MINUTE"
+	agents = ["EUROPE_WEST", "SOUTH_AMERICA", "PALO_ALTO", "NEW_YORK"]
+	threshold = 4
+	total_limit{
+		warning = 10 
+		critical = 15 
+		fail = 20
+	}
+	transaction{
+		method = "POST"
+		protocol_version = "HTTP/1.0"
+		url = "https://www.ultradns.com/"
+		transmitted_data = "foo=bar"
+		follow_redirects = true
+		expected_response = "3XX"
+		search_string {
+			warning = "Warning"
+			critical = "Critical"
+			fail = "Failure"
+		}
+		connect_limit{
+			warning = 5 
+			critical = 8 
+			fail = 10
+		}
+		avg_connect_limit{
+			warning = 5 
+			critical = 8 
+			fail = 10
+		}
+		run_limit{
+			warning = 5 
+			critical = 8 
+			fail = 10
+		}
+		avg_run_limit{
+			warning = 5 
+			critical = 8 
+			fail = 10
+		}
+	}
+}
+```
+
 ## Argument Reference
 
 The following arguments are supported:
 
 * `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
+* `pool_type` - (Optional) (String) Pool type of the probe. Valid values are `A`, `AAAA`.</br>Default value set to `A`.
 * `interval` - (Optional) (String) Length of time between probes in minutes. Valid values are `HALF_MINUTE`, `ONE_MINUTE`, `TWO_MINUTES`, `FIVE_MINUTES`, `TEN_MINUTES`, and `FIFTEEN_MINUTES`.</br>Default value set to `FIVE_MINUTES`.
 * `agents` - (Required) (String List) Locations that will be used for probing. One or more values must be specified.
 Valid values are `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_CENTRAL`, `NORTH_AMERICA_EAST`, `NORTH_AMERICA_WEST`, `SOUTH_AMERICA`, `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.

@@ -45,7 +45,11 @@ Below are the supported resource record types with the corresponding number:<br/
 `TXT (16)`
 `AAAA (28)`
 `SRV (33)`
+`DS (43)`
 `SSHFP (44)`
+`SVCB (64)`
+`HTTPS (65)`
+`CAA (257)`
 `APEXALIAS (65282)`
 
 

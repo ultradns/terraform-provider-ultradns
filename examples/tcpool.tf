@@ -34,6 +34,40 @@ resource "ultradns_tcpool" "tcpoola" {
     }
 }
 
+## TC Pool Resource of Type AAAA (28)
+resource "ultradns_tcpool" "tcpoolaaaa" {
+    zone_name = "${resource.ultradns_zone.primary.id}"
+    owner_name = "tcpoolaaaa"
+    record_type = "AAAA"
+    ttl = 120
+    pool_description = "TC Pool Resource of Type AAAA"
+    run_probes = true
+    act_on_probes = true
+    failure_threshold = 2
+    max_to_lb = 1
+    rdata_info{
+        priority = 2
+        threshold = 1
+        rdata = "2001:db8:85a3:0:0:8a2e:370:7334"
+        failover_delay = 2
+        run_probes = true
+        state = "ACTIVE"
+        weight = 4
+    }
+    rdata_info{
+        priority = 1
+        threshold = 1
+        rdata = "2001:db8:85a3:0:0:8a2e:370:7335"
+        failover_delay = 1
+        run_probes = false
+        state = "NORMAL"
+    }
+    backup_record{
+        rdata = "2001:db8:85a3:0:0:8a2e:370:7336"
+        failover_delay = 1
+    }
+}
+
 ## TC Pool Datasource
 data "ultradns_tcpool" "tcpool" {
     zone_name = "${resource.ultradns_zone.primary.id}"

@@ -53,12 +53,31 @@ resource "ultradns_probe_tcp" "tcp_tc" {
 }
 ```
 
+### Create TCP Probe for AAAA Pool
+
+```terraform
+resource "ultradns_probe_tcp" "tcp_sb" {
+	zone_name = "example.com."
+	owner_name = "sb.example.com."
+	pool_type = "AAAA"
+	interval = "HALF_MINUTE"
+	agents = ["EUROPE_WEST", "SOUTH_AMERICA", "PALO_ALTO", "NEW_YORK"]
+	threshold = 4
+	port = 443
+	control_ip = "192.168.1.1"
+	connect_limit{
+		fail = 11
+	}
+}
+```
+
 ## Argument Reference
 
 The following arguments are supported:
 
 * `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
+* `pool_type` - (Optional) (String) Pool type of the probe. Valid values are `A`, `AAAA`.</br>Default value set to `A`.
 * `interval` - (Optional) (String) Length of time between probes in minutes. Valid values are `HALF_MINUTE`, `ONE_MINUTE`, `TWO_MINUTES`, `FIVE_MINUTES`, `TEN_MINUTES`, and `FIFTEEN_MINUTES`.</br>Default value set to `FIVE_MINUTES`.
 * `agents` - (Required) (String List) Locations that will be used for probing. Multiple values can be comma separated. Valid values are:  `ASIA`, `CHINA`, `EUROPE_EAST`, `EUROPE_WEST`, `NORTH_AMERICA_CENTRAL`, `NORTH_AMERICA_EAST`, `NORTH_AMERICA_WEST`, `SOUTH_AMERICA`, `NEW_YORK`, `PALO_ALTO`, `DALLAS`, and `AMSTERDAM`.
 * `threshold` - (Required) (Integer) Number of agents that must agree for a probe state to be changed.

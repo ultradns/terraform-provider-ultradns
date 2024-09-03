@@ -21,8 +21,9 @@ resource "ultradns_probe_dns" "dns_sb" {
 
 ## DNS Probe Resource of TC Pool
 resource "ultradns_probe_dns" "dns_tc" {
-	zone_name = "${resource.ultradns_tcpool.tcpoola.zone_name}"
-	owner_name = "tcpoola"
+	zone_name = "${resource.ultradns_tcpool.tcpoolaaaa.zone_name}"
+	owner_name = "tcpoolaaaa"
+	pool_type = "AAAA"
 	interval = "HALF_MINUTE"
 	agents = ["EUROPE_WEST", "SOUTH_AMERICA", "PALO_ALTO", "NEW_YORK"]
 	threshold = 4
@@ -54,4 +55,5 @@ data "ultradns_probe_dns" "probedns" {
 	interval = "${resource.ultradns_probe_dns.dns_tc.interval}"
 	threshold = "${resource.ultradns_probe_dns.dns_tc.threshold}"
 	agents = "${resource.ultradns_probe_dns.dns_tc.agents}"
+	pool_type = "AAAA"
 }

@@ -2,8 +2,9 @@
 
 ## HTTP Probe Resource of SB Pool
 resource "ultradns_probe_http" "http_sb" {
-	zone_name = "${resource.ultradns_sbpool.sbpoola.zone_name}"
-	owner_name = "sbpoola"
+	zone_name = "${resource.ultradns_sbpool.sbpoolaaaa.zone_name}"
+	owner_name = "sbpoolaaaa"
+	pool_type = "AAAA"
 	interval = "HALF_MINUTE"
 	agents = ["EUROPE_WEST", "SOUTH_AMERICA", "PALO_ALTO", "NEW_YORK"]
 	threshold = 4

@@ -3,7 +3,7 @@
 ## DIR Pool Resource of Type A (1)
 resource "ultradns_dirpool" "a" {
     zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "a"
+    owner_name = "dirpool_a"
     record_type = "A"
     ignore_ecs = true
     conflict_resolve = "IP"
@@ -41,7 +41,7 @@ resource "ultradns_dirpool" "a" {
 ## DIR Pool Resource of Type PTR (12)
 resource "ultradns_dirpool" "ptr" {
     zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "1"
+    owner_name = "dirpool_12"
     record_type = "PTR"
     rdata_info{
         rdata = "ns1.example.com."
@@ -56,7 +56,7 @@ resource "ultradns_dirpool" "ptr" {
 ## DIR Pool Resource of Type MX (15)
 resource "ultradns_dirpool" "mx" {
     zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "mx"
+    owner_name = "dirpool_mx"
     record_type = "MX"
     rdata_info{
         rdata = "2 example.com."
@@ -71,7 +71,7 @@ resource "ultradns_dirpool" "mx" {
 ## DIR Pool Resource of Type TXT (16)
 resource "ultradns_dirpool" "txt" {
     zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "txt.${resource.ultradns_zone.primary.id}"
+    owner_name = "dirpool_txt.${resource.ultradns_zone.primary.id}"
     record_type = "TXT"
     rdata_info{
         rdata = "text data"
@@ -86,7 +86,7 @@ resource "ultradns_dirpool" "txt" {
 ## DIR Pool Resource of Type AAAA (28)
 resource "ultradns_dirpool" "aaaa" {
     zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "aaaa"
+    owner_name = "dirpool_aaaa"
     record_type = "AAAA"
     pool_description = "DIR Pool Resource of Type AAAA"
     ignore_ecs = true
@@ -114,7 +114,7 @@ resource "ultradns_dirpool" "aaaa" {
 ## DIR Pool Resource of Type SRV (33)
 resource "ultradns_dirpool" "srv" {
     zone_name = "${resource.ultradns_zone.primary.id}"
-    owner_name = "srv"
+    owner_name = "dirpool_srv"
     record_type = "SRV"
     rdata_info{
         rdata = "5 6 7 example.com."

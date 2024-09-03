@@ -21,6 +21,16 @@ data "ultradns_probe_http" "http" {
 }
 ```
 
+### Get last created HTTP Probe of AAAA Pool
+
+```terraform
+data "ultradns_probe_http" "http" {
+    zone_name = "example.com."
+    owner_name = "www"
+    pool_type = "AAAA"
+}
+```
+
 ### Get HTTP Probe by guid
 
 ```terraform
@@ -48,6 +58,7 @@ The following arguments are supported:
 
 * `zone_name` - (Required) (String) Name of the zone.
 * `owner_name` - (Required) (String) The domain name of the owner of the RRSet. Can be either a fully qualified domain name (FQDN) or a relative domain name. If provided as a FQDN, it must be contained within the zone name's FQDN.
+* `pool_type` - (Optional) (String) Pool type of the probe. Valid values are `A`, `AAAA`.</br>Default value set to `A`.
 
 The following arguments are used to filter the probes:
 

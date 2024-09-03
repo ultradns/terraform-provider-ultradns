@@ -33,7 +33,7 @@ resource "ultradns_zone" "secondary" {
         primary_name_server_1 {
             ip = "${var.ultradns_primary_name_server}"
         } 
-        notification_email_address = "${var.ultradns_notification_email_address}"
+        # notification_email_address = "${var.ultradns_notification_email_address}"
     }
 }
 
