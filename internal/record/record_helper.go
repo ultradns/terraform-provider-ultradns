@@ -73,20 +73,19 @@ func getDiffRecordData(first, second []interface{}, recType string) []string {
 
 func rmRecordData(data, target []string) []string {
 	dataMap := make(map[string]bool)
+	result := make([]string, len(target)-len(data))
 
 	for _, val := range data {
 		dataMap[val] = true
 	}
 
-	for i, val := range target {
-		if dataMap[val] {
-			target[i] = target[len(target)-1]
-			target[len(target)-1] = ""
-			target = target[:len(target)-1]
+	for _, val := range target {
+		if !dataMap[val] {
+			result = append(result, val)
 		}
 	}
 
-	return target
+	return result
 }
 
 func addRecordData(data, target []string) []string {

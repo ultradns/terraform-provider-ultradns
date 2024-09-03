@@ -12,12 +12,12 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			Required:         true,
 			ForceNew:         true,
 			DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
-			StateFunc:		  helper.CaseInSensitiveState,
+			StateFunc:        helper.CaseInSensitiveState,
 		},
 		"account_name": {
-			Type:        schema.TypeString,
-			Optional:    true,
-			ForceNew:    true,
+			Type:     schema.TypeString,
+			Optional: true,
+			// ForceNew:    true,
 			DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_ACCOUNT", nil),
 		},
 		"type": {

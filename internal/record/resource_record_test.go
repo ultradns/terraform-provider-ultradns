@@ -478,12 +478,12 @@ func testAccResourceRecordAPEXALIAS(zoneName string) string {
 
 	resource "ultradns_record" "apex" {
 		zone_name = "%s"
-		owner_name = "%s.${resource.ultradns_zone.primary_record.id}"
+		owner_name = "${resource.ultradns_zone.primary_record.id}"
 		record_type = "APEXALIAS"
 		ttl = 800
 		record_data = ["example.com."]
 	}
-	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), strings.TrimSuffix(zoneName, "."), tfacctest.RandString(3))
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), strings.TrimSuffix(zoneName, "."))
 }
 
 func testAccResourceRecordDS(zoneName string) string {
