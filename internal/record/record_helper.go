@@ -126,6 +126,8 @@ func isRecordTypeShareCommonOwnerName(recordType string) bool {
 		"DS (43)":      true,
 		"CDS (59)":     true,
 		"CDNSKEY (60)": true,
+		"SVCB (64)":    true,
+		"HTTPS (65)":   true,
 		"SPF (99)":     true,
 		"CAA (257)":    true,
 	}

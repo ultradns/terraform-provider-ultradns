@@ -14,9 +14,8 @@ https://registry.terraform.io/providers/ultradns/ultradns/latest/docs
 
 ## Getting Help
 
-* Open a support ticket with [Customer Support Ticket]().
 * If you think you may have found a bug, please open an [issue](https://github.com/ultradns/terraform-provider-ultradns/issues/new).
-* Contact customer support [email]().
+* Contact customer support [email](mailto:ultradnssupport@vercara.com).
 
 ## Resources
 
