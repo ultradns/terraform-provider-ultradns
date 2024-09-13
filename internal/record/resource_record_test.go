@@ -491,13 +491,13 @@ func testAccResourceRecordDS(zoneName string) string {
 	%s
 
 	resource "ultradns_record" "ds" {
-		zone_name = "%s"
+		zone_name = "${resource.ultradns_zone.primary_record.id}"
 		owner_name = "%s"
 		record_type = "DS"
 		ttl = 800
 		record_data = ["25286 1 1 340437DC66C3DFAD0B3E849740D2CF1A4151671D"]
 	}
-	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, zoneName)
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName)
 }
 
 func testAccResourceRecordCAA(zoneName string) string {
@@ -505,13 +505,13 @@ func testAccResourceRecordCAA(zoneName string) string {
 	%s
 
 	resource "ultradns_record" "caa" {
-		zone_name = "%s"
+		zone_name = "${resource.ultradns_zone.primary_record.id}"
 		owner_name = "%s"
 		record_type = "CAA"
 		ttl = 800
 		record_data = ["0 issue ultradns"]
 	}
-	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, zoneName)
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName)
 }
 
 func testAccResourceRecordHTTPS(zoneName string) string {
@@ -519,13 +519,13 @@ func testAccResourceRecordHTTPS(zoneName string) string {
 	%s
 
 	resource "ultradns_record" "https" {
-		zone_name = "%s"
+		zone_name = "${resource.ultradns_zone.primary_record.id}"
 		owner_name = "%s"
 		record_type = "HTTPS"
 		ttl = 800
 		record_data = ["1 www.ultradns.com. ech=dGVzdA== mandatory=alpn,key65444 no-default-alpn port=8080 ipv4hint=1.2.3.4,9.8.7.6 key65444=privateKeyTesting ipv6hint=2001:db8:3333:4444:5555:6666:7777:8888,2001:db8:3333:4444:cccc:dddd:eeee:ffff alpn=h3,h3-29,h2"]
 	}
-	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, tfacctest.RandString(3))
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), tfacctest.RandString(3))
 }
 
 func testAccResourceRecordSVCB(zoneName string) string {
@@ -533,11 +533,11 @@ func testAccResourceRecordSVCB(zoneName string) string {
 	%s
 
 	resource "ultradns_record" "svcb" {
-		zone_name = "%s"
+		zone_name = "${resource.ultradns_zone.primary_record.id}"
 		owner_name = "%s"
 		record_type = "SVCB"
 		ttl = 800
 		record_data = ["0 www.ultradns.com."]
 	}
-	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, tfacctest.RandString(3))
+	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), tfacctest.RandString(3))
 }
