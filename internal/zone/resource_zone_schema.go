@@ -15,9 +15,9 @@ func resourceZoneSchema() map[string]*schema.Schema {
 			StateFunc:        helper.CaseInSensitiveState,
 		},
 		"account_name": {
-			Type:     schema.TypeString,
-			Optional: true,
-			// ForceNew:    true,
+			Type:        schema.TypeString,
+			Optional:    true,
+			ForceNew:    true,
 			DefaultFunc: schema.EnvDefaultFunc("ULTRADNS_ACCOUNT", nil),
 		},
 		"type": {
