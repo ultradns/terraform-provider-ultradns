@@ -360,33 +360,33 @@ func testAccResourceRecordCNAME(zoneName string) string {
 	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), strings.TrimSuffix(zoneName, "."), tfacctest.RandString(3))
 }
 
-func testAccResourceRecordSOA(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
+// func testAccResourceRecordSOA(zoneName string) string {
+// 	return fmt.Sprintf(`
+// 	%s
 
-	resource "ultradns_record" "soa" {
-		zone_name = "%s"
-		owner_name = "%s"
-		record_type = "6"
-		ttl = 800
-		record_data = ["udns1.ultradns.net. sample@example.com. 10800 3600 2592000 10800"]
-	}
-	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), strings.TrimSuffix(zoneName, "."), zoneName)
-}
+// 	resource "ultradns_record" "soa" {
+// 		zone_name = "%s"
+// 		owner_name = "%s"
+// 		record_type = "6"
+// 		ttl = 800
+// 		record_data = ["udns1.ultradns.net. sample@example.com. 10800 3600 2592000 10800"]
+// 	}
+// 	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), strings.TrimSuffix(zoneName, "."), zoneName)
+// }
 
-func testAccUpdateResourceRecordSOA(zoneName string) string {
-	return fmt.Sprintf(`
-	%s
+// func testAccUpdateResourceRecordSOA(zoneName string) string {
+// 	return fmt.Sprintf(`
+// 	%s
 
-	resource "ultradns_record" "soa" {
-		zone_name = "%s"
-		owner_name = "%s"
-		record_type = "SOA"
-		ttl = 800
-		record_data = ["udns1.ultradns.net. test.sample@example.com. 10800 3600 2592000 10800"]
-	}
-	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, strings.TrimSuffix(zoneName, "."))
-}
+// 	resource "ultradns_record" "soa" {
+// 		zone_name = "%s"
+// 		owner_name = "%s"
+// 		record_type = "SOA"
+// 		ttl = 800
+// 		record_data = ["udns1.ultradns.net. test.sample@example.com. 10800 3600 2592000 10800"]
+// 	}
+// 	`, acctest.TestAccResourceZonePrimary(zoneResourceName, zoneName), zoneName, strings.TrimSuffix(zoneName, "."))
+// }
 
 func testAccResourceRecordPTR(zoneName string) string {
 	return fmt.Sprintf(`
