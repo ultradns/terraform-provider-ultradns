@@ -6,6 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
+	provhelper "github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/geo"
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
@@ -27,6 +29,7 @@ func ResourceGeoGroup() *schema.Resource {
 }
 
 func resourceGeoGroupCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Geo Group resource create context invoked")
 	services := meta.(*service.Service)
 	geoGroupData := newGeoGroup(rd)
 
@@ -42,14 +45,21 @@ func resourceGeoGroupCreate(ctx context.Context, rd *schema.ResourceData, meta i
 }
 
 func resourceGeoGroupRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Geo Group resource read context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
 	geoID := rd.Id()
 
-	_, geoGroup, _, err := services.DirGroupGeoService.Read(geoID)
+	res, geoGroup, _, err := services.DirGroupGeoService.Read(geoID)
+
+	if err != nil && res != nil && res.Status == provhelper.RESOURCE_NOT_FOUND {
+		tflog.Warn(ctx, errors.ResourceNotFoundError(rd.Id()).Error())
+		rd.SetId("")
+		return nil
+	}
+
 	if err != nil {
-		tflog.Error(ctx, err.Error())
 		return diag.FromErr(err)
 	}
 
@@ -70,7 +80,7 @@ func resourceGeoGroupRead(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func resourceGeoGroupUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
-
+	tflog.Trace(ctx, "Geo Group resource update context invoked")
 	services := meta.(*service.Service)
 	geoGroupData := newGeoGroup(rd)
 
@@ -84,6 +94,7 @@ func resourceGeoGroupUpdate(ctx context.Context, rd *schema.ResourceData, meta i
 }
 
 func resourceGeoGroupDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Geo Group resource delete context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)

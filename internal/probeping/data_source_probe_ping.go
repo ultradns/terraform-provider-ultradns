@@ -78,6 +78,10 @@ func flattenDataSourceProbePING(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe
 		return diag.FromErr(err)
 	}
 
+	if err := rd.Set("pool_type", rrSetKey.RecordType); err != nil {
+		return diag.FromErr(err)
+	}
+
 	return diags
 }
 

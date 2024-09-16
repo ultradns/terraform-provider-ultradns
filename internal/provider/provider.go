@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -42,7 +43,7 @@ func Provider() *schema.Provider {
 			"ultradns_probe_http":   probehttp.ResourceProbeHTTP(),
 			"ultradns_probe_ping":   probeping.ResourceProbePING(),
 			"ultradns_probe_dns":    probedns.ResourceProbeDNS(),
-      "ultradns_probe_tcp":    probetcp.ResourceProbeTCP(),
+			"ultradns_probe_tcp":    probetcp.ResourceProbeTCP(),
 			"ultradns_dirgroup_ip":  dirgroupip.ResourceIPGroup(),
 			"ultradns_dirgroup_geo": dirgroupgeo.ResourceGeoGroup(),
 		},
@@ -58,7 +59,7 @@ func Provider() *schema.Provider {
 			"ultradns_probe_http":   probehttp.DataSourceprobeHTTP(),
 			"ultradns_probe_ping":   probeping.DataSourceprobePING(),
 			"ultradns_probe_dns":    probedns.DataSourceprobeDNS(),
-      "ultradns_probe_tcp":    probetcp.DataSourceprobeTCP(),
+			"ultradns_probe_tcp":    probetcp.DataSourceprobeTCP(),
 			"ultradns_dirgroup_ip":  dirgroupip.DataSourceIPGroup(),
 			"ultradns_dirgroup_geo": dirgroupgeo.DataSourceGeoGroup(),
 		},
@@ -85,5 +86,15 @@ func providerConfigureContext(ctx context.Context, rd *schema.ResourceData) (int
 		return nil, diag.FromErr(err)
 	}
 
+	initializeSDKLogger(client)
 	return service, diags
+}
+
+func initializeSDKLogger(c *client.Client) {
+	switch os.Getenv("TF_LOG") {
+	case "DEBUG":
+		c.EnableLogger(client.LogDebug, 0)
+	case "TRACE":
+		c.EnableLogger(client.LogTrace, 0)
+	}
 }

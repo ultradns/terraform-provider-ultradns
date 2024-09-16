@@ -6,6 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/record/dirpool"
@@ -29,6 +31,7 @@ func ResourceDIRPool() *schema.Resource {
 }
 
 func resourceDIRPoolCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Directional pool resource create context invoked")
 	services := meta.(*service.Service)
 	rrSetData := getNewDIRPoolRRSet(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
@@ -44,16 +47,22 @@ func resourceDIRPoolCreate(ctx context.Context, rd *schema.ResourceData, meta in
 }
 
 func resourceDIRPoolRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Directional pool resource read context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkpool.DIR
-	_, resList, err := services.RecordService.Read(rrSetKey)
-	if err != nil {
+	res, resList, err := services.RecordService.Read(rrSetKey)
+
+	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
+		tflog.Warn(ctx, errors.ResourceNotFoundError(rd.Id()).Error())
 		rd.SetId("")
-		tflog.Error(ctx, err.Error())
 		return nil
+	}
+
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	if len(resList.RRSets) > 0 {
@@ -66,6 +75,7 @@ func resourceDIRPoolRead(ctx context.Context, rd *schema.ResourceData, meta inte
 }
 
 func resourceDIRPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Directional pool resource update context invoked")
 	services := meta.(*service.Service)
 	rrSetData := getNewDIRPoolRRSet(rd)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
@@ -79,6 +89,7 @@ func resourceDIRPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta in
 }
 
 func resourceDIRPoolDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Directional pool resource delete context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)

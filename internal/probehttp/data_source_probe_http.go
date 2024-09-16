@@ -26,7 +26,10 @@ func DataSourceprobeHTTP() *schema.Resource {
 func dataSourceprobeHTTPRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	rrSetKey := rrset.NewRRSetKey(rd)
 	rrSetKey.PType = sdkprobe.HTTP
-	rrSetKey.RecordType = probe.RecordTypeA
+
+	if val, ok := rd.GetOk("pool_type"); ok {
+		rrSetKey.RecordType = val.(string)
+	}
 
 	if val, ok := rd.GetOk("guid"); ok {
 		rrSetKey.ID = val.(string)
@@ -75,6 +78,10 @@ func flattenDataSourceProbeHTTP(rrSetKey *sdkrrset.RRSetKey, probeData *sdkprobe
 	}
 
 	if err := flattenProbeHTTP(probeData, rd); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := rd.Set("pool_type", rrSetKey.RecordType); err != nil {
 		return diag.FromErr(err)
 	}
 

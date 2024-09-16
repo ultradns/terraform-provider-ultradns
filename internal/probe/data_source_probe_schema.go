@@ -14,6 +14,11 @@ func DataSourceProbeSchema() map[string]*schema.Schema {
 			Type:     schema.TypeString,
 			Required: true,
 		},
+		"pool_type": {
+			Type:     schema.TypeString,
+			Optional: true,
+			Default:  "A",
+		},
 		"guid": {
 			Type:     schema.TypeString,
 			Optional: true,

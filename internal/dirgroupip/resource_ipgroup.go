@@ -7,6 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
+	provhelper "github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/ip"
 	"github.com/ultradns/ultradns-go-sdk/pkg/helper"
@@ -28,6 +30,7 @@ func ResourceIPGroup() *schema.Resource {
 }
 
 func resourceIPGroupCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "IP Group resource create context invoked")
 	services := meta.(*service.Service)
 	ipGroupData := newIPGroup(rd)
 
@@ -43,15 +46,22 @@ func resourceIPGroupCreate(ctx context.Context, rd *schema.ResourceData, meta in
 }
 
 func resourceIPGroupRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "IP Group resource read context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
 	ipID := rd.Id()
 
-	_, ipGroup, _, err := services.DirGroupIPService.Read(ipID)
+	res, ipGroup, _, err := services.DirGroupIPService.Read(ipID)
 	//_, _, err := services.DirGroupIPService.Read(ipID)
+
+	if err != nil && res != nil && res.Status == provhelper.RESOURCE_NOT_FOUND {
+		tflog.Warn(ctx, errors.ResourceNotFoundError(rd.Id()).Error())
+		rd.SetId("")
+		return nil
+	}
+
 	if err != nil {
-		tflog.Error(ctx, err.Error())
 		return diag.FromErr(err)
 	}
 
@@ -75,6 +85,7 @@ func resourceIPGroupRead(ctx context.Context, rd *schema.ResourceData, meta inte
 }
 
 func resourceIPGroupUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "IP Group resource update context invoked")
 	services := meta.(*service.Service)
 	ipGroupData := newIPGroup(rd)
 
@@ -88,6 +99,7 @@ func resourceIPGroupUpdate(ctx context.Context, rd *schema.ResourceData, meta in
 }
 
 func resourceIPGroupDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "IP Group resource delete context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)

@@ -108,6 +108,18 @@ resource "ultradns_record" "srv" {
 }
 ```
 
+### Create DNS record of type DS (43)
+
+```terraform
+resource "ultradns_record" "ds" {
+    zone_name = "example.com."
+    owner_name = "example.com."
+    record_type = "DS"
+    ttl = 800
+    record_data = ["25286 1 1 340437DC66C3DFAD0B3E849740D2CF1A4151671D"]
+}
+```
+
 ### Create DNS record of type SSHFP (44)
 
 ```terraform
@@ -117,6 +129,42 @@ resource "ultradns_record" "sshfp" {
     record_type = "SSHFP"
     ttl = 120
     record_data = ["1 2 54B5E539EAF593AEA410F80737530B71CCDE8B6C3D241184A1372E98BC7EDB37"]
+}
+```
+
+### Create DNS record of type SVCB (64)
+
+```terraform
+resource "ultradns_record" "svcb" {
+    zone_name = "example.com."
+    owner_name = "svcb"
+    record_type = "SVCB"
+    ttl = 800
+    record_data = ["0 www.ultradns.com."]
+}
+```
+
+### Create DNS record of type HTTPS (65)
+
+```terraform
+resource "ultradns_record" "https" {
+    zone_name = "example.com."
+    owner_name = "https"
+    record_type = "HTTPS"
+    ttl = 800
+    record_data = ["1 www.ultradns.com. ech=dGVzdA== mandatory=alpn,key65444 no-default-alpn port=8080 ipv4hint=1.2.3.4,9.8.7.6 key65444=privateKeyTesting ipv6hint=2001:db8:3333:4444:5555:6666:7777:8888,2001:db8:3333:4444:cccc:dddd:eeee:ffff alpn=h3,h3-29,h2"]
+}
+```
+
+### Create DNS record of type CAA (257)
+
+```terraform
+resource "ultradns_record" "caa" {
+    zone_name = "example.com."
+    owner_name = "example.com."
+    record_type = "CAA"
+    ttl = 800
+    record_data = ["0 issue ultradns"]
 }
 ```
 
@@ -165,7 +213,11 @@ Below are the supported resource record types with the corresponding number:<br/
 `TXT (16)`
 `AAAA (28)`
 `SRV (33)`
+`DS (43)`
 `SSHFP (44)`
+`SVCB (64)`
+`HTTPS (65)`
+`CAA (257)`
 `APEXALIAS (65282)`
 * `ttl` - (Optional) (Integer) The time to live (in seconds) for the record. Must be a value between 0 and 2147483647, inclusive.
 * `record_data` - (Required) (String List) The data for the record displayed as the BIND presentation format for the specified RRTYPE.<br/>

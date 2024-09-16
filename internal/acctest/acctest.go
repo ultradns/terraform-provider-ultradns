@@ -2,8 +2,6 @@ package acctest
 
 import (
 	"context"
-	"crypto/rand"
-	"math/big"
 	"os"
 	"testing"
 
@@ -31,11 +29,13 @@ const (
 )
 
 var (
-	TestHost      = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
-	TestAccount   = os.Getenv("ULTRADNS_UNIT_TEST_ACCOUNT")
-	TestUsername  = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME")
-	testPassword  = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD")
-	testUserAgent = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
+	TestHost          = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
+	TestAccount       = os.Getenv("ULTRADNS_UNIT_TEST_ACCOUNT")
+	TestUsername      = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME")
+	TestNameServer    = os.Getenv("ULTRADNS_UNIT_TEST_NAME_SERVER")
+	TestSecondaryZone = os.Getenv("ULTRADNS_UNIT_TEST_SECONDARY_ZONE_NAME")
+	testPassword      = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD")
+	testUserAgent     = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
 )
 
 var (
@@ -164,6 +164,7 @@ func TestAccCheckDirGroupResourceExists(resourceName, resourceType, resourceID s
 		return nil
 	}
 }
+
 func TestAccCheckRecordResourceDestroy(resourceName, pType string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		for _, rs := range s.RootModule().Resources {
@@ -236,10 +237,10 @@ func GetRandomZoneNameWithSpecialChar() string {
 	return randZoneNamePrefix + "/" + acctest.RandString(randStringLength) + "/" + acctest.RandString(randStringLength) + randZoneNameWithSpecialCharSuffix
 }
 
-func GetRandomSecondaryZoneName() string {
-	if num, err := rand.Int(rand.Reader, big.NewInt(randSecondaryZoneCount)); err == nil {
-		return randZoneNamePrefix + num.String() + randZoneNameSuffix
-	}
+// func GetRandomSecondaryZoneName() string {
+// 	if num, err := rand.Int(rand.Reader, big.NewInt(randSecondaryZoneCount)); err == nil {
+// 		return randZoneNamePrefix + num.String() + randZoneNameSuffix
+// 	}
 
-	return randZoneNamePrefix + "0" + randZoneNameSuffix
-}
+// 	return randZoneNamePrefix + "0" + randZoneNameSuffix
+// }

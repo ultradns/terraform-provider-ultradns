@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/probe"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
@@ -31,11 +32,14 @@ func ResourceProbeDNS() *schema.Resource {
 }
 
 func resourceProbeDNSCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "DNS probe resource create context invoked")
 	services := meta.(*service.Service)
 	probeData := getNewProbeDNS(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
 
-	rrSetKeyData.RecordType = probe.RecordTypeA
+	if val, ok := rd.GetOk("pool_type"); ok {
+		rrSetKeyData.RecordType = val.(string)
+	}
 
 	res, err := services.ProbeService.Create(rrSetKeyData, probeData)
 	if err != nil {
@@ -52,16 +56,22 @@ func resourceProbeDNSCreate(ctx context.Context, rd *schema.ResourceData, meta i
 }
 
 func resourceProbeDNSRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "DNS probe resource read context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
 	rrSetKey := probe.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkprobe.DNS
-	_, probeData, err := services.ProbeService.Read(rrSetKey)
-	if err != nil {
+	res, probeData, err := services.ProbeService.Read(rrSetKey)
+
+	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
+		tflog.Warn(ctx, errors.ResourceNotFoundError(rd.Id()).Error())
 		rd.SetId("")
-		tflog.Error(ctx, err.Error())
 		return nil
+	}
+
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	if err = probe.FlattenRRSetKey(rrSetKey, rd); err != nil {
@@ -72,10 +82,15 @@ func resourceProbeDNSRead(ctx context.Context, rd *schema.ResourceData, meta int
 		return diag.FromErr(err)
 	}
 
+	if err := rd.Set("pool_type", rrSetKey.RecordType); err != nil {
+		return diag.FromErr(err)
+	}
+
 	return diags
 }
 
 func resourceProbeDNSUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "DNS probe resource update context invoked")
 	services := meta.(*service.Service)
 	probeData := getNewProbeDNS(rd)
 	rrSetKeyData := probe.GetRRSetKeyFromID(rd.Id())
@@ -89,6 +104,7 @@ func resourceProbeDNSUpdate(ctx context.Context, rd *schema.ResourceData, meta i
 }
 
 func resourceProbeDNSDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "DNS probe resource delete context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)

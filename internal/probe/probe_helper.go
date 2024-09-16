@@ -3,6 +3,8 @@ package probe
 import (
 	"strings"
 
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	sdkhelper "github.com/ultradns/ultradns-go-sdk/pkg/helper"
@@ -193,4 +195,22 @@ func ValidateProbeFilterOptions(probeType string, probeData *probe.Probe, rd *sc
 	}
 
 	return true
+}
+
+func poolTypeValidation(i interface{}, p cty.Path) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	supportedRRType := map[string]bool{
+		"A": true, "1": true,
+		"AAAA": true, "28": true,
+	}
+
+	recordType := i.(string)
+	_, ok := supportedRRType[recordType]
+
+	if !ok {
+		return diag.Errorf("invalid or unsupported record type")
+	}
+
+	return diags
 }

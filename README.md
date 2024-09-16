@@ -12,3 +12,11 @@ Full documentation is available on the Terraform website:</br>
 
 https://registry.terraform.io/providers/ultradns/ultradns/latest/docs
 
+## Getting Help
+
+* If you think you may have found a bug, please open an [issue](https://github.com/ultradns/terraform-provider-ultradns/issues/new).
+* Contact customer support [email](mailto:ultradnssupport@vercara.com).
+
+## Resources
+
+* [Examples](https://github.com/ultradns/terraform-provider-ultradns/tree/master/examples) Included in the repo are several terraform examples using the UltraDNS Terraform provider.

@@ -10,18 +10,18 @@ jobs:
     steps:
       - 
         name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - 
         name: Fetching GO version from repo
         run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
       - 
         name: Setup GO environment
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
       - 
         name: Code linter
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
         with: 
           args: -v
       - 
@@ -33,6 +33,7 @@ jobs:
           ULTRADNS_UNIT_TEST_HOST_URL: ${{ secrets.ULTRADNS_UNIT_TEST_HOST_URL }}
           ULTRADNS_UNIT_TEST_USER_AGENT: ${{ secrets.ULTRADNS_UNIT_TEST_USER_AGENT }}
           ULTRADNS_UNIT_TEST_NAME_SERVER: ${{ secrets.ULTRADNS_UNIT_TEST_NAME_SERVER }}
+          ULTRADNS_UNIT_TEST_SECONDARY_ZONE_NAME: ${{ secrets.ULTRADNS_UNIT_TEST_SECONDARY_ZONE_NAME }}
           ULTRADNS_UNIT_TEST_ACCOUNT: ${{ secrets.ULTRADNS_UNIT_TEST_ACCOUNT }}
   Release_Job:
     runs-on: ubuntu-latest
@@ -41,13 +42,13 @@ jobs:
     steps:
       - 
         name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - 
         name: Fetching GO version from repo
         run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
       - 
         name: Setup GO environment
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
       - 
@@ -71,13 +72,13 @@ jobs:
       -
         name: Import GPG key
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
       -
         name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2.8.0
+        uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
           args: release --rm-dist

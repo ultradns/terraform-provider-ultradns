@@ -6,6 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	"github.com/ultradns/terraform-provider-ultradns/internal/pool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
@@ -30,6 +32,7 @@ func ResourceSFPool() *schema.Resource {
 }
 
 func resourceSFPoolCreate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Simple Failover pool resource create context invoked")
 	services := meta.(*service.Service)
 	rrSetData := getNewSFPoolRRSet(rd)
 	rrSetKeyData := rrset.NewRRSetKey(rd)
@@ -45,16 +48,21 @@ func resourceSFPoolCreate(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func resourceSFPoolRead(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Simple Failover pool resource read context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)
 	rrSetKey := rrset.GetRRSetKeyFromID(rd.Id())
 	rrSetKey.PType = sdkpool.SF
-	_, resList, err := services.RecordService.Read(rrSetKey)
-	if err != nil {
+	res, resList, err := services.RecordService.Read(rrSetKey)
+	if err != nil && res != nil && res.Status == helper.RESOURCE_NOT_FOUND {
+		tflog.Warn(ctx, errors.ResourceNotFoundError(rd.Id()).Error())
 		rd.SetId("")
-		tflog.Error(ctx, err.Error())
 		return nil
+	}
+
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	if len(resList.RRSets) > 0 {
@@ -67,6 +75,7 @@ func resourceSFPoolRead(ctx context.Context, rd *schema.ResourceData, meta inter
 }
 
 func resourceSFPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Simple Failover pool resource update context invoked")
 	services := meta.(*service.Service)
 	rrSetData := getNewSFPoolRRSet(rd)
 	rrSetKeyData := rrset.GetRRSetKeyFromID(rd.Id())
@@ -80,6 +89,7 @@ func resourceSFPoolUpdate(ctx context.Context, rd *schema.ResourceData, meta int
 }
 
 func resourceSFPoolDelete(ctx context.Context, rd *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	tflog.Trace(ctx, "Simple Failover pool resource delete context invoked")
 	var diags diag.Diagnostics
 
 	services := meta.(*service.Service)

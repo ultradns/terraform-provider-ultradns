@@ -112,6 +112,24 @@ func TestAccResourceProbeDNS(t *testing.T) {
 					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_tc", "avg_run_limit.0.fail", "16"),
 				),
 			},
+			{
+				Config: testAccResourceProbeDNSForSBPoolAAAA(zoneNameSB, ownerName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckProbeResourceExists("ultradns_probe_dns.dns_sb_aaaa", probe.DNS),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "zone_name", zoneNameSB),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "owner_name", ownerName+"."+zoneNameSB),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "pool_type", "AAAA"),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "pool_record", "2001:db8:85a3:0:0:8a2e:370:7335"),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "agents.#", "2"),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "threshold", "2"),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "interval", "ONE_MINUTE"),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "port", "55"),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "tcp_only", "true"),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "type", "SOA"),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "response.0.fail", "fail"),
+					resource.TestCheckResourceAttr("ultradns_probe_dns.dns_sb_aaaa", "run_limit.0.fail", "5"),
+				),
+			},
 		},
 	}
 
@@ -220,4 +238,28 @@ func testAccResourceUpdateProbeDNSForTCPool(zoneName, ownerName string) string {
 		}
 	}
 	`, acctest.TestAccResourceTCPool(zoneName, ownerName))
+}
+
+func testAccResourceProbeDNSForSBPoolAAAA(zoneName, ownerName string) string {
+	return fmt.Sprintf(`
+	%s
+	resource "ultradns_probe_dns" "dns_sb_aaaa" {
+		zone_name = "${resource.ultradns_zone.primary_sbpool.id}"
+		owner_name = "${resource.ultradns_sbpool.aaaa.owner_name}"
+		pool_type = "AAAA"
+		pool_record = "2001:db8:85a3:0:0:8a2e:370:7335"
+		interval = "ONE_MINUTE"
+		agents = ["NEW_YORK","DALLAS"]
+		threshold = 2
+		port = 55
+		tcp_only = true
+		type = "SOA"
+		response{
+			fail = "fail"
+		}
+		run_limit{
+			fail = 5
+		}
+	}
+	`, acctest.TestAccResourceSBPoolAAAA(zoneName, ownerName))
 }

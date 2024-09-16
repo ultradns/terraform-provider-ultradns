@@ -119,6 +119,28 @@ func TestAccResourceProbeHTTP(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			{
+				Config: testAccResourceProbeHTTPForTCPoolAAAA(strings.ToUpper(zoneNameTC), ownerName),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckProbeResourceExists("ultradns_probe_http.http_tc_aaaa", probe.HTTP),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "zone_name", zoneNameTC),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "owner_name", ownerName+"."+zoneNameTC),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "pool_type", "AAAA"),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "pool_record", "2001:db8:85a3:0:0:8a2e:370:7335"),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "agents.#", "4"),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "threshold", "4"),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "interval", "HALF_MINUTE"),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "total_limit.0.warning", "5"),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "total_limit.0.critical", "8"),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "total_limit.0.fail", "10"),
+					resource.TestCheckResourceAttr("ultradns_probe_http.http_tc_aaaa", "transaction.#", "3"),
+				),
+			},
+			{
+				ResourceName:      "ultradns_probe_http.http_tc_aaaa",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	}
 
@@ -309,4 +331,80 @@ func testAccResourceUpdateProbeHTTPForTCPool(zoneName, ownerName string) string 
 		}
 	}
 	`, acctest.TestAccResourceTCPool(zoneName, ownerName))
+}
+
+func testAccResourceProbeHTTPForTCPoolAAAA(zoneName, ownerName string) string {
+	return fmt.Sprintf(`
+	%s
+	resource "ultradns_probe_http" "http_tc_aaaa" {
+		zone_name = "${resource.ultradns_zone.primary_tcpool.id}"
+		owner_name = "${resource.ultradns_tcpool.aaaa.owner_name}"
+		pool_type = "AAAA"
+		pool_record = "2001:db8:85a3:0:0:8a2e:370:7335"
+		interval = "HALF_MINUTE"
+		agents = ["EUROPE_WEST", "SOUTH_AMERICA", "PALO_ALTO", "NEW_YORK"]
+		threshold = 4
+		total_limit{
+			warning = "5"
+			critical = "8"
+			fail = "10"
+		}
+		transaction{
+			method = "GET"
+			protocol_version = "HTTP/1.0"
+			url = "https://www.ultradns.com/"
+			follow_redirects = false
+			expected_response = "2XX"
+			search_string {
+				fail = "fail"
+				warning = "warning"
+				critical = "critical"
+			}
+			connect_limit{
+				warning = "5"
+				critical = "8"
+				fail = "10"
+			}
+			run_limit{
+				warning = "5"
+				critical = "8"
+				fail = "10"
+			}
+		}
+		transaction{
+			method = "POST"
+			protocol_version = "HTTP/1.0"
+			url = "https://www.ultradns.com/"
+			transmitted_data = "foo=bar"
+			follow_redirects = true
+			expected_response = "2XX"
+			search_string {
+				fail = "Failure"
+			}
+			connect_limit{
+				fail = 11
+			}
+			run_limit{
+				fail = 12
+			}
+		}
+		transaction{
+			method = "POST"
+			protocol_version = "HTTP/1.0"
+			url = "https://www.ultradns.com/"
+			transmitted_data = "foo=bar"
+			follow_redirects = true
+			expected_response = "2XX"
+			search_string {
+				fail = "Failure"
+			}
+			connect_limit{
+				fail = 11
+			}
+			run_limit{
+				fail = 12
+			}
+		}
+	}
+	`, acctest.TestAccResourceTCPoolAAAA(zoneName, ownerName))
 }
