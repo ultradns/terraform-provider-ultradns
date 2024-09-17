@@ -196,7 +196,7 @@ func TestAccRecordHandling(t *testing.T) {
 					resource.TestCheckResourceAttr("data.ultradns_record.data_caa", "owner_name", zoneName),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_caa", "record_type", "CAA"),
 					resource.TestCheckResourceAttr("data.ultradns_record.data_caa", "ttl", "60"),
-					resource.TestCheckResourceAttr("data.ultradns_record.data_caa", "record_data.#", "1"),
+					resource.TestCheckResourceAttr("data.ultradns_record.data_caa", "record_data.0", "0 issue \"ultradns\""),
 				),
 			},
 		},
