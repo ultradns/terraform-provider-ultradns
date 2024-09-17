@@ -76,9 +76,9 @@ func fmtDiffSuppress(recordType string, rd *schema.ResourceData) bool {
 
 	switch recordType {
 	case record.CAA:
-		return formatCAARecordSetToString(oldData).Equal(formatCAARecordSetToString(newData))
+		return formatCAARecordSet(oldData).Equal(formatCAARecordSet(newData))
 	case record.SVCB, record.HTTPS:
-		return formatSVCRecordSetToString(oldData).Equal(formatSVCRecordSetToString(newData))
+		return formatSVCRecordSet(oldData).Equal(formatSVCRecordSet(newData))
 	}
 
 	return false
@@ -166,7 +166,7 @@ func splitURI(uri, split string) string {
 	return ""
 }
 
-func formatCAARecordSetToString(data *schema.Set) *schema.Set {
+func formatCAARecordSet(data *schema.Set) *schema.Set {
 	result := &schema.Set{F: schema.HashString}
 
 	for _, d := range data.List() {
@@ -185,7 +185,7 @@ func FormatCAARecord(rec string) string {
 	return strings.Join(splitStringData, " ")
 }
 
-func formatSVCRecordSetToString(data *schema.Set) *schema.Set {
+func formatSVCRecordSet(data *schema.Set) *schema.Set {
 	result := &schema.Set{F: schema.HashString}
 
 	for _, d := range data.List() {
