@@ -76,9 +76,9 @@ func fmtDiffSuppress(recordType string, rd *schema.ResourceData) bool {
 
 	switch recordType {
 	case record.CAA:
-		return formatCAARecordSetToString(oldData) == formatCAARecordSetToString(newData)
+		return formatCAARecordSetToString(oldData).Equal(formatCAARecordSetToString(newData))
 	case record.SVCB, record.HTTPS:
-		return formatSVCRecordSetToString(oldData) == formatSVCRecordSetToString(newData)
+		return formatSVCRecordSetToString(oldData).Equal(formatSVCRecordSetToString(newData))
 	}
 
 	return false
@@ -166,14 +166,14 @@ func splitURI(uri, split string) string {
 	return ""
 }
 
-func formatCAARecordSetToString(data *schema.Set) string {
-	result := make([]string, data.Len())
+func formatCAARecordSetToString(data *schema.Set) *schema.Set {
+	result := &schema.Set{F: schema.HashString}
 
-	for i, d := range data.List() {
-		result[i] = FormatCAARecord(d.(string))
+	for _, d := range data.List() {
+		result.Add(FormatCAARecord(d.(string)))
 	}
 
-	return strings.Join(result, ",")
+	return result
 }
 
 func FormatCAARecord(rec string) string {
@@ -185,8 +185,14 @@ func FormatCAARecord(rec string) string {
 	return strings.Join(splitStringData, " ")
 }
 
-func formatSVCRecordSetToString(data *schema.Set) string {
-	return FormatSVCRecord(data.List()[0].(string))
+func formatSVCRecordSetToString(data *schema.Set) *schema.Set {
+	result := &schema.Set{F: schema.HashString}
+
+	for _, d := range data.List() {
+		result.Add(FormatSVCRecord(d.(string)))
+	}
+
+	return result
 }
 
 func FormatSVCRecord(rec string) string {
@@ -198,6 +204,7 @@ func FormatSVCRecord(rec string) string {
 
 	return strings.Join(svcDataSplt, " ")
 }
+
 func formatSVCParams(svcParams string) string {
 	svcParams = strings.TrimPrefix(svcParams, "(")
 	svcParams = strings.TrimSuffix(svcParams, ")")
