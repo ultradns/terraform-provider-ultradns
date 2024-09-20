@@ -147,6 +147,27 @@ func TestAccRecordHandling(t *testing.T) {
 				),
 			},
 			{
+				Config: getRecordHandlingConfig(
+					acctest.TestAccResourceZonePrimary(zoneResource, zoneName),
+					updateResourceConfig("caa", "${resource.ultradns_zone.record_handling.name}", zoneName, "CAA", "60", "0 issue ultradns", "0 issue ultra"),
+					updateResourceConfig("https", "${resource.ultradns_zone.record_handling.name}", zoneName, "HTTPS", "60", "1 www.ultradns.com. alpn=h3,h3-29,h2 mandatory=alpn", "2 www.ultra.com. alpn=h2"),
+				),
+				Check: resource.ComposeTestCheckFunc(
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.caa", ""),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "record_type", "CAA"),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "ttl", "60"),
+					resource.TestCheckResourceAttr("ultradns_record.caa", "record_data.#", "2"),
+					acctest.TestAccCheckRecordResourceExists("ultradns_record.https", ""),
+					resource.TestCheckResourceAttr("ultradns_record.https", "zone_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.https", "owner_name", zoneName),
+					resource.TestCheckResourceAttr("ultradns_record.https", "record_type", "HTTPS"),
+					resource.TestCheckResourceAttr("ultradns_record.https", "ttl", "60"),
+					resource.TestCheckResourceAttr("ultradns_record.https", "record_data.#", "2"),
+				),
+			},
+			{
 				ResourceName:      "ultradns_record.https",
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -161,7 +182,7 @@ func TestAccRecordHandling(t *testing.T) {
 					acctest.TestAccResourceZonePrimary(zoneResource, zoneName),
 					getResourceConfig("caa", "${resource.ultradns_zone.record_handling.name}", zoneName, "CAA", "60", "0 issue ultradns"),
 					getDataSourceConfig("ns", "${resource.ultradns_zone.record_handling.name}", zoneName, "NS"),
-					getDataSourceConfig("caa", "${resource.ultradns_zone.record_handling.name}", zoneName, "CAA"),
+					getDataSourceConfig("caa", "${resource.ultradns_record.caa.zone_name}", zoneName, "CAA"),
 				),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckRecordResourceExists("data.ultradns_record.data_ns", ""),
@@ -201,6 +222,18 @@ func getResourceConfig(rsName, zoneName, ownerName, rrType, ttl, rdata string) s
 		record_data = ["%s"]
 	}
 	`, rsName, zoneName, ownerName, rrType, ttl, rdata)
+}
+
+func updateResourceConfig(rsName, zoneName, ownerName, rrType, ttl, rdata1, rdata2 string) string {
+	return fmt.Sprintf(`
+	resource "ultradns_record" "%s" {
+		zone_name = "%s"
+		owner_name = "%s"
+		record_type = "%s"
+		ttl = %s
+		record_data = ["%s","%s"]
+	}
+	`, rsName, zoneName, ownerName, rrType, ttl, rdata1, rdata2)
 }
 
 func getDataSourceConfig(dsName, zoneName, ownerName, rrType string) string {
