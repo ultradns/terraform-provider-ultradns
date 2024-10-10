@@ -92,6 +92,8 @@ func providerConfigureContext(ctx context.Context, rd *schema.ResourceData) (int
 
 func initializeSDKLogger(c *client.Client) {
 	switch os.Getenv("TF_LOG") {
+	case "WARN":
+		c.EnableLogger(client.LogWarn, 0)
 	case "DEBUG":
 		c.EnableLogger(client.LogDebug, 0)
 	case "TRACE":
