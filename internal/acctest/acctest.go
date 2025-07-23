@@ -147,14 +147,14 @@ func TestAccCheckDirGroupResourceExists(resourceName, resourceType, resourceID s
 		}
 
 		services := TestAccProvider.Meta().(*service.Service)
-		switch {
-		case resourceType == ip.DirGroupType:
+		switch resourceType {
+		case ip.DirGroupType:
 			_, dirGroupResponse, _, err := services.DirGroupIPService.Read(resourceID)
 			if err != nil || dirGroupResponse.Name != rs.Primary.ID {
 				return err
 			}
 
-		case resourceType == geo.DirGroupType:
+		case geo.DirGroupType:
 			_, dirGroupResponse, _, err := services.DirGroupGeoService.Read(resourceID)
 			if err != nil || dirGroupResponse.Name != rs.Primary.ID {
 				return err

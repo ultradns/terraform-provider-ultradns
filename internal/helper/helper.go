@@ -226,7 +226,7 @@ func formatSVCParams(svcParams string) string {
 	}
 
 	keys := make([]int, 0)
-	for k, _ := range svcParamsMap {
+	for k := range svcParamsMap {
 		keys = append(keys, k)
 	}
 
