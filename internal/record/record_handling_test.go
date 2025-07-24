@@ -68,7 +68,7 @@ func TestAccRecordHandling(t *testing.T) {
 				Config: getRecordHandlingConfig(
 					acctest.TestAccResourceZonePrimary(zoneResource, zoneName),
 					getResourceConfig("ns", "${resource.ultradns_zone.record_handling.name}", zoneName, "NS", "60", "udns3.ultradns.net."),
-					getResourceConfig("caa", "${resource.ultradns_record.caa_one.zone_name}", zoneName, "CAA", "60", "0 issue a b c d"),
+					getResourceConfig("caa", "${resource.ultradns_record.caa_one.zone_name}", zoneName, "CAA", "60", "0 issue letsencrypt"),
 					getResourceConfig("caa_one", "${resource.ultradns_zone.record_handling.name}", zoneName, "CAA", "60", "0 issue a b c d"),
 					getResourceConfig("https", "${resource.ultradns_zone.record_handling.name}", zoneName, "HTTPS", "60", "1 www.ultradns.com. ech=dGVzdA== no-default-alpn ipv4hint=1.2.5.4,9.8.7.6 key65444=privatekeyTesting ipv6hint=2001:db8:3333:4444:5555:6666:7777:8888,2001:db8:3333:4444:cccc:dddd:eeee:ffff port=8080 alpn=h3,h3-29,h2 mandatory=alpn,key65444"),
 					getDataSourceConfig("soa", "${resource.ultradns_zone.record_handling.name}", zoneName, "SOA"),

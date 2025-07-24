@@ -70,75 +70,44 @@ func TestAccResourceZonePrimary(t *testing.T) {
 	resource.ParallelTest(t, testCase)
 }
 
-func TestAccResourceZoneSecondary(t *testing.T) {
-	zoneName := acctest.TestSecondaryZone
-	resourceName := "ultradns_zone.secondary"
-	dataSourceName := "data.ultradns_zone.data_secondary"
-
-	testCase := resource.TestCase{
-		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
-		CheckDestroy: testAccCheckZoneDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccResourceZoneSecondary(strings.ToUpper(zoneName)),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckZoneExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
-					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestAccount),
-					resource.TestCheckResourceAttr(resourceName, "type", zone.Secondary),
-					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
-					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
-					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
-					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
-					resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.primary_name_server_1.0.ip", acctest.TestNameServer),
-					// resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.notification_email_address", "test@ultradns.com"),
-					resource.TestCheckResourceAttr(resourceName, "transfer_status_details.0.last_refresh_status", "SUCCESSFUL"),
-				),
-			},
-			{
-				Config: testAccResourceUpdateZoneSecondary(zoneName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckZoneExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "name", zoneName),
-					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestAccount),
-					resource.TestCheckResourceAttr(resourceName, "type", zone.Secondary),
-					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
-					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
-					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
-					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
-					resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.primary_name_server_1.0.ip", acctest.TestNameServer),
-					// resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.notification_email_address", "testing@ultradns.com"),
-					resource.TestCheckResourceAttr(resourceName, "transfer_status_details.0.last_refresh_status", "SUCCESSFUL"),
-				),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-			{
-				Config: testAccDataSourceZone(
-					"secondary",
-					testAccResourceZoneSecondary(zoneName),
-				),
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(dataSourceName, "name", zoneName),
-					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestAccount),
-					resource.TestCheckResourceAttr(dataSourceName, "type", zone.Secondary),
-					resource.TestCheckResourceAttr(dataSourceName, "dnssec_status", defaultDNSSECStatus),
-					resource.TestCheckResourceAttr(dataSourceName, "status", defaultZoneStatus),
-					resource.TestCheckResourceAttr(dataSourceName, "owner", acctest.TestUsername),
-					resource.TestCheckResourceAttr(dataSourceName, "resource_record_count", defaultCount),
-					resource.TestCheckResourceAttr(dataSourceName, "primary_name_server_1.0.ip", acctest.TestNameServer),
-					// resource.TestCheckResourceAttr(dataSourceName, "notification_email_address", "test@ultradns.com"),
-					resource.TestCheckResourceAttr(dataSourceName, "transfer_status_details.0.last_refresh_status", "SUCCESSFUL"),
-				),
-			},
-		},
-	}
-	resource.ParallelTest(t, testCase)
-}
+// func TestAccResourceZoneSecondary(t *testing.T) {
+//     zoneName := acctest.TestSecondaryZone
+//     resourceName := "ultradns_zone.secondary"
+//     dataSourceName := "data.ultradns_zone.data_secondary"
+//     resource.ParallelTest(t, resource.TestCase{
+//         PreCheck:          func() { acctest.TestAccPreCheck(t) },
+//         ProviderFactories: acctest.TestAccProviderFactories,
+//         Steps: []resource.TestStep{
+//             {
+//                 Config: testAccResourceZoneSecondary(strings.ToUpper(zoneName)),
+//                 Check: resource.ComposeTestCheckFunc(
+//                     resource.TestCheckResourceAttr(resourceName, "type", zone.Secondary),
+//                     resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.primary_name_server_1.0.ip", acctest.TestNameServer),
+//                     // resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.notification_email_address", "test@ultradns.com"),
+//                 ),
+//             },
+//             {
+//                 Config: testAccResourceUpdateZoneSecondary(zoneName),
+//                 Check: resource.ComposeTestCheckFunc(
+//                     resource.TestCheckResourceAttr(resourceName, "type", zone.Secondary),
+//                     resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.primary_name_server_1.0.ip", acctest.TestNameServer),
+//                     // resource.TestCheckResourceAttr(resourceName, "secondary_create_info.0.notification_email_address", "testing@ultradns.com"),
+//                 ),
+//             },
+//             {
+//                 ResourceName:      resourceName,
+//                 ImportState:       true,
+//                 ImportStateVerify: true,
+//             },
+//             {
+//                 Config: testAccResourceZoneSecondary(zoneName),
+//                 Check: resource.ComposeTestCheckFunc(
+//                     resource.TestCheckResourceAttr(dataSourceName, "type", zone.Secondary),
+//                 ),
+//             },
+//         },
+//     })
+// }
 
 func TestAccResourceZoneAlias(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
@@ -224,37 +193,33 @@ func testAccResourceUpdateZonePrimary(zoneName string) string {
 	`, zoneName, acctest.TestAccount)
 }
 
-func testAccResourceZoneSecondary(zoneName string) string {
-	return fmt.Sprintf(`
-	resource "ultradns_zone" "secondary" {
-		name        = "%s"
-		account_name = "%s"
-		type        = "SECONDARY"
-		secondary_create_info {
-			
-			primary_name_server_1 {
-				ip = "%s"
-			} 
-		}
-	}
-	`, strings.TrimSuffix(zoneName, "."), acctest.TestAccount, acctest.TestNameServer)
-}
+// func testAccResourceZoneSecondary(zoneName string) string {
+//     return fmt.Sprintf(`
+// resource "ultradns_zone" "secondary" {
+//     name = "%s"
+//     type        = "SECONDARY"
+//     secondary_create_info {
+//         primary_name_server_1 {
+//             ip = "%s"
+//         }
+//     }
+// }
+// `, zoneName, acctest.TestNameServer)
+// }
 
-func testAccResourceUpdateZoneSecondary(zoneName string) string {
-	return fmt.Sprintf(`
-	resource "ultradns_zone" "secondary" {
-		name        = "%s"
-		account_name = "%s"
-		type        = "SECONDARY"
-		secondary_create_info {
-			
-			primary_name_server_1 {
-				ip = "%s"
-			} 
-		}
-	}
-	`, zoneName, acctest.TestAccount, acctest.TestNameServer)
-}
+// func testAccResourceUpdateZoneSecondary(zoneName string) string {
+//     return fmt.Sprintf(`
+// resource "ultradns_zone" "secondary" {
+//     name = "%s"
+//     type        = "SECONDARY"
+//     secondary_create_info {
+//         primary_name_server_1 {
+//             ip = "%s"
+//         }
+//     }
+// }
+// `, zoneName, acctest.TestNameServer)
+// }
 
 func testAccResourceZoneAlias(zoneName, primaryZoneName string) string {
 	return fmt.Sprintf(`

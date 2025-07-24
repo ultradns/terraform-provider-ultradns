@@ -3,6 +3,7 @@ package acctest
 import (
 	"context"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -180,6 +181,14 @@ func TestAccCheckRecordResourceDestroy(resourceName, pType string) resource.Test
 			if err == nil {
 				if len(response.RRSets) > 0 && response.RRSets[0].OwnerName == rrSetKey.Owner {
 					return errors.ResourceNotDestroyedError(rs.Primary.ID)
+				}
+			} else {
+				errMsg := err.Error()
+				if strings.Contains(errMsg, "70002") || strings.Contains(errMsg, "Data not found") || strings.Contains(errMsg, "1801") || strings.Contains(errMsg, "Zone does not exist") {
+					// Ignore 'Data not found' and 'Zone does not exist' errors
+					continue
+				} else {
+					return err
 				}
 			}
 		}
