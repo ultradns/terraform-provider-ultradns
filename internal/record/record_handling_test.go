@@ -206,7 +206,7 @@ func TestAccRecordHandling(t *testing.T) {
 
 func getRecordHandlingConfig(v ...any) string {
 	strFmt := ""
-	for _, _ = range v {
+	for range v {
 		strFmt += "%s\n"
 	}
 	return fmt.Sprintf(strFmt, v...)

@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	errNotFound     = errors.New("Existing resource not found")
+	errNotFound     = errors.New("existing resource not found")
 	errNotDestroyed = errors.New("not destroyed")
 	errMismatched   = errors.New("mismatched")
 )
