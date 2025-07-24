@@ -53,13 +53,7 @@ func resourceRecordCreate(ctx context.Context, rd *schema.ResourceData, meta int
 
 	_, err := services.RecordService.Create(rrSetKeyData, rrSetData)
 	if err != nil {
-		errMsg := err.Error()
-		if strings.Contains(errMsg, "2111") || strings.Contains(errMsg, "already exists") {
-			// Ignore 'already exists' error and continue
-			tflog.Warn(ctx, "Record already exists, continuing", map[string]interface{}{"error": errMsg})
-		} else {
-			return diag.FromErr(err)
-		}
+		return diag.FromErr(err)
 	}
 
 	rd.SetId(rrSetKeyData.RecordID())
