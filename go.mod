@@ -8,6 +8,7 @@ require (
 	github.com/hashicorp/go-cty v1.5.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.37.0
+	// Temporary pseudo-version until ultradns-go-sdk v1.8.2 is released.
 	github.com/ultradns/ultradns-go-sdk v1.0.0-202201070925-6692cb0.0.20260420074101-08124e06438b
 )
 
