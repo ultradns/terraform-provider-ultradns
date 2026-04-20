@@ -38,3 +38,24 @@ func TestAccDataSourceProbeWithOptions(dataSourceType, datasourceName, zoneName,
 	}
 	`, resource, dataSourceType, datasourceName, zoneName, interval, poolRecord, poolType)
 }
+
+func TestAccDataSourceCDN(datasourceName, resourceName, resource string) string {
+	return fmt.Sprintf(`
+	%[1]s
+	data "ultradns_cdn" "data_%[2]s" {
+		account_name = "${resource.ultradns_cdn.%[3]s.account_name}"
+		fqdn = "${resource.ultradns_cdn.%[3]s.fqdn}"
+	}
+	`, resource, datasourceName, resourceName)
+}
+
+func TestAccDataSourceCDNs(datasourceName, resourceName string, page, size int, resource string) string {
+	return fmt.Sprintf(`
+	%[1]s
+	data "ultradns_cdns" "data_%[2]s" {
+		account_name = "${resource.ultradns_cdn.%[3]s.account_name}"
+		page = %[4]d
+		size = %[5]d
+	}
+	`, resource, datasourceName, resourceName, page, size)
+}

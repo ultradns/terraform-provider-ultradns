@@ -182,3 +182,167 @@ func TestAccResourceTCPoolAAAA(zoneName, ownerName string) string {
 	}
 	`, TestAccResourceZonePrimary("primary_tcpool", zoneName), ownerName)
 }
+
+func TestAccResourceCDN(resourceName, fqdn, cdnType, name, description string) string {
+	descriptionLine := fmt.Sprintf("description  = %q", description)
+	contentTypeLine := "content_type = \"static\""
+	configMapsBlock := `
+			cdnEnablementMap = jsonencode({
+				worldDefault = ["TEST-PROVIDER-1"]
+				asnOverrides = {}
+				continents  = {}
+			})
+			trafficDistribution = jsonencode({
+				worldDefault = {
+					options = [{
+						name        = "equal_distribution"
+						description = "Equal distribution across available CDNs"
+						equalWeight = true
+						distribution = [{
+							id = "TEST-PROVIDER-1"
+						}]
+					}]
+				}
+			})`
+
+	checksConfigBlock := ""
+	if cdnType == "SYNTHETIC" {
+		descriptionLine = ""
+		contentTypeLine = ""
+		configMapsBlock = ""
+		checksConfigBlock = `
+			checksConfig = jsonencode({
+				protocol = "HTTP"
+				path = "/"
+			})`
+	}
+
+	return fmt.Sprintf(`
+	resource "ultradns_zone" "primary_%s" {
+		name         = "%s"
+		account_name = "%s"
+		type         = "PRIMARY"
+		primary_create_info {
+			create_type = "NEW"
+			notify_addresses {
+				notify_address = "192.168.1.1"
+			}
+			notify_addresses {
+				notify_address = "192.168.1.2"
+			}
+			notify_addresses {
+				notify_address = "192.168.1.3"
+			}
+			restrict_ip {
+				single_ip = "192.168.1.1"
+			}
+			restrict_ip {
+				single_ip = "192.168.1.2"
+			}
+			restrict_ip {
+				single_ip = "192.168.1.3"
+			}
+		}
+	}
+
+	resource "ultradns_cdn" "%s" {
+		account_name = "%s"
+		fqdn         = "www.${ultradns_zone.primary_%s.id}"
+		type         = "%s"
+		name         = "%s"
+		%s
+		ttl          = 300
+		%s
+
+		cdn_providers {
+			client_cdn_id = "TEST-PROVIDER-1"
+			cdn_name      = "Test CDN Provider"
+			fqdn          = "cdn-provider.example.com."
+		}
+
+		config_properties = {
+			%s
+			%s
+		}
+
+		preference_properties = {
+			availabilityThresholds = jsonencode({
+				world = 92
+				continents = {
+					NA = {
+						countries = {
+							US = 70
+							CA = 70
+							MX = 70
+						}
+						default = 79
+					}
+				}
+			})
+			performanceFiltering = jsonencode({
+				world = {
+					mode = "relative"
+					relativeThreshold = 0.2
+				}
+				continents = {
+					NA = {
+						mode = "relative"
+						relativeThreshold = 0.3
+					}
+				}
+			})
+			enabledSubdivisionCountries = jsonencode({
+				continents = {
+					AS = {
+						countries = ["IN"]
+					}
+					NA = {
+						countries = ["US", "CA", "MX"]
+					}
+					SA = {
+						countries = ["BR"]
+					}
+				}
+			})
+		}
+	}
+	`, resourceName, fqdn, TestAccount, resourceName, TestAccount, resourceName, cdnType, name, descriptionLine, contentTypeLine, configMapsBlock, checksConfigBlock)
+}
+// TestAccResourceCDNWithClientCdnID returns an HCL config identical to
+// TestAccResourceCDN except the cdn_providers block uses the supplied
+// clientCdnID value. Use this to trigger schema-level ValidateFunc errors
+// without changing the main fixture.
+func TestAccResourceCDNWithClientCdnID(resourceName, fqdn, cdnType, name, clientCdnID string) string {
+	return fmt.Sprintf(`
+	resource "ultradns_zone" "primary_%s" {
+		name         = "%s"
+		account_name = "%s"
+		type         = "PRIMARY"
+		primary_create_info {
+			create_type = "NEW"
+		}
+	}
+
+	resource "ultradns_cdn" "%s" {
+		account_name = "%s"
+		fqdn         = "www.${ultradns_zone.primary_%s.id}"
+		type         = "%s"
+		name         = "%s"
+
+		cdn_providers {
+			client_cdn_id = "%s"
+		}
+
+		config_properties = {
+			cdnEnablementMap = jsonencode({ worldDefault = [], asnOverrides = {}, continents = {} })
+			trafficDistribution = jsonencode({ worldDefault = { options = [] } })
+		}
+
+		preference_properties = {
+			availabilityThresholds = jsonencode({ world = 90, continents = {} })
+			performanceFiltering = jsonencode({ world = { mode = "relative", relativeThreshold = 0.2 } })
+			enabledSubdivisionCountries = jsonencode({ continents = {} })
+		}
+	}
+	`, resourceName, fqdn, TestAccount, resourceName, TestAccount, resourceName, cdnType, name, clientCdnID)
+}

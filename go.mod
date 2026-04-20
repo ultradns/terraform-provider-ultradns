@@ -11,6 +11,8 @@ require (
 	github.com/ultradns/ultradns-go-sdk v1.8.1-20250722213956-faef419
 )
 
+replace github.com/ultradns/ultradns-go-sdk => ../ultradns-go-sdk
+
 require (
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/agext/levenshtein v1.2.2 // indirect

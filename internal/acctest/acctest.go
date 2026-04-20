@@ -17,6 +17,7 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/client"
+	cdnresource "github.com/ultradns/ultradns-go-sdk/pkg/cdn/resource"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/geo"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/ip"
 )
@@ -65,6 +66,10 @@ func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.Resour
 	client, err := client.NewClient(cnf)
 	if err != nil {
 		return nil, diag.FromErr(err)
+	}
+
+	if os.Getenv("ULTRADNS_UNIT_TEST_DEBUG_HTTP") == "1" {
+		client.EnableDefaultDebugLogger()
 	}
 
 	service, err := service.NewService(client)
@@ -166,6 +171,29 @@ func TestAccCheckDirGroupResourceExists(resourceName, resourceType, resourceID s
 	}
 }
 
+func TestAccCheckCDNResourceExists(resourceName string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[resourceName]
+		if !ok {
+			return errors.ResourceNotFoundError(resourceName)
+		}
+
+		accountName := rs.Primary.Attributes["account_name"]
+		fqdn := rs.Primary.Attributes["fqdn"]
+
+		services := TestAccProvider.Meta().(*service.Service)
+		_, payload, err := services.CDNResourceService.Read(accountName, fqdn)
+		if err != nil {
+			return err
+		}
+		if payload == nil || !strings.EqualFold(payload.FQDN, fqdn) {
+			return errors.ResourceNotFoundError(rs.Primary.ID)
+		}
+
+		return nil
+	}
+}
+
 func TestAccCheckRecordResourceDestroy(resourceName, pType string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		for _, rs := range s.RootModule().Resources {
@@ -211,6 +239,37 @@ func TestAccCheckProbeResourceDestroy(resourceName, pType string) resource.TestC
 
 			if err == nil {
 				if response.Type == pType {
+					return errors.ResourceNotDestroyedError(rs.Primary.ID)
+				}
+			}
+		}
+
+		return nil
+	}
+}
+
+func TestAccCheckCDNResourceDestroy(resourceName string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		for _, rs := range s.RootModule().Resources {
+			if rs.Type != resourceName {
+				continue
+			}
+
+			accountName := rs.Primary.Attributes["account_name"]
+			fqdn := rs.Primary.Attributes["fqdn"]
+
+			services := TestAccProvider.Meta().(*service.Service)
+			_, listPayload, err := services.CDNResourceService.List(accountName, &cdnresource.ListOptions{Page: 1, Size: 1000})
+			if err != nil {
+				return err
+			}
+
+			if listPayload == nil {
+				continue
+			}
+
+			for _, item := range listPayload.Content {
+				if item != nil && strings.EqualFold(item.FQDN, fqdn) {
 					return errors.ResourceNotDestroyedError(rs.Primary.ID)
 				}
 			}

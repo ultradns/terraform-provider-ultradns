@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/cdn"
 	"github.com/ultradns/terraform-provider-ultradns/internal/dirgroupgeo"
 	"github.com/ultradns/terraform-provider-ultradns/internal/dirgroupip"
 	"github.com/ultradns/terraform-provider-ultradns/internal/dirpool"
@@ -32,6 +33,7 @@ func Provider() *schema.Provider {
 		Schema: providerSchema(),
 
 		ResourcesMap: map[string]*schema.Resource{
+			"ultradns_cdn":          cdn.ResourceCDN(),
 			"ultradns_zone":         zone.ResourceZone(),
 			"ultradns_record":       record.ResourceRecord(),
 			"ultradns_rdpool":       rdpool.ResourceRDPool(),
@@ -48,6 +50,8 @@ func Provider() *schema.Provider {
 			"ultradns_dirgroup_geo": dirgroupgeo.ResourceGeoGroup(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
+			"ultradns_cdn":          cdn.DataSourceCDN(),
+			"ultradns_cdns":         cdn.DataSourceCDNs(),
 			"ultradns_zone":         zone.DataSourceZone(),
 			"ultradns_record":       record.DataSourceRecord(),
 			"ultradns_rdpool":       rdpool.DataSourceRDPool(),

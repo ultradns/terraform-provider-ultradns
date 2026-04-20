@@ -1,6 +1,7 @@
 package service
 
 import (
+	cdnresource "github.com/ultradns/ultradns-go-sdk/pkg/cdn/resource"
 	"github.com/ultradns/ultradns-go-sdk/pkg/client"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/geo"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/ip"
@@ -15,6 +16,7 @@ type Service struct {
 	ProbeService       *probe.Service
 	DirGroupGeoService *geo.Service
 	DirGroupIPService  *ip.Service
+	CDNResourceService *cdnresource.Service
 }
 
 func NewService(c *client.Client) (*Service, error) {
@@ -39,6 +41,10 @@ func NewService(c *client.Client) (*Service, error) {
 	}
 
 	if service.DirGroupIPService, err = ip.Get(c); err != nil {
+		return nil, err
+	}
+
+	if service.CDNResourceService, err = cdnresource.Get(c); err != nil {
 		return nil, err
 	}
 
