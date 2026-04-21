@@ -2,12 +2,10 @@ package cdn_test
 
 import (
 	"fmt"
-	"strconv"
 	"testing"
 
 	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
 	cdnresource "github.com/ultradns/ultradns-go-sdk/pkg/cdn/resource"
 )
@@ -80,26 +78,4 @@ func TestAccDataSourceCDNs(t *testing.T) {
 	resource.ParallelTest(t, testCase)
 }
 
-func testAccCheckCDNListed(resourceName, fqdn, expectedType string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[resourceName]
-		if !ok {
-			return fmt.Errorf("resource not found in state: %s", resourceName)
-		}
 
-		count, err := strconv.Atoi(rs.Primary.Attributes["cdns.#"])
-		if err != nil {
-			return fmt.Errorf("failed to parse cdns count: %w", err)
-		}
-
-		for i := 0; i < count; i++ {
-			fqdnKey := fmt.Sprintf("cdns.%d.fqdn", i)
-			typeKey := fmt.Sprintf("cdns.%d.type", i)
-			if rs.Primary.Attributes[fqdnKey] == fqdn && rs.Primary.Attributes[typeKey] == expectedType {
-				return nil
-			}
-		}
-
-		return fmt.Errorf("cdn %s with type %s not found in data source %s", fqdn, expectedType, resourceName)
-	}
-}
