@@ -56,12 +56,29 @@ func init() {
 	}
 }
 
+func NewTestAccProvidersCDN() map[string]*schema.Provider {
+	providerCDN := provider.Provider()
+	providerCDN.ConfigureContextFunc = getTestAccProviderConfigureContextFuncCDN
+
+	return map[string]*schema.Provider{
+		"ultradns": providerCDN,
+	}
+}
+
 func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.ResourceData) (interface{}, diag.Diagnostics) {
+	return configureTestAccProviderContext(TestUsername, testPassword)
+}
+
+func getTestAccProviderConfigureContextFuncCDN(c context.Context, rd *schema.ResourceData) (interface{}, diag.Diagnostics) {
+	return configureTestAccProviderContext(TestUsernameCDN, testPasswordCDN)
+}
+
+func configureTestAccProviderContext(username, password string) (interface{}, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	cnf := client.Config{
-		Username:  TestUsername,
-		Password:  testPassword,
+		Username:  username,
+		Password:  password,
 		HostURL:   TestHost,
 		UserAgent: testUserAgent,
 	}
@@ -103,6 +120,24 @@ func TestPreCheck(t *testing.T) func() {
 
 		if testUserAgent == "" {
 			t.Fatal("user agent required for creating test client")
+		}
+	}
+}
+
+func TestPreCheckCDN(t *testing.T) func() {
+	return func() {
+		TestPreCheck(t)()
+
+		if TestUsernameCDN == "" {
+			t.Fatal("cdn username required for creating test client")
+		}
+
+		if testPasswordCDN == "" {
+			t.Fatal("cdn password required for creating test client")
+		}
+
+		if TestAccountCDN == "" {
+			t.Fatal("cdn account required for creating test client")
 		}
 	}
 }
@@ -184,7 +219,10 @@ func TestAccCheckCDNResourceExists(resourceName string) resource.TestCheckFunc {
 		accountName := rs.Primary.Attributes["account_name"]
 		fqdn := rs.Primary.Attributes["fqdn"]
 
-		services := TestAccProvider.Meta().(*service.Service)
+		services, err := getCDNService()
+		if err != nil {
+			return err
+		}
 		_, payload, err := services.CDNResourceService.Read(accountName, fqdn)
 		if err != nil {
 			return err
@@ -261,7 +299,10 @@ func TestAccCheckCDNResourceDestroy(resourceName string) resource.TestCheckFunc 
 			accountName := rs.Primary.Attributes["account_name"]
 			fqdn := rs.Primary.Attributes["fqdn"]
 
-			services := TestAccProvider.Meta().(*service.Service)
+			services, err := getCDNService()
+			if err != nil {
+				return err
+			}
 			_, listPayload, err := services.CDNResourceService.List(accountName, &cdnresource.ListOptions{Page: 1, Size: 1000})
 			if err != nil {
 				return err
@@ -280,6 +321,22 @@ func TestAccCheckCDNResourceDestroy(resourceName string) resource.TestCheckFunc 
 
 		return nil
 	}
+}
+
+func getCDNService() (*service.Service, error) {
+	cnf := client.Config{
+		Username:  TestUsernameCDN,
+		Password:  testPasswordCDN,
+		HostURL:   TestHost,
+		UserAgent: testUserAgent,
+	}
+
+	client, err := client.NewClient(cnf)
+	if err != nil {
+		return nil, err
+	}
+
+	return service.NewService(client)
 }
 
 func TestAccCheckDirGroupResourceDestroy(resourceName, resourceType, resourceID string) resource.TestCheckFunc {
