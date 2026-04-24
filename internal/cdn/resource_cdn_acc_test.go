@@ -26,7 +26,7 @@ func TestAccResourceCDNBYOD(t *testing.T) {
 				Config: acctest.TestAccResourceCDN("byod", fqdn, cdnresource.TypeBYOD, name, "BYOD acceptance test"),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckCDNResourceExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestAccount),
+					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestAccountCDN),
 					resource.TestCheckResourceAttr(resourceName, "fqdn", cdnFQDN),
 					resource.TestCheckResourceAttr(resourceName, "type", cdnresource.TypeBYOD),
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -85,7 +85,7 @@ func TestAccResourceCDNSynthetic(t *testing.T) {
 				Config: acctest.TestAccResourceCDN("synthetic", fqdn, cdnresource.TypeSynthetic, name, "Synthetic acceptance test"),
 				Check: resource.ComposeTestCheckFunc(
 					acctest.TestAccCheckCDNResourceExists(resourceName),
-					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestAccount),
+					resource.TestCheckResourceAttr(resourceName, "account_name", acctest.TestAccountCDN),
 					resource.TestCheckResourceAttr(resourceName, "fqdn", cdnFQDN),
 					resource.TestCheckResourceAttr(resourceName, "type", cdnresource.TypeSynthetic),
 					resource.TestCheckResourceAttr(resourceName, "name", name),

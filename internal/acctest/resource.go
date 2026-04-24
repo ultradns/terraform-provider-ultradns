@@ -306,7 +306,7 @@ func TestAccResourceCDN(resourceName, fqdn, cdnType, name, description string) s
 			})
 		}
 	}
-	`, resourceName, fqdn, TestAccount, resourceName, TestAccount, resourceName, cdnType, name, descriptionLine, contentTypeLine, configMapsBlock, checksConfigBlock)
+	`, resourceName, fqdn, TestAccountCDN, resourceName, TestAccountCDN, resourceName, cdnType, name, descriptionLine, contentTypeLine, configMapsBlock, checksConfigBlock)
 }
 // TestAccResourceCDNWithClientCdnID returns an HCL config identical to
 // TestAccResourceCDN except the cdn_providers block uses the supplied
@@ -340,9 +340,9 @@ func TestAccResourceCDNWithClientCdnID(resourceName, fqdn, cdnType, name, client
 
 		preference_properties = {
 			availabilityThresholds = jsonencode({ world = 90, continents = {} })
-			performanceFiltering = jsonencode({ world = { mode = "relative", relativeThreshold = 0.2 } })
+			performanceFiltering = jsonencode({ world = { mode = "relative", relativeThreshold = 0.2 }, continents = {} })
 			enabledSubdivisionCountries = jsonencode({ continents = {} })
 		}
 	}
-	`, resourceName, fqdn, TestAccount, resourceName, TestAccount, resourceName, cdnType, name, clientCdnID)
+	`, resourceName, fqdn, TestAccountCDN, resourceName, TestAccountCDN, resourceName, cdnType, name, clientCdnID)
 }

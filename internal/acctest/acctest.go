@@ -33,10 +33,13 @@ const (
 var (
 	TestHost          = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
 	TestAccount       = os.Getenv("ULTRADNS_UNIT_TEST_ACCOUNT")
+	TestAccountCDN    = os.Getenv("ULTRADNS_UNIT_TEST_ACCOUNT_CDN")
 	TestUsername      = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME")
+	TestUsernameCDN   = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME_CDN")
 	TestNameServer    = os.Getenv("ULTRADNS_UNIT_TEST_NAME_SERVER")
 	TestSecondaryZone = os.Getenv("ULTRADNS_UNIT_TEST_SECONDARY_ZONE_NAME")
 	testPassword      = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD")
+	testPasswordCDN   = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD_CDN")
 	testUserAgent     = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
 )
 
