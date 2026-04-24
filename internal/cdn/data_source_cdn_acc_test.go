@@ -18,8 +18,8 @@ func TestAccDataSourceCDN(t *testing.T) {
 	name := "cdn-" + tfacctest.RandString(6)
 
 	testCase := resource.TestCase{
-		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		PreCheck:     acctest.TestPreCheckCDN(t),
+		Providers:    acctest.NewTestAccProvidersCDN(),
 		CheckDestroy: acctest.TestAccCheckCDNResourceDestroy("ultradns_cdn"),
 		Steps: []resource.TestStep{
 			{
@@ -29,7 +29,7 @@ func TestAccDataSourceCDN(t *testing.T) {
 					acctest.TestAccResourceCDN(resourceName, fqdn, cdnresource.TypeSynthetic, name, "Synthetic data source test"),
 				),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestAccount),
+					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestAccountCDN),
 					resource.TestCheckResourceAttr(dataSourceName, "fqdn", cdnFQDN),
 					resource.TestCheckResourceAttr(dataSourceName, "type", cdnresource.TypeSynthetic),
 					resource.TestCheckResourceAttr(dataSourceName, "name", name),
@@ -60,14 +60,14 @@ func TestAccDataSourceCDNs(t *testing.T) {
 	)
 
 	testCase := resource.TestCase{
-		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		PreCheck:     acctest.TestPreCheckCDN(t),
+		Providers:    acctest.NewTestAccProvidersCDN(),
 		CheckDestroy: acctest.TestAccCheckCDNResourceDestroy("ultradns_cdn"),
 		Steps: []resource.TestStep{
 			{
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestAccount),
+					resource.TestCheckResourceAttr(dataSourceName, "account_name", acctest.TestAccountCDN),
 					resource.TestCheckResourceAttrSet(dataSourceName, "total_pages"),
 					resource.TestCheckResourceAttrSet(dataSourceName, "total_elements"),
 				),
