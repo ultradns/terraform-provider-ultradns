@@ -24,9 +24,11 @@ import (
 
 const (
 	randZoneNamePrefix                = "terraform-plugin-acc-test-"
+	randCDNZoneNamePrefix             = "terraform-plugin-cdn-acc-test-"
 	randZoneNameSuffix                = ".com."
 	randZoneNameWithSpecialCharSuffix = ".in-addr.arpa."
 	randStringLength                  = 5
+	randCDNStringLength               = 10
 	randSecondaryZoneCount            = 50
 )
 
@@ -359,6 +361,14 @@ func TestAccCheckDirGroupResourceDestroy(resourceName, resourceType, resourceID 
 }
 func GetRandomZoneName() string {
 	return randZoneNamePrefix + acctest.RandString(randStringLength) + randZoneNameSuffix
+}
+
+func GetRandomCDNZoneName() string {
+	return randCDNZoneNamePrefix + acctest.RandString(randCDNStringLength) + randZoneNameSuffix
+}
+
+func GetRandomCDNName() string {
+	return "cdn-" + acctest.RandString(randCDNStringLength)
 }
 
 func GetRandomZoneNameWithSpecialChar() string {

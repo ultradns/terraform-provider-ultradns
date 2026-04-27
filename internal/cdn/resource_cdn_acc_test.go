@@ -4,18 +4,17 @@ import (
 	"regexp"
 	"testing"
 
-	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
 	cdnresource "github.com/ultradns/ultradns-go-sdk/pkg/cdn/resource"
 )
 
 func TestAccResourceCDNBYOD(t *testing.T) {
-	fqdn := acctest.GetRandomZoneName()
+	fqdn := acctest.GetRandomCDNZoneName()
 	cdnFQDN := "www." + fqdn
 	resourceName := "ultradns_cdn.byod"
-	name := "cdn-" + tfacctest.RandString(6)
-	updatedName := "cdn-" + tfacctest.RandString(6)
+	name := acctest.GetRandomCDNName()
+	updatedName := acctest.GetRandomCDNName()
 
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheckCDN(t),
@@ -70,11 +69,11 @@ func TestAccResourceCDNBYOD(t *testing.T) {
 }
 
 func TestAccResourceCDNSynthetic(t *testing.T) {
-	fqdn := acctest.GetRandomZoneName()
+	fqdn := acctest.GetRandomCDNZoneName()
 	cdnFQDN := "www." + fqdn
 	resourceName := "ultradns_cdn.synthetic"
-	name := "cdn-" + tfacctest.RandString(6)
-	updatedName := "cdn-" + tfacctest.RandString(6)
+	name := acctest.GetRandomCDNName()
+	updatedName := acctest.GetRandomCDNName()
 
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheckCDN(t),
@@ -117,8 +116,8 @@ func TestAccResourceCDNSynthetic(t *testing.T) {
 // ValidateFunc rejects a clientCdnId that does not match ^[A-Za-z0-9\-_]{1,64}$
 // before any API call is made.
 func TestAccResourceCDNInvalidClientCdnID(t *testing.T) {
-	fqdn := acctest.GetRandomZoneName()
-	name := "cdn-" + tfacctest.RandString(6)
+	fqdn := acctest.GetRandomCDNZoneName()
+	name := acctest.GetRandomCDNName()
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  acctest.TestPreCheckCDN(t),
@@ -135,8 +134,8 @@ func TestAccResourceCDNInvalidClientCdnID(t *testing.T) {
 // TestAccResourceCDNInvalidType verifies that the schema-level ValidateFunc
 // rejects an unknown CDN type before any API call is made.
 func TestAccResourceCDNInvalidType(t *testing.T) {
-	fqdn := acctest.GetRandomZoneName()
-	name := "cdn-" + tfacctest.RandString(6)
+	fqdn := acctest.GetRandomCDNZoneName()
+	name := acctest.GetRandomCDNName()
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  acctest.TestPreCheckCDN(t),

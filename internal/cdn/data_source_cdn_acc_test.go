@@ -4,18 +4,17 @@ import (
 	"fmt"
 	"testing"
 
-	tfacctest "github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/ultradns/terraform-provider-ultradns/internal/acctest"
 	cdnresource "github.com/ultradns/ultradns-go-sdk/pkg/cdn/resource"
 )
 
 func TestAccDataSourceCDN(t *testing.T) {
-	fqdn := acctest.GetRandomZoneName()
+	fqdn := acctest.GetRandomCDNZoneName()
 	cdnFQDN := "www." + fqdn
 	dataSourceName := "data.ultradns_cdn.data_single"
 	resourceName := "single"
-	name := "cdn-" + tfacctest.RandString(6)
+	name := acctest.GetRandomCDNName()
 
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheckCDN(t),
@@ -43,11 +42,11 @@ func TestAccDataSourceCDN(t *testing.T) {
 }
 
 func TestAccDataSourceCDNs(t *testing.T) {
-	byodFQDN := acctest.GetRandomZoneName()
-	syntheticFQDN := acctest.GetRandomZoneName()
+	byodFQDN := acctest.GetRandomCDNZoneName()
+	syntheticFQDN := acctest.GetRandomCDNZoneName()
 	dataSourceName := "data.ultradns_cdns.data_all"
-	byodName := "cdn-" + tfacctest.RandString(6)
-	syntheticName := "cdn-" + tfacctest.RandString(6)
+	byodName := acctest.GetRandomCDNName()
+	syntheticName := acctest.GetRandomCDNName()
 
 	config := fmt.Sprintf(`
 		%s
