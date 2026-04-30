@@ -8,7 +8,7 @@ description: |-
 
 # Data Source: ultradns_cdns
 
-Use this data source to list CDN resources for an account with pagination.
+Use this data source to list CDN resources in UltraDNS.
 
 ## Example Usage
 
@@ -30,11 +30,11 @@ The following arguments are supported:
 
 ## Attributes Reference
 
-In addition to the arguments above, the following attributes are exported:
+In addition to all of the arguments above, the following attributes are exported:
 
 * `total_pages` - (Computed) (Integer) Total number of pages.
 * `total_elements` - (Computed) (Integer) Total number of CDN resources.
-* `cdns` - (Computed) (Block List) List of CDN resources.
+* `cdns` - (Computed) (Block List) List of CDN resources. The structure of this block is described below.
 
 ### Nested `cdns` block has the following structure:
 
