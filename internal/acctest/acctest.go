@@ -2,6 +2,7 @@ package acctest
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -17,7 +18,6 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/rrset"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
 	"github.com/ultradns/ultradns-go-sdk/pkg/client"
-	cdnresource "github.com/ultradns/ultradns-go-sdk/pkg/cdn/resource"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/geo"
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/ip"
 )
