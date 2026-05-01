@@ -142,13 +142,13 @@ func expandCDNResource(rd *schema.ResourceData, fqdn string) (*cdnresource.Resou
 		Name: rd.Get("name").(string),
 	}
 
-	if v, ok := rd.GetOkExists("description"); ok {
+	if v, ok := rd.GetOk("description"); ok {
 		payload.Description = v.(string)
 	}
-	if v, ok := rd.GetOkExists("ttl"); ok {
+	if v, ok := rd.GetOk("ttl"); ok {
 		payload.TTL = v.(int)
 	}
-	if v, ok := rd.GetOkExists("content_type"); ok {
+	if v, ok := rd.GetOk("content_type"); ok {
 		payload.ContentType = v.(string)
 	}
 
