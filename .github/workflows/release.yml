@@ -25,7 +25,13 @@ jobs:
         with: 
           args: -v
       - 
-        name: Running acceptace test
+        name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+          terraform_version: 1.5.7
+      - 
+        name: Running acceptance test
         run: TF_ACC=1 go test -v ./...
         env:
           ULTRADNS_UNIT_TEST_USERNAME: ${{ secrets.ULTRADNS_UNIT_TEST_USERNAME }}

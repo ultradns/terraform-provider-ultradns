@@ -3,11 +3,11 @@ package cdn
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	sdkhelper "github.com/ultradns/ultradns-go-sdk/pkg/helper"
 )
 
 func DataSourceCDN() *schema.Resource {
@@ -22,7 +22,7 @@ func dataSourceCDNRead(ctx context.Context, rd *schema.ResourceData, meta interf
 
 	services := meta.(*service.Service)
 	accountName := rd.Get("account_name").(string)
-	fqdn := strings.ToLower(rd.Get("fqdn").(string))
+	fqdn := sdkhelper.GetZoneFQDN(rd.Get("fqdn").(string))
 
 	_, payload, err := services.CDNResourceService.Read(accountName, fqdn)
 	if err != nil {

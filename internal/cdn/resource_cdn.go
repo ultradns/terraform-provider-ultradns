@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/ultradns/terraform-provider-ultradns/internal/errors"
 	"github.com/ultradns/terraform-provider-ultradns/internal/service"
+	sdkhelper "github.com/ultradns/ultradns-go-sdk/pkg/helper"
 )
 
 func ResourceCDN() *schema.Resource {
@@ -33,7 +34,7 @@ func resourceCDNCreate(ctx context.Context, rd *schema.ResourceData, meta interf
 
 	services := meta.(*service.Service)
 	accountName := rd.Get("account_name").(string)
-	fqdn := strings.ToLower(rd.Get("fqdn").(string))
+	fqdn := sdkhelper.GetZoneFQDN(rd.Get("fqdn").(string))
 
 	payload, err := expandCDNResource(rd, fqdn)
 	if err != nil {
@@ -131,7 +132,7 @@ func parseCDNResourceID(id string) (string, string, error) {
 		return "", "", fmt.Errorf("invalid CDN resource id %q; expected account_name:fqdn", id)
 	}
 
-	return parts[0], parts[1], nil
+	return parts[0], sdkhelper.GetZoneFQDN(parts[1]), nil
 }
 
 func cdnResourceID(accountName, fqdn string) string {
