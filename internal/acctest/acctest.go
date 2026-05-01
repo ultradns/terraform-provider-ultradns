@@ -325,6 +325,13 @@ func TestAccCheckCDNResourceDestroy(resourceName string) resource.TestCheckFunc 
 				continue
 			}
 
+			// CDN resources only exist under primary zones in acceptance tests. Once the
+			// test zone has been destroyed, CDN read APIs can return a validation/server
+			// error instead of a clean 404, which still means the CDN is no longer usable.
+			if strings.Contains(errMsg, "500010") || strings.Contains(errMsg, "not primary") {
+				continue
+			}
+
 			return err
 		}
 

@@ -158,12 +158,22 @@ func expandCDNResource(rd *schema.ResourceData, fqdn string) (*cdnresource.Resou
 		cdns := make([]*cdnresource.CdnConfig, 0, len(rawList))
 		for _, raw := range rawList {
 			m := raw.(map[string]interface{})
-			cdns = append(cdns, &cdnresource.CdnConfig{
-				ClientCdnID: m["client_cdn_id"].(string),
-				CdnName:     m["cdn_name"].(string),
-				Description: m["description"].(string),
-				FQDN:        m["fqdn"].(string),
-			})
+
+			cdnConfig := &cdnresource.CdnConfig{}
+			if clientCdnID, ok := m["client_cdn_id"].(string); ok {
+				cdnConfig.ClientCdnID = clientCdnID
+			}
+			if cdnName, ok := m["cdn_name"].(string); ok {
+				cdnConfig.CdnName = cdnName
+			}
+			if description, ok := m["description"].(string); ok {
+				cdnConfig.Description = description
+			}
+			if providerFQDN, ok := m["fqdn"].(string); ok {
+				cdnConfig.FQDN = providerFQDN
+			}
+
+			cdns = append(cdns, cdnConfig)
 		}
 		if payload.Configs == nil {
 			payload.Configs = &cdnresource.Configs{}

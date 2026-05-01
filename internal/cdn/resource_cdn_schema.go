@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
 	cdnresource "github.com/ultradns/ultradns-go-sdk/pkg/cdn/resource"
 )
 
@@ -26,9 +27,11 @@ func resourceCDNSchema() map[string]*schema.Schema {
 			ForceNew: true,
 		},
 		"fqdn": {
-			Type:     schema.TypeString,
-			Required: true,
-			ForceNew: true,
+			Type:             schema.TypeString,
+			Required:         true,
+			ForceNew:         true,
+			DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
+			StateFunc:        helper.CaseInSensitiveState,
 		},
 		"type": {
 			Type:         schema.TypeString,

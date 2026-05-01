@@ -1,6 +1,9 @@
 package cdn
 
-import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/ultradns/terraform-provider-ultradns/internal/helper"
+)
 
 func dataSourceCDNSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
@@ -9,8 +12,10 @@ func dataSourceCDNSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 		"fqdn": {
-			Type:     schema.TypeString,
-			Required: true,
+			Type:             schema.TypeString,
+			Required:         true,
+			DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
+			StateFunc:        helper.CaseInSensitiveState,
 		},
 		// All remaining fields are read-only; values come from the API.
 		"type": {
