@@ -104,6 +104,8 @@ func configureTestAccProviderContext(username, password string) (interface{}, di
 
 func TestPreCheck(t *testing.T) func() {
 	return func() {
+		TestPreCheckCommon(t)()
+
 		if TestUsername == "" {
 			t.Fatal("username required for creating test client")
 		}
@@ -112,12 +114,16 @@ func TestPreCheck(t *testing.T) func() {
 			t.Fatal("password required for creating test client")
 		}
 
-		if TestHost == "" {
-			t.Fatal("host required for creating test client")
-		}
-
 		if TestAccount == "" {
 			t.Fatal("account required for creating test client")
+		}
+	}
+}
+
+func TestPreCheckCommon(t *testing.T) func() {
+	return func() {
+		if TestHost == "" {
+			t.Fatal("host required for creating test client")
 		}
 
 		if testUserAgent == "" {
@@ -128,7 +134,7 @@ func TestPreCheck(t *testing.T) func() {
 
 func TestPreCheckCDN(t *testing.T) func() {
 	return func() {
-		TestPreCheck(t)()
+		TestPreCheckCommon(t)()
 
 		if TestUsernameCDN == "" {
 			t.Fatal("cdn username required for creating test client")
@@ -305,20 +311,21 @@ func TestAccCheckCDNResourceDestroy(resourceName string) resource.TestCheckFunc 
 			if err != nil {
 				return err
 			}
-			_, listPayload, err := services.CDNResourceService.List(accountName, &cdnresource.ListOptions{Page: 1, Size: 1000})
-			if err != nil {
-				return err
+			res, _, err := services.CDNResourceService.Read(accountName, fqdn)
+			if err == nil {
+				return errors.ResourceNotDestroyedError(rs.Primary.ID)
 			}
 
-			if listPayload == nil {
+			if res != nil && res.StatusCode == http.StatusNotFound {
 				continue
 			}
 
-			for _, item := range listPayload.Content {
-				if item != nil && strings.EqualFold(item.FQDN, fqdn) {
-					return errors.ResourceNotDestroyedError(rs.Primary.ID)
-				}
+			errMsg := strings.ToLower(err.Error())
+			if strings.Contains(errMsg, "not found") || strings.Contains(errMsg, "1801") || strings.Contains(errMsg, "70002") {
+				continue
 			}
+
+			return err
 		}
 
 		return nil

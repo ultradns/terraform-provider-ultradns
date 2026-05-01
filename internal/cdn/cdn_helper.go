@@ -135,14 +135,21 @@ func isServerManagedPropertyKey(key string) bool {
 }
 
 // expandCDNResource builds the SDK Resource from Terraform ResourceData.
-func expandCDNResource(rd *schema.ResourceData, fqdn string) *cdnresource.Resource {
+func expandCDNResource(rd *schema.ResourceData, fqdn string) (*cdnresource.Resource, error) {
 	payload := &cdnresource.Resource{
-		FQDN:        fqdn,
-		Type:        rd.Get("type").(string),
-		Name:        rd.Get("name").(string),
-		Description: rd.Get("description").(string),
-		TTL:         rd.Get("ttl").(int),
-		ContentType: rd.Get("content_type").(string),
+		FQDN: fqdn,
+		Type: rd.Get("type").(string),
+		Name: rd.Get("name").(string),
+	}
+
+	if v, ok := rd.GetOkExists("description"); ok {
+		payload.Description = v.(string)
+	}
+	if v, ok := rd.GetOkExists("ttl"); ok {
+		payload.TTL = v.(int)
+	}
+	if v, ok := rd.GetOkExists("content_type"); ok {
+		payload.ContentType = v.(string)
 	}
 
 	// cdn_providers → Configs.CDNs
@@ -167,14 +174,9 @@ func expandCDNResource(rd *schema.ResourceData, fqdn string) *cdnresource.Resour
 	// config_properties → Configs.AdditionalProperties
 	if v, ok := rd.GetOk("config_properties"); ok {
 		rawMap := v.(map[string]interface{})
-		props := make(map[string]interface{}, len(rawMap))
-		for k, strVal := range rawMap {
-			var decoded interface{}
-			if err := json.Unmarshal([]byte(strVal.(string)), &decoded); err == nil {
-				props[k] = decoded
-			} else {
-				props[k] = strVal
-			}
+		props, err := expandAdditionalProperties(rawMap, "config_properties")
+		if err != nil {
+			return nil, err
 		}
 		if payload.Configs == nil {
 			payload.Configs = &cdnresource.Configs{}
@@ -185,19 +187,33 @@ func expandCDNResource(rd *schema.ResourceData, fqdn string) *cdnresource.Resour
 	// preference_properties → Preferences.AdditionalProperties
 	if v, ok := rd.GetOk("preference_properties"); ok {
 		rawMap := v.(map[string]interface{})
-		props := make(map[string]interface{}, len(rawMap))
-		for k, strVal := range rawMap {
-			var decoded interface{}
-			if err := json.Unmarshal([]byte(strVal.(string)), &decoded); err == nil {
-				props[k] = decoded
-			} else {
-				props[k] = strVal
-			}
+		props, err := expandAdditionalProperties(rawMap, "preference_properties")
+		if err != nil {
+			return nil, err
 		}
 		payload.Preferences = &cdnresource.Preferences{AdditionalProperties: props}
 	}
 
-	return payload
+	return payload, nil
+}
+
+func expandAdditionalProperties(rawMap map[string]interface{}, field string) (map[string]interface{}, error) {
+	props := make(map[string]interface{}, len(rawMap))
+	for k, raw := range rawMap {
+		strVal, ok := raw.(string)
+		if !ok {
+			return nil, fmt.Errorf("%s[%s] must be a JSON string", field, k)
+		}
+
+		var decoded interface{}
+		if err := json.Unmarshal([]byte(strVal), &decoded); err != nil {
+			return nil, fmt.Errorf("%s[%s] must contain valid JSON: %w", field, k, err)
+		}
+
+		props[k] = decoded
+	}
+
+	return props, nil
 }
 
 func flattenCDNList(payload *cdnresource.ResponseList, rd *schema.ResourceData) error {

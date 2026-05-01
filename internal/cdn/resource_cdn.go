@@ -35,9 +35,12 @@ func resourceCDNCreate(ctx context.Context, rd *schema.ResourceData, meta interf
 	accountName := rd.Get("account_name").(string)
 	fqdn := strings.ToLower(rd.Get("fqdn").(string))
 
-	payload := expandCDNResource(rd, fqdn)
+	payload, err := expandCDNResource(rd, fqdn)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
-	_, err := services.CDNResourceService.Create(accountName, fqdn, payload)
+	_, err = services.CDNResourceService.Create(accountName, fqdn, payload)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -88,7 +91,10 @@ func resourceCDNUpdate(ctx context.Context, rd *schema.ResourceData, meta interf
 	}
 
 	services := meta.(*service.Service)
-	payload := expandCDNResource(rd, fqdn)
+	payload, err := expandCDNResource(rd, fqdn)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	_, err = services.CDNResourceService.Update(accountName, fqdn, payload)
 	if err != nil {

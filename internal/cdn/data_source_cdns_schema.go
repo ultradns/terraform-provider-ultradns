@@ -1,6 +1,9 @@
 package cdn
 
-import "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+)
 
 func dataSourceCDNsSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
@@ -12,11 +15,13 @@ func dataSourceCDNsSchema() map[string]*schema.Schema {
 			Type:     schema.TypeInt,
 			Optional: true,
 			Default:  1,
+			ValidateFunc: validation.IntAtLeast(1),
 		},
 		"size": {
 			Type:     schema.TypeInt,
 			Optional: true,
 			Default:  100,
+			ValidateFunc: validation.IntAtLeast(1),
 		},
 		"total_pages": {
 			Type:     schema.TypeInt,
