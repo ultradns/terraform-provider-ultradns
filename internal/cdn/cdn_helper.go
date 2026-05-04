@@ -47,7 +47,7 @@ func flattenCDNResource(payload *cdnresource.Resource, rd *schema.ResourceData) 
 	}
 
 	if payload.Configs != nil {
-		if err := rd.Set("cdn_providers", flattenCdnProviders(payload.Configs.CDNs)); err != nil {
+		if err := rd.Set("cdn_providers", flattenCDNProviders(payload.Configs.CDNs)); err != nil {
 			return err
 		}
 		flatConfigProps, err := flattenAdditionalProperties(filterAdditionalProperties(payload.Configs.AdditionalProperties, rd, "config_properties"))
@@ -72,7 +72,7 @@ func flattenCDNResource(payload *cdnresource.Resource, rd *schema.ResourceData) 
 	return nil
 }
 
-func flattenCdnProviders(cdns []*cdnresource.CdnConfig) []interface{} {
+func flattenCDNProviders(cdns []*cdnresource.CdnConfig) []interface{} {
 	result := make([]interface{}, 0, len(cdns))
 	for _, c := range cdns {
 		if c == nil {

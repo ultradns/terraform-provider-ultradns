@@ -11,13 +11,10 @@ import (
 
 // clientCdnIDPattern mirrors the Java validator: ^[A-Za-z0-9\-_]{1,64}$
 const clientCdnIDPattern = `^[A-Za-z0-9\-_]{1,64}$`
+var clientCdnIDRegex = regexp.MustCompile(clientCdnIDPattern)
 
 // nameMaxLen mirrors the Java validator constant NAME_MAX_LENGTH = 64
 const nameMaxLen = 64
-
-func mustCompileRegex(pattern string) *regexp.Regexp {
-	return regexp.MustCompile(pattern)
-}
 
 func resourceCDNSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
@@ -68,7 +65,7 @@ func resourceCDNSchema() map[string]*schema.Schema {
 					"client_cdn_id": {
 						Type:         schema.TypeString,
 						Required:     true,
-						ValidateFunc: validation.StringMatch(mustCompileRegex(clientCdnIDPattern), "must match "+clientCdnIDPattern),
+						ValidateFunc: validation.StringMatch(clientCdnIDRegex, "must match "+clientCdnIDPattern),
 					},
 					"cdn_name": {
 						Type:     schema.TypeString,
