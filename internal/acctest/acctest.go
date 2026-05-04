@@ -352,6 +352,10 @@ func getCDNService() (*service.Service, error) {
 		return nil, err
 	}
 
+	if os.Getenv("ULTRADNS_UNIT_TEST_DEBUG_HTTP") == "1" {
+		client.EnableDefaultDebugLogger()
+	}
+
 	return service.NewService(client)
 }
 

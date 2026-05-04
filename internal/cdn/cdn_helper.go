@@ -181,36 +181,32 @@ func expandCDNResource(rd *schema.ResourceData, fqdn string) (*cdnresource.Resou
 		payload.Configs.CDNs = cdns
 	}
 
-	// config_properties → Configs.AdditionalProperties
-	if v, ok := rd.GetOkExists("config_properties"); ok {
-		rawMap := v.(map[string]interface{})
-		if len(rawMap) == 0 {
-			return nil, fmt.Errorf("config_properties must not be empty")
-		}
-
-		props, err := expandAdditionalProperties(rawMap, "config_properties")
-		if err != nil {
-			return nil, err
-		}
-		if payload.Configs == nil {
-			payload.Configs = &cdnresource.Configs{}
-		}
-		payload.Configs.AdditionalProperties = props
+	// config_properties is required in schema; ensure users don't pass an empty map.
+	rawConfigMap := rd.Get("config_properties").(map[string]interface{})
+	if len(rawConfigMap) == 0 {
+		return nil, fmt.Errorf("config_properties must not be empty")
 	}
 
-	// preference_properties → Preferences.AdditionalProperties
-	if v, ok := rd.GetOkExists("preference_properties"); ok {
-		rawMap := v.(map[string]interface{})
-		if len(rawMap) == 0 {
-			return nil, fmt.Errorf("preference_properties must not be empty")
-		}
-
-		props, err := expandAdditionalProperties(rawMap, "preference_properties")
-		if err != nil {
-			return nil, err
-		}
-		payload.Preferences = &cdnresource.Preferences{AdditionalProperties: props}
+	configProps, err := expandAdditionalProperties(rawConfigMap, "config_properties")
+	if err != nil {
+		return nil, err
 	}
+	if payload.Configs == nil {
+		payload.Configs = &cdnresource.Configs{}
+	}
+	payload.Configs.AdditionalProperties = configProps
+
+	// preference_properties is required in schema; ensure users don't pass an empty map.
+	rawPreferenceMap := rd.Get("preference_properties").(map[string]interface{})
+	if len(rawPreferenceMap) == 0 {
+		return nil, fmt.Errorf("preference_properties must not be empty")
+	}
+
+	preferenceProps, err := expandAdditionalProperties(rawPreferenceMap, "preference_properties")
+	if err != nil {
+		return nil, err
+	}
+	payload.Preferences = &cdnresource.Preferences{AdditionalProperties: preferenceProps}
 
 	return payload, nil
 }

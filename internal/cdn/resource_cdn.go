@@ -116,9 +116,12 @@ func resourceCDNDelete(ctx context.Context, rd *schema.ResourceData, meta interf
 	}
 
 	services := meta.(*service.Service)
-	_, err = services.CDNResourceService.Delete(accountName, fqdn)
+	res, err := services.CDNResourceService.Delete(accountName, fqdn)
 	if err != nil {
-		rd.SetId("")
+		if res != nil && res.StatusCode == http.StatusNotFound {
+			rd.SetId("")
+			return diags
+		}
 		return diag.FromErr(err)
 	}
 
