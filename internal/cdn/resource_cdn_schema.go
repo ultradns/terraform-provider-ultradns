@@ -88,14 +88,18 @@ func resourceCDNSchema() map[string]*schema.Schema {
 			},
 		},
 		// config_properties maps to configs.additionalProperties (inline via @JsonAnyGetter).
-		// Values are JSON-encoded strings. Required: validator enforces non-empty.
+		// Values are JSON-encoded strings. Note: Required prevents the key from being
+		// omitted entirely, but the SDK still allows an empty map; non-empty enforcement
+		// happens in expandCDNResource.
 		"config_properties": {
 			Type:     schema.TypeMap,
 			Required: true,
 			Elem:     &schema.Schema{Type: schema.TypeString},
 		},
 		// preference_properties maps to preferences.additionalProperties (inline via @JsonAnyGetter).
-		// Values are JSON-encoded strings. Required: validator enforces non-empty.
+		// Values are JSON-encoded strings. Note: Required prevents the key from being
+		// omitted entirely, but the SDK still allows an empty map; non-empty enforcement
+		// happens in expandCDNResource.
 		"preference_properties": {
 			Type:     schema.TypeMap,
 			Required: true,

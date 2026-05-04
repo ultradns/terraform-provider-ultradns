@@ -50,13 +50,21 @@ func flattenCDNResource(payload *cdnresource.Resource, rd *schema.ResourceData) 
 		if err := rd.Set("cdn_providers", flattenCdnProviders(payload.Configs.CDNs)); err != nil {
 			return err
 		}
-		if err := rd.Set("config_properties", flattenAdditionalProperties(filterAdditionalProperties(payload.Configs.AdditionalProperties, rd, "config_properties"))); err != nil {
+		flatConfigProps, err := flattenAdditionalProperties(filterAdditionalProperties(payload.Configs.AdditionalProperties, rd, "config_properties"))
+		if err != nil {
+			return err
+		}
+		if err := rd.Set("config_properties", flatConfigProps); err != nil {
 			return err
 		}
 	}
 
 	if payload.Preferences != nil {
-		if err := rd.Set("preference_properties", flattenAdditionalProperties(filterAdditionalProperties(payload.Preferences.AdditionalProperties, rd, "preference_properties"))); err != nil {
+		flatPrefProps, err := flattenAdditionalProperties(filterAdditionalProperties(payload.Preferences.AdditionalProperties, rd, "preference_properties"))
+		if err != nil {
+			return err
+		}
+		if err := rd.Set("preference_properties", flatPrefProps); err != nil {
 			return err
 		}
 	}
@@ -82,17 +90,18 @@ func flattenCdnProviders(cdns []*cdnresource.CdnConfig) []interface{} {
 
 // flattenAdditionalProperties encodes each value as a JSON string so it can be
 // stored in a TypeMap(TypeString) schema attribute.
-func flattenAdditionalProperties(props map[string]interface{}) map[string]string {
+// Returns an error if any value cannot be marshalled to valid JSON, because
+// expandAdditionalProperties requires every stored value to be valid JSON.
+func flattenAdditionalProperties(props map[string]interface{}) (map[string]string, error) {
 	out := make(map[string]string, len(props))
 	for k, v := range props {
 		b, err := json.Marshal(v)
 		if err != nil {
-			out[k] = fmt.Sprintf("%v", v)
-		} else {
-			out[k] = string(b)
+			return nil, fmt.Errorf("flattenAdditionalProperties: key %q cannot be marshalled to JSON: %w", k, err)
 		}
+		out[k] = string(b)
 	}
-	return out
+	return out, nil
 }
 
 // filterAdditionalProperties keeps user-declared keys stable in state and
