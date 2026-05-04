@@ -182,8 +182,12 @@ func expandCDNResource(rd *schema.ResourceData, fqdn string) (*cdnresource.Resou
 	}
 
 	// config_properties → Configs.AdditionalProperties
-	if v, ok := rd.GetOk("config_properties"); ok {
+	if v, ok := rd.GetOkExists("config_properties"); ok {
 		rawMap := v.(map[string]interface{})
+		if len(rawMap) == 0 {
+			return nil, fmt.Errorf("config_properties must not be empty")
+		}
+
 		props, err := expandAdditionalProperties(rawMap, "config_properties")
 		if err != nil {
 			return nil, err
@@ -195,8 +199,12 @@ func expandCDNResource(rd *schema.ResourceData, fqdn string) (*cdnresource.Resou
 	}
 
 	// preference_properties → Preferences.AdditionalProperties
-	if v, ok := rd.GetOk("preference_properties"); ok {
+	if v, ok := rd.GetOkExists("preference_properties"); ok {
 		rawMap := v.(map[string]interface{})
+		if len(rawMap) == 0 {
+			return nil, fmt.Errorf("preference_properties must not be empty")
+		}
+
 		props, err := expandAdditionalProperties(rawMap, "preference_properties")
 		if err != nil {
 			return nil, err

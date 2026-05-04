@@ -112,7 +112,7 @@ func resourceCDNDelete(ctx context.Context, rd *schema.ResourceData, meta interf
 	accountName, fqdn, err := parseCDNResourceID(rd.Id())
 	if err != nil {
 		rd.SetId("")
-		return diag.FromErr(err)
+		return nil
 	}
 
 	services := meta.(*service.Service)
