@@ -79,8 +79,10 @@ func resourceCDNSchema() map[string]*schema.Schema {
 						Optional: true,
 					},
 					"fqdn": {
-						Type:     schema.TypeString,
-						Optional: true,
+						Type:             schema.TypeString,
+						Optional:         true,
+						DiffSuppressFunc: helper.ZoneFQDNDiffSuppress,
+						StateFunc:        helper.CaseInSensitiveState,
 					},
 				},
 			},

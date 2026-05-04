@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	cdnresource "github.com/ultradns/ultradns-go-sdk/pkg/cdn/resource"
+	sdkhelper "github.com/ultradns/ultradns-go-sdk/pkg/helper"
 )
 
 func flattenCDNResource(payload *cdnresource.Resource, rd *schema.ResourceData) error {
@@ -169,8 +170,8 @@ func expandCDNResource(rd *schema.ResourceData, fqdn string) (*cdnresource.Resou
 			if description, ok := m["description"].(string); ok {
 				cdnConfig.Description = description
 			}
-			if providerFQDN, ok := m["fqdn"].(string); ok {
-				cdnConfig.FQDN = providerFQDN
+			if providerFQDN, ok := m["fqdn"].(string); ok && providerFQDN != "" {
+				cdnConfig.FQDN = sdkhelper.GetZoneFQDN(providerFQDN)
 			}
 
 			cdns = append(cdns, cdnConfig)
