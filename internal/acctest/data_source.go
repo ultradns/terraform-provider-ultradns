@@ -52,7 +52,7 @@ func TestAccDataSourceCDN(datasourceName, resourceName, resource string) string 
 func TestAccDataSourceCDNs(datasourceName, resourceName string, page, size int, resource string) string {
 	return fmt.Sprintf(`
 	%[1]s
-	data "ultradns_cdns" "data_%[2]s" {
+	data "ultradns_cdn_list" "data_%[2]s" {
 		account_name = "${resource.ultradns_cdn.%[3]s.account_name}"
 		page = %[4]d
 		size = %[5]d

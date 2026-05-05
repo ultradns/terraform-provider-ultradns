@@ -51,7 +51,7 @@ func Provider() *schema.Provider {
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"ultradns_cdn":          cdn.DataSourceCDN(),
-			"ultradns_cdns":         cdn.DataSourceCDNs(),
+			"ultradns_cdn_list":     cdn.DataSourceCDNs(),
 			"ultradns_zone":         zone.DataSourceZone(),
 			"ultradns_record":       record.DataSourceRecord(),
 			"ultradns_rdpool":       rdpool.DataSourceRDPool(),

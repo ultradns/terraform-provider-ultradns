@@ -44,7 +44,7 @@ func TestAccDataSourceCDN(t *testing.T) {
 func TestAccDataSourceCDNs(t *testing.T) {
 	byodFQDN := acctest.GetRandomCDNZoneName()
 	syntheticFQDN := acctest.GetRandomCDNZoneName()
-	dataSourceName := "data.ultradns_cdns.data_all"
+	dataSourceName := "data.ultradns_cdn_list.data_all"
 	byodName := acctest.GetRandomCDNName()
 	syntheticName := acctest.GetRandomCDNName()
 

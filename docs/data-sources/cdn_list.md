@@ -1,19 +1,19 @@
 ---
 subcategory: "CDN"
 layout: "ultradns"
-page_title: "ULTRADNS: ultradns_cdns"
+page_title: "ULTRADNS: ultradns_cdn_list"
 description: |-
   List CDN resources for an UltraDNS account.
 ---
 
-# Data Source: ultradns_cdns
+# Data Source: ultradns_cdn_list
 
 Use this data source to list CDN resources in UltraDNS.
 
 ## Example Usage
 
 ```terraform
-data "ultradns_cdns" "all" {
+data "ultradns_cdn_list" "all" {
   account_name = "my-account"
   page         = 1
   size         = 100
