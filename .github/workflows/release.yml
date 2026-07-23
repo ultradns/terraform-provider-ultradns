@@ -10,18 +10,18 @@ jobs:
     steps:
       - 
         name: Check out repository code
-        uses: actions/checkout@v4
-      - 
+        uses: actions/checkout@v7
+      -
         name: Fetching GO version from repo
         run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
-      - 
+      -
         name: Setup GO environment
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
-      - 
+      -
         name: Code linter
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with: 
           args: -v
       - 
@@ -51,13 +51,13 @@ jobs:
     steps:
       - 
         name: Check out repository code
-        uses: actions/checkout@v4
-      - 
+        uses: actions/checkout@v7
+      -
         name: Fetching GO version from repo
         run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
-      - 
+      -
         name: Setup GO environment
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
       - 
@@ -81,13 +81,13 @@ jobs:
       -
         name: Import GPG key
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@v7
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
       -
         name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser
           version: "~> v2"

@@ -16,7 +16,7 @@ import (
 const (
 	zoneResourceName    = "primary"
 	defaultCount        = "3"
-	defaultRecordCount  = "4"
+	defaultRecordCount  = "4"   // SOA + 3 NS records provisioned by UltraDNS on new zone creation
 	defaultZoneStatus   = "ACTIVE"
 	defaultDNSSECStatus = "UNSIGNED"
 )
