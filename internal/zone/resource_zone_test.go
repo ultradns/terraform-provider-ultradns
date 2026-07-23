@@ -16,6 +16,7 @@ import (
 const (
 	zoneResourceName    = "primary"
 	defaultCount        = "3"
+	defaultRecordCount  = "4"   // SOA + 3 NS records provisioned by UltraDNS on new zone creation
 	defaultZoneStatus   = "ACTIVE"
 	defaultDNSSECStatus = "UNSIGNED"
 )
@@ -39,7 +40,7 @@ func TestAccResourceZonePrimary(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
-					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultRecordCount),
 					resource.TestCheckResourceAttr(resourceName, "primary_create_info.0.notify_addresses.#", defaultCount),
 					resource.TestCheckResourceAttr(resourceName, "primary_create_info.0.restrict_ip.#", defaultCount),
 				),
@@ -54,7 +55,7 @@ func TestAccResourceZonePrimary(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dnssec_status", defaultDNSSECStatus),
 					resource.TestCheckResourceAttr(resourceName, "status", defaultZoneStatus),
 					resource.TestCheckResourceAttr(resourceName, "owner", acctest.TestUsername),
-					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultCount),
+					resource.TestCheckResourceAttr(resourceName, "resource_record_count", defaultRecordCount),
 					resource.TestCheckResourceAttr(resourceName, "primary_create_info.0.notify_addresses.#", "0"),
 					resource.TestCheckResourceAttr(resourceName, "primary_create_info.0.restrict_ip.#", "0"),
 				),
