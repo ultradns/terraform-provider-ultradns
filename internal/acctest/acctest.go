@@ -2,6 +2,7 @@ package acctest
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -23,19 +24,24 @@ import (
 
 const (
 	randZoneNamePrefix                = "terraform-plugin-acc-test-"
+	randCDNZoneNamePrefix             = "terraform-plugin-cdn-acc-test-"
 	randZoneNameSuffix                = ".com."
 	randZoneNameWithSpecialCharSuffix = ".in-addr.arpa."
 	randStringLength                  = 5
+	randCDNStringLength               = 10
 	randSecondaryZoneCount            = 50
 )
 
 var (
 	TestHost          = os.Getenv("ULTRADNS_UNIT_TEST_HOST_URL")
 	TestAccount       = os.Getenv("ULTRADNS_UNIT_TEST_ACCOUNT")
+	TestAccountCDN    = os.Getenv("ULTRADNS_UNIT_TEST_ACCOUNT_CDN")
 	TestUsername      = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME")
+	TestUsernameCDN   = os.Getenv("ULTRADNS_UNIT_TEST_USERNAME_CDN")
 	TestNameServer    = os.Getenv("ULTRADNS_UNIT_TEST_NAME_SERVER")
 	TestSecondaryZone = os.Getenv("ULTRADNS_UNIT_TEST_SECONDARY_ZONE_NAME")
 	testPassword      = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD")
+	testPasswordCDN   = os.Getenv("ULTRADNS_UNIT_TEST_PASSWORD_CDN")
 	testUserAgent     = os.Getenv("ULTRADNS_UNIT_TEST_USER_AGENT")
 )
 
@@ -52,12 +58,29 @@ func init() {
 	}
 }
 
+func NewTestAccProvidersCDN() map[string]*schema.Provider {
+	providerCDN := provider.Provider()
+	providerCDN.ConfigureContextFunc = getTestAccProviderConfigureContextFuncCDN
+
+	return map[string]*schema.Provider{
+		"ultradns": providerCDN,
+	}
+}
+
 func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.ResourceData) (interface{}, diag.Diagnostics) {
+	return configureTestAccProviderContext(TestUsername, testPassword)
+}
+
+func getTestAccProviderConfigureContextFuncCDN(c context.Context, rd *schema.ResourceData) (interface{}, diag.Diagnostics) {
+	return configureTestAccProviderContext(TestUsernameCDN, testPasswordCDN)
+}
+
+func configureTestAccProviderContext(username, password string) (interface{}, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	cnf := client.Config{
-		Username:  TestUsername,
-		Password:  testPassword,
+		Username:  username,
+		Password:  password,
 		HostURL:   TestHost,
 		UserAgent: testUserAgent,
 	}
@@ -65,6 +88,10 @@ func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.Resour
 	client, err := client.NewClient(cnf)
 	if err != nil {
 		return nil, diag.FromErr(err)
+	}
+
+	if os.Getenv("ULTRADNS_UNIT_TEST_DEBUG_HTTP") == "1" {
+		client.EnableDefaultDebugLogger()
 	}
 
 	service, err := service.NewService(client)
@@ -77,6 +104,8 @@ func getTestAccProviderConfigureContextFunc(c context.Context, rd *schema.Resour
 
 func TestPreCheck(t *testing.T) func() {
 	return func() {
+		TestPreCheckCommon(t)()
+
 		if TestUsername == "" {
 			t.Fatal("username required for creating test client")
 		}
@@ -85,16 +114,38 @@ func TestPreCheck(t *testing.T) func() {
 			t.Fatal("password required for creating test client")
 		}
 
+		if TestAccount == "" {
+			t.Fatal("account required for creating test client")
+		}
+	}
+}
+
+func TestPreCheckCommon(t *testing.T) func() {
+	return func() {
 		if TestHost == "" {
 			t.Fatal("host required for creating test client")
 		}
 
-		if TestAccount == "" {
-			t.Fatal("account required for creating test client")
-		}
-
 		if testUserAgent == "" {
 			t.Fatal("user agent required for creating test client")
+		}
+	}
+}
+
+func TestPreCheckCDN(t *testing.T) func() {
+	return func() {
+		TestPreCheckCommon(t)()
+
+		if TestUsernameCDN == "" {
+			t.Fatal("cdn username required for creating test client")
+		}
+
+		if testPasswordCDN == "" {
+			t.Fatal("cdn password required for creating test client")
+		}
+
+		if TestAccountCDN == "" {
+			t.Fatal("cdn account required for creating test client")
 		}
 	}
 }
@@ -166,6 +217,32 @@ func TestAccCheckDirGroupResourceExists(resourceName, resourceType, resourceID s
 	}
 }
 
+func TestAccCheckCDNResourceExists(resourceName string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[resourceName]
+		if !ok {
+			return errors.ResourceNotFoundError(resourceName)
+		}
+
+		accountName := rs.Primary.Attributes["account_name"]
+		fqdn := rs.Primary.Attributes["fqdn"]
+
+		services, err := getCDNService()
+		if err != nil {
+			return err
+		}
+		_, payload, err := services.CDNResourceService.Read(accountName, fqdn)
+		if err != nil {
+			return err
+		}
+		if payload == nil || !strings.EqualFold(payload.FQDN, fqdn) {
+			return errors.ResourceNotFoundError(rs.Primary.ID)
+		}
+
+		return nil
+	}
+}
+
 func TestAccCheckRecordResourceDestroy(resourceName, pType string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		for _, rs := range s.RootModule().Resources {
@@ -220,6 +297,68 @@ func TestAccCheckProbeResourceDestroy(resourceName, pType string) resource.TestC
 	}
 }
 
+func TestAccCheckCDNResourceDestroy(resourceName string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		for _, rs := range s.RootModule().Resources {
+			if rs.Type != resourceName {
+				continue
+			}
+
+			accountName := rs.Primary.Attributes["account_name"]
+			fqdn := rs.Primary.Attributes["fqdn"]
+
+			services, err := getCDNService()
+			if err != nil {
+				return err
+			}
+			res, _, err := services.CDNResourceService.Read(accountName, fqdn)
+			if err == nil {
+				return errors.ResourceNotDestroyedError(rs.Primary.ID)
+			}
+
+			if res != nil && res.StatusCode == http.StatusNotFound {
+				continue
+			}
+
+			errMsg := strings.ToLower(err.Error())
+			if strings.Contains(errMsg, "not found") || strings.Contains(errMsg, "1801") || strings.Contains(errMsg, "70002") {
+				continue
+			}
+
+			// CDN resources only exist under primary zones in acceptance tests. Once the
+			// test zone has been destroyed, CDN read APIs can return a validation/server
+			// error instead of a clean 404, which still means the CDN is no longer usable.
+			if strings.Contains(errMsg, "500010") || strings.Contains(errMsg, "not primary") {
+				continue
+			}
+
+			return err
+		}
+
+		return nil
+	}
+}
+
+func getCDNService() (*service.Service, error) {
+	cnf := client.Config{
+		Username:  TestUsernameCDN,
+		Password:  testPasswordCDN,
+		HostURL:   TestHost,
+		UserAgent: testUserAgent,
+	}
+
+	client, err := client.NewClient(cnf)
+	if err != nil {
+		return nil, err
+	}
+
+	if os.Getenv("ULTRADNS_UNIT_TEST_DEBUG_HTTP") == "1" {
+		client.EnableDefaultDebugLogger()
+	}
+
+	return service.NewService(client)
+}
+
 func TestAccCheckDirGroupResourceDestroy(resourceName, resourceType, resourceID string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		for _, rs := range s.RootModule().Resources {
@@ -240,6 +379,14 @@ func TestAccCheckDirGroupResourceDestroy(resourceName, resourceType, resourceID 
 }
 func GetRandomZoneName() string {
 	return randZoneNamePrefix + acctest.RandString(randStringLength) + randZoneNameSuffix
+}
+
+func GetRandomCDNZoneName() string {
+	return randCDNZoneNamePrefix + acctest.RandString(randCDNStringLength) + randZoneNameSuffix
+}
+
+func GetRandomCDNName() string {
+	return "cdn-" + acctest.RandString(randCDNStringLength)
 }
 
 func GetRandomZoneNameWithSpecialChar() string {
