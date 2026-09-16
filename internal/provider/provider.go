@@ -22,6 +22,7 @@ import (
 	"github.com/ultradns/terraform-provider-ultradns/internal/slbpool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/tcpool"
 	"github.com/ultradns/terraform-provider-ultradns/internal/version"
+	"github.com/ultradns/terraform-provider-ultradns/internal/webforward"
 	"github.com/ultradns/terraform-provider-ultradns/internal/zone"
 	"github.com/ultradns/ultradns-go-sdk/pkg/client"
 )
@@ -48,6 +49,7 @@ func Provider() *schema.Provider {
 			"ultradns_probe_tcp":    probetcp.ResourceProbeTCP(),
 			"ultradns_dirgroup_ip":  dirgroupip.ResourceIPGroup(),
 			"ultradns_dirgroup_geo": dirgroupgeo.ResourceGeoGroup(),
+			"ultradns_webforward":   webforward.ResourceWebForward(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"ultradns_cdn":          cdn.DataSourceCDN(),
@@ -66,6 +68,7 @@ func Provider() *schema.Provider {
 			"ultradns_probe_tcp":    probetcp.DataSourceprobeTCP(),
 			"ultradns_dirgroup_ip":  dirgroupip.DataSourceIPGroup(),
 			"ultradns_dirgroup_geo": dirgroupgeo.DataSourceGeoGroup(),
+			"ultradns_webforward":   webforward.DataSourceWebForward(),
 		},
 	}
 }
