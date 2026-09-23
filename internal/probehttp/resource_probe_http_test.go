@@ -17,7 +17,7 @@ func TestAccResourceProbeHTTP(t *testing.T) {
 	ownerName := tfacctest.RandString(3)
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		ProviderFactories: acctest.TestAccProviderFactories,
 		CheckDestroy: acctest.TestAccCheckProbeResourceDestroy("ultradns_probe_http", probe.HTTP),
 		Steps: []resource.TestStep{
 			{

@@ -19,7 +19,7 @@ func TestAccResourceSLBPool(t *testing.T) {
 	ownerNameTypeAAAA := tfacctest.RandString(3)
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		ProviderFactories: acctest.TestAccProviderFactories,
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_slbpool", pool.SLB),
 		Steps: []resource.TestStep{
 			{

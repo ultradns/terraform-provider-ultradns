@@ -32,7 +32,7 @@ func TestAccDataSourceDirGroupIP(t *testing.T) {
 
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		ProviderFactories: acctest.TestAccProviderFactories,
 		CheckDestroy: acctest.TestAccCheckDirGroupResourceDestroy(resourceName, ip.DirGroupType, ipData.DirGroupIPID()),
 
 		Steps: []resource.TestStep{

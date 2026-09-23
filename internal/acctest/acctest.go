@@ -46,8 +46,9 @@ var (
 )
 
 var (
-	TestAccProviders map[string]*schema.Provider
-	TestAccProvider  *schema.Provider
+	TestAccProviders        map[string]*schema.Provider
+	TestAccProviderFactories map[string]func() (*schema.Provider, error)
+	TestAccProvider         *schema.Provider
 )
 
 func init() {
@@ -55,6 +56,11 @@ func init() {
 	TestAccProvider.ConfigureContextFunc = getTestAccProviderConfigureContextFunc
 	TestAccProviders = map[string]*schema.Provider{
 		"ultradns": TestAccProvider,
+	}
+	TestAccProviderFactories = map[string]func() (*schema.Provider, error){
+		"ultradns": func() (*schema.Provider, error) {
+			return TestAccProvider, nil
+		},
 	}
 }
 

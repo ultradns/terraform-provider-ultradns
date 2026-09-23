@@ -25,7 +25,7 @@ func TestAccResourceDirGroupGeo(t *testing.T) {
 
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		ProviderFactories: acctest.TestAccProviderFactories,
 		CheckDestroy: acctest.TestAccCheckDirGroupResourceDestroy(resourceName, geo.DirGroupType, geoData.DirGroupGeoID()),
 		Steps: []resource.TestStep{
 			{

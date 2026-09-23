@@ -16,7 +16,7 @@ func TestAccDataSourceRDPool(t *testing.T) {
 	ownerNameTypeAAAA := tfacctest.RandString(3)
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		ProviderFactories: acctest.TestAccProviderFactories,
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_rdpool", pool.RD),
 		Steps: []resource.TestStep{
 			{

@@ -18,7 +18,7 @@ func TestAccResourceDirPool(t *testing.T) {
 	ownerNameA := tfacctest.RandString(3)
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		ProviderFactories: acctest.TestAccProviderFactories,
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_dirpool", pool.DIR),
 		Steps: []resource.TestStep{
 			{

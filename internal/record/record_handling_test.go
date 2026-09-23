@@ -14,7 +14,7 @@ func TestAccRecordHandling(t *testing.T) {
 	zoneName := acctest.GetRandomZoneName()
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		ProviderFactories: acctest.TestAccProviderFactories,
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_record", ""),
 		Steps: []resource.TestStep{
 			{
