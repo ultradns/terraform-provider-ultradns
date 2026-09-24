@@ -18,7 +18,7 @@ func TestAccDataSourceCDN(t *testing.T) {
 
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheckCDN(t),
-		Providers:    acctest.NewTestAccProvidersCDN(),
+		ProviderFactories:    acctest.NewTestAccProvidersCDN(),
 		CheckDestroy: acctest.TestAccCheckCDNResourceDestroy("ultradns_cdn"),
 		Steps: []resource.TestStep{
 			{
@@ -60,7 +60,7 @@ func TestAccDataSourceCDNs(t *testing.T) {
 
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheckCDN(t),
-		Providers:    acctest.NewTestAccProvidersCDN(),
+		ProviderFactories:    acctest.NewTestAccProvidersCDN(),
 		CheckDestroy: acctest.TestAccCheckCDNResourceDestroy("ultradns_cdn"),
 		Steps: []resource.TestStep{
 			{

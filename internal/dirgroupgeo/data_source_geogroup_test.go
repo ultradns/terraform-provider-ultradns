@@ -20,7 +20,7 @@ func TestAccDataSourceDirGroupGeo(t *testing.T) {
 	dataSourceName := "data.ultradns_dirgroup_geo.data_ultradns_geo"
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		ProviderFactories: acctest.TestAccProviderFactories,
 		CheckDestroy: acctest.TestAccCheckDirGroupResourceDestroy(resourceName, geo.DirGroupType, geoData.DirGroupGeoID()),
 
 		Steps: []resource.TestStep{

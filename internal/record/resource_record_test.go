@@ -18,7 +18,7 @@ func TestAccResourceRecord(t *testing.T) {
 	ownerNameTypeNS := tfacctest.RandString(3)
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheck(t),
-		Providers:    acctest.TestAccProviders,
+		ProviderFactories: acctest.TestAccProviderFactories,
 		CheckDestroy: acctest.TestAccCheckRecordResourceDestroy("ultradns_record", ""),
 		Steps: []resource.TestStep{
 			{

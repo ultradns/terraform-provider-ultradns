@@ -18,7 +18,7 @@ func TestAccResourceCDNBYOD(t *testing.T) {
 
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheckCDN(t),
-		Providers:    acctest.NewTestAccProvidersCDN(),
+		ProviderFactories:    acctest.NewTestAccProvidersCDN(),
 		CheckDestroy: acctest.TestAccCheckCDNResourceDestroy("ultradns_cdn"),
 		Steps: []resource.TestStep{
 			{
@@ -77,7 +77,7 @@ func TestAccResourceCDNSynthetic(t *testing.T) {
 
 	testCase := resource.TestCase{
 		PreCheck:     acctest.TestPreCheckCDN(t),
-		Providers:    acctest.NewTestAccProvidersCDN(),
+		ProviderFactories:    acctest.NewTestAccProvidersCDN(),
 		CheckDestroy: acctest.TestAccCheckCDNResourceDestroy("ultradns_cdn"),
 		Steps: []resource.TestStep{
 			{
@@ -121,7 +121,7 @@ func TestAccResourceCDNInvalidClientCdnID(t *testing.T) {
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  acctest.TestPreCheckCDN(t),
-		Providers: acctest.NewTestAccProvidersCDN(),
+		ProviderFactories: acctest.NewTestAccProvidersCDN(),
 		Steps: []resource.TestStep{
 			{
 				Config:      acctest.TestAccResourceCDNWithClientCdnID("neg", fqdn, cdnresource.TypeBYOD, name, "invalid cdn id!"),
@@ -139,7 +139,7 @@ func TestAccResourceCDNInvalidType(t *testing.T) {
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  acctest.TestPreCheckCDN(t),
-		Providers: acctest.NewTestAccProvidersCDN(),
+		ProviderFactories: acctest.NewTestAccProvidersCDN(),
 		Steps: []resource.TestStep{
 			{
 				Config:      acctest.TestAccResourceCDN("neg", fqdn, "INVALID_TYPE", name, "type validation test"),

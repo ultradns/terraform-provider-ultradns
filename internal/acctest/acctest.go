@@ -46,8 +46,9 @@ var (
 )
 
 var (
-	TestAccProviders map[string]*schema.Provider
-	TestAccProvider  *schema.Provider
+	TestAccProviders        map[string]*schema.Provider
+	TestAccProviderFactories map[string]func() (*schema.Provider, error)
+	TestAccProvider         *schema.Provider
 )
 
 func init() {
@@ -56,14 +57,20 @@ func init() {
 	TestAccProviders = map[string]*schema.Provider{
 		"ultradns": TestAccProvider,
 	}
+	TestAccProviderFactories = map[string]func() (*schema.Provider, error){
+		"ultradns": func() (*schema.Provider, error) {
+			return TestAccProvider, nil
+		},
+	}
 }
 
-func NewTestAccProvidersCDN() map[string]*schema.Provider {
-	providerCDN := provider.Provider()
-	providerCDN.ConfigureContextFunc = getTestAccProviderConfigureContextFuncCDN
-
-	return map[string]*schema.Provider{
-		"ultradns": providerCDN,
+func NewTestAccProvidersCDN() map[string]func() (*schema.Provider, error) {
+	return map[string]func() (*schema.Provider, error){
+		"ultradns": func() (*schema.Provider, error) {
+			providerCDN := provider.Provider()
+			providerCDN.ConfigureContextFunc = getTestAccProviderConfigureContextFuncCDN
+			return providerCDN, nil
+		},
 	}
 }
 
