@@ -7,6 +7,7 @@ import (
 	"github.com/ultradns/ultradns-go-sdk/pkg/dirgroup/ip"
 	"github.com/ultradns/ultradns-go-sdk/pkg/probe"
 	"github.com/ultradns/ultradns-go-sdk/pkg/record"
+	"github.com/ultradns/ultradns-go-sdk/pkg/webforward"
 	"github.com/ultradns/ultradns-go-sdk/pkg/zone"
 )
 
@@ -17,6 +18,7 @@ type Service struct {
 	DirGroupGeoService *geo.Service
 	DirGroupIPService  *ip.Service
 	CDNResourceService *cdnresource.Service
+	WebForwardService  *webforward.Service
 }
 
 func NewService(c *client.Client) (*Service, error) {
@@ -45,6 +47,10 @@ func NewService(c *client.Client) (*Service, error) {
 	}
 
 	if service.CDNResourceService, err = cdnresource.Get(c); err != nil {
+		return nil, err
+	}
+
+	if service.WebForwardService, err = webforward.Get(c); err != nil {
 		return nil, err
 	}
 
